@@ -1,4 +1,4 @@
-package at.ac.tgm.beispielprojekt.controller;
+package at.ac.tgm.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
