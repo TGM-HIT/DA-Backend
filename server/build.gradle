@@ -12,3 +12,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-ldap'
     implementation 'com.unboundid:unboundid-ldapsdk'
 }
+
+bootJar {
+    enabled = true
+}
