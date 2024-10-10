@@ -5,14 +5,32 @@ Gemeinsames Spring Boot Backend für Diplomarbeitsprojekte
 
 Getestet mit:
 
-- SDK Eclipse Temurin (AdoptOpenJDK HotSpot) 21.0.4 und Amazon Corretto 17.0.12
+- SDK Eclipse Temurin (AdoptOpenJDK HotSpot) 21.0.4
 - Gradle 8.10.1
 
-## Enthaltene Spring Abhändigkeiten
+Für die Active Directory LDAP Anbindung muss auf der Root eine `.env` Datei angelegt werden, welche Folgendes enthält:
 
-- Spring Boot DevTools
-- Lombok
-- Spring Web
-- Spring Data JPA
-- H2 Database
-- Validation
+```
+AD_USER=insertTGMEmailAdressHere
+AD_PASSWORD=insertTGMPasswortHere
+```
+
+## Gradle Projektstruktur
+
+Die angedachte Struktur ist folgende:
+
+- Im **server** Modul wird 
+  - der Tomcat gestartet
+  - im SecurityConfig die Pfade konfiguriert, bei denen ein Login notwendig ist.
+  - alle enthalten Projekte (und core) im `implementation project(':beispielprojekt')` importiert
+- Das **beispiel** -Modul ist eine Vorlage für ein Modul, wo eine Diplomarbeit ihren spezifischen Code entwickeln soll.
+- **core**: Alle Module importieren dies und hier soll auch der von mehreren Projekten genutzte Code wie z.B. Active Directory LDAP Anbindung reinkommen
+
+## Beispiel-API-Endpoints
+
+### Active Directory LDAP Anbindung
+
+- [Eingeloggter User](http://localhost:8080/beispielprojekt)
+- [HIT-Schueler auflisten](http://localhost:8080/beispielprojekt/list/schueler)
+- [Lehrer auflisten](http://localhost:8080/beispielprojekt/list/lehrer)
+- [Person anhand des Nachnamen suchen](http://localhost:8080/beispielprojekt/find/Pointner)
