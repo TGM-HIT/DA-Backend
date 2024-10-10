@@ -5,6 +5,10 @@ plugins {
     id 'org.springframework.boot' version '3.3.4'
 }
 
+repositories {
+    mavenCentral()
+}
+
 subprojects {
     
     apply plugin: 'java'
