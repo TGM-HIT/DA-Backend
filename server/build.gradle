@@ -1,3 +1,10 @@
 dependencies {
-    implementation project(':beispielprojekt')
+    implementation project(':core')
+    implementation project(':beispiel')
+    
+    implementation("me.paulschwarz:spring-dotenv:4.0.0")
+    implementation("org.springframework.ldap:spring-ldap-core")
+    implementation("org.springframework.security:spring-security-ldap")
+    implementation("org.springframework.boot:spring-boot-starter-data-ldap")
+    implementation("com.unboundid:unboundid-ldapsdk")
 }
