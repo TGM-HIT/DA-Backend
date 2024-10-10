@@ -15,14 +15,19 @@ import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAu
 import javax.naming.Name;
 import java.io.IOException;
 import java.util.Collections;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableLdapRepositories
 public class AdLdapConfig {
+    @Value("${spring.ldap.urls}")
+    private String url;
+    @Value("${spring.ldap.domain}")
+    private String domain;
     
     @Bean
     ActiveDirectoryLdapAuthenticationProvider authenticationProvider() {
-        ActiveDirectoryLdapAuthenticationProvider authenticationProvider = new ActiveDirectoryLdapAuthenticationProvider("tgm.ac.at", "ldap://10.2.24.151/");
+        ActiveDirectoryLdapAuthenticationProvider authenticationProvider = new ActiveDirectoryLdapAuthenticationProvider(domain, url);
         authenticationProvider.setConvertSubErrorCodesToExceptions(true);
         authenticationProvider.setUseAuthenticationRequestCredentials(true);
         return authenticationProvider;
@@ -42,7 +47,7 @@ public class AdLdapConfig {
         return mapper;
     }
     
-    class NameJsonSerializer extends StdSerializer<Name> {
+    static class NameJsonSerializer extends StdSerializer<Name> {
         public NameJsonSerializer() {
             this(null);
         }
