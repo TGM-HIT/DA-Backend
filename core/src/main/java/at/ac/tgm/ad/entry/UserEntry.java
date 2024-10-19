@@ -11,7 +11,7 @@ import javax.naming.Name;
 import java.util.List;
 import java.util.Set;
 
-@Entry(base = EntryBase.LEHRER, objectClasses = {"user", "organizationalPerson", "person", "top"})
+@Entry(base = EntryBase.USER, objectClasses = {"user", "organizationalPerson", "person", "top"})
 @Getter
 @Setter
 @NoArgsConstructor
