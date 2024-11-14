@@ -1,5 +1,6 @@
 package at.ac.tgm.controller;
 
+import at.ac.tgm.Consts;
 import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.ad.util.EntryBase;
@@ -16,8 +17,8 @@ import javax.naming.Name;
 import java.util.List;
 
 @RestController
-@RequestMapping("/beispiel")
-public class HelloWorldController {
+@RequestMapping(Consts.BEISPIEL_PATH_PREFIX)
+public class ADLDAPDemoController {
     
     @Autowired
     private UserService userService;
