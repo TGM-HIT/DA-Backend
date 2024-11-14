@@ -16,7 +16,7 @@ import javax.naming.Name;
 import java.util.List;
 
 @RestController
-@RequestMapping("/beispielprojekt")
+@RequestMapping("/beispiel")
 public class HelloWorldController {
     
     @Autowired
