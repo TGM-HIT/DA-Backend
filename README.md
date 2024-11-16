@@ -15,6 +15,19 @@ AD_USER=insertTGMEmailAdressHere
 AD_PASSWORD=insertTGMPasswortHere
 ```
 
+Im Ordner `server/src/main/resources/certs/` RSA-Keys erstellen wie unter [JWT Private Key](https://bootify.io/spring-security/signing-jwts-with-private-key-spring-security.html) beschrieben:
+
+```cmd
+# create key pair
+openssl genrsa -out keypair.pem 2048
+
+# extract public key
+openssl rsa -in keypair.pem -pubout -out public.pem
+
+# extract private key
+openssl pkcs8 -in keypair.pem -topk8 -nocrypt -inform PEM -outform PEM -out private.pem
+```
+
 ## Gradle Projektstruktur
 
 Die angedachte Struktur ist folgende:

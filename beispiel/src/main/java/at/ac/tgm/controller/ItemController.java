@@ -1,19 +1,24 @@
 package at.ac.tgm.controller;
 
 import at.ac.tgm.Consts;
+import at.ac.tgm.UserRoles;
 import at.ac.tgm.dto.ItemDto;
 import at.ac.tgm.service.ItemService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping(Consts.BEISPIEL_PATH_PREFIX + "/item")
+@PreAuthorize("hasAuthority('" + UserRoles.LEHRER + "')")
+@SecurityRequirement(name = "bearer-jwt")
 public class ItemController {
     @Autowired
     private ItemService service;

@@ -45,6 +45,10 @@ public class UserService {
         return user;
     }
     
+    public Optional<UserEntry> findByUserPrincipalName(String userPrincipalName) {
+        return userRepository.findByUserPrincipalName(userPrincipalName);
+    }
+    
     public List<String> listUserCNs(String entryBase) {
         return ldapTemplate.list(entryBase);
     }

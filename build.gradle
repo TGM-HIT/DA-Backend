@@ -53,7 +53,7 @@ allprojects{
         annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
         implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
         
-        
+        implementation 'com.auth0:java-jwt:4.4.0'
         
     }
     

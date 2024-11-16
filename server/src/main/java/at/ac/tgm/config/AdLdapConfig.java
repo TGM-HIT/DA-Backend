@@ -1,21 +1,30 @@
-package at.ac.tgm;
+package at.ac.tgm.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.ldap.repository.config.EnableLdapRepositories;
+import org.springframework.ldap.core.DirContextAdapter;
+import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 
 import javax.naming.Name;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 
 @Configuration
 @EnableLdapRepositories
@@ -35,8 +44,20 @@ public class AdLdapConfig {
     
     @Bean
     public AuthenticationManager authenticationManager(ActiveDirectoryLdapAuthenticationProvider adProvider) {
-        return new ProviderManager(Collections.singletonList(adProvider));
+        ProviderManager providerManager = new ProviderManager(Collections.singletonList(adProvider));
+        return providerManager;
     }
+    
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
+        return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder
+                .featuresToDisable(
+                        DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                        DeserializationFeature.ACCEPT_FLOAT_AS_INT,
+                        SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
+                );
+    }
+    
     
     @Bean
     public ObjectMapper registerObjectMapper(){

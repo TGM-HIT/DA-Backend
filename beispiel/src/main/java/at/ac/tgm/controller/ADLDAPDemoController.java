@@ -1,11 +1,14 @@
 package at.ac.tgm.controller;
 
 import at.ac.tgm.Consts;
+import at.ac.tgm.UserRoles;
 import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.ad.util.EntryBase;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +21,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping(Consts.BEISPIEL_PATH_PREFIX)
+//@PreAuthorize("hasAnyAuthority('" + UserRoles.SCHUELER + "', '" + UserRoles.LEHRER + "')")
+//@SecurityRequirement(name = "bearer-jwt")
 public class ADLDAPDemoController {
     
     @Autowired

@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface UserRepository extends LdapRepository<UserEntry> {
     Optional<UserEntry> findByCn(String cn);
     Optional<UserEntry> findBySn(String sn);
+    Optional<UserEntry> findByUserPrincipalName(String userPrincipalName);
     
     /*
     BUG: findAll() nicht nutzen, da das base-Attribute in der @Entry Annotation nicht beachtet wird und damit immer alle Nutzer auflistet werden:
