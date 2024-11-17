@@ -12,7 +12,7 @@ public class AuthenticationRequest {
 
     @NotNull
     @Size(max = 255)
-    private String login;
+    private String username;
 
     @NotNull
     @Size(max = 255)

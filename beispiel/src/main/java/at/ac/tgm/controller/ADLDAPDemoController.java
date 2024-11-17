@@ -21,8 +21,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(Consts.BEISPIEL_PATH_PREFIX)
-//@PreAuthorize("hasAnyAuthority('" + UserRoles.SCHUELER + "', '" + UserRoles.LEHRER + "')")
-//@SecurityRequirement(name = "bearer-jwt")
 public class ADLDAPDemoController {
     
     @Autowired
@@ -30,10 +28,10 @@ public class ADLDAPDemoController {
     
     @GetMapping({"", "/"})
     public Authentication getAuthCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth;
+        return SecurityContextHolder.getContext().getAuthentication();
     }
     
+    @PreAuthorize("hasAnyAuthority('" + UserRoles.SCHUELER + "', '" + UserRoles.LEHRER + "')")
     @GetMapping("/list/lehrer")
     public List<String> listLehrer() {
         return userService.listUserCNs(EntryBase.LEHRER);
@@ -44,6 +42,7 @@ public class ADLDAPDemoController {
         return ResponseEntity.of(userService.findBySurname(surname, true));
     }
     
+    @PreAuthorize("hasAuthority('" + UserRoles.SCHUELER + "')")
     @GetMapping("/list/schueler")
     public List<Name> entities() {
         return userService.listUserDNs(EntryBase.SCHUELER_HIT);

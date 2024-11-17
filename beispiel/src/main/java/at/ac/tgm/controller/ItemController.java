@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping(Consts.BEISPIEL_PATH_PREFIX + "/item")
 @PreAuthorize("hasAuthority('" + UserRoles.LEHRER + "')")
-@SecurityRequirement(name = "bearer-jwt")
 public class ItemController {
     @Autowired
     private ItemService service;
