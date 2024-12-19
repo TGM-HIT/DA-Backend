@@ -1,4 +1,4 @@
-package at.ac.tgm;
+package at.ac.tgm.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +33,9 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost", "https://projekte.tgm.ac.at")
+                        .allowedMethods("*")
+                        .allowCredentials(true)
+                        .allowedOriginPatterns("http://localhost:[*]", "https://projekte.tgm.ac.at")
                         .exposedHeaders("Access-Control-Allow-Origin");
             }
         };

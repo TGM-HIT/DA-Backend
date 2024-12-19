@@ -1,6 +1,5 @@
 package at.ac.tgm.controller;
 
-import at.ac.tgm.Consts;
 import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.ad.util.EntryBase;
@@ -17,7 +16,7 @@ import javax.naming.Name;
 import java.util.List;
 
 @RestController
-@RequestMapping(Consts.BEISPIEL_PATH_PREFIX)
+@RequestMapping
 public class ADLDAPDemoController {
     
     @Autowired
