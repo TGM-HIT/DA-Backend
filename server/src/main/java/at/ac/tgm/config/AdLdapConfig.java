@@ -1,10 +1,11 @@
-package at.ac.tgm;
+package at.ac.tgm.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.ldap.repository.config.EnableLdapRepositories;
@@ -15,7 +16,6 @@ import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAu
 import javax.naming.Name;
 import java.io.IOException;
 import java.util.Collections;
-import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableLdapRepositories
@@ -39,7 +39,7 @@ public class AdLdapConfig {
     }
     
     @Bean
-    public ObjectMapper registerObjectMapper(){
+    public ObjectMapper registerObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule("MyNameSerializer");
         module.addSerializer(Name.class, new NameJsonSerializer());
