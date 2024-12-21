@@ -5,11 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -23,32 +23,42 @@ public class SecurityConfig {
         return new HttpSessionSecurityContextRepository();
     }
     
+    /*@Bean
+    public CookieCsrfTokenRepository cookieCsrfTokenRepository() {
+        return CookieCsrfTokenRepository.withHttpOnlyFalse();
+    }*/
+    
     @Bean
     public HttpSessionCsrfTokenRepository httpSessionCsrfTokenRepository() {
         return new HttpSessionCsrfTokenRepository();
+    }
+    
+    @Bean CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler() {
+        return new CsrfTokenRequestAttributeHandler();
     }
     
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             SecurityContextRepository securityContextRepository,
-            HttpSessionCsrfTokenRepository httpSessionCsrfTokenRepository
+            //CookieCsrfTokenRepository cookieCsrfTokenRepository,
+            HttpSessionCsrfTokenRepository httpSessionCsrfTokenRepository,
+            CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler
     ) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                /*.csrf((csrf) -> csrf
-                        .ignoringRequestMatchers("/auth/**")
-                        .csrfTokenRepository(new HttpSessionCsrfTokenRepository())
-                )*/
+        return http
+                .csrf((csrf) -> {
+                    csrf.csrfTokenRepository(httpSessionCsrfTokenRepository);
+                    //csrf.csrfTokenRepository(cookieCsrfTokenRepository);
+                    csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler);
+                })
                 .cors(Customizer.withDefaults())
                 .securityContext((context) -> context.securityContextRepository(securityContextRepository))
                 .sessionManagement((session) -> {
                     //session.maximumSessions(1).maxSessionsPreventsLogin(true);
                     session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
                     //session.sessionFixation().migrateSession();
-                });
-        
-        return http.build();
+                })
+                .build();
     }
     
     @Bean
@@ -57,10 +67,11 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
+                        .allowedHeaders("*")
                         .allowedMethods("*")
                         .allowCredentials(true)
                         .allowedOriginPatterns("http://localhost:[*]", "https://projekte.tgm.ac.at")
-                        .exposedHeaders("Access-Control-Allow-Origin");
+                        .exposedHeaders("Access-Control-Allow-Origin", "X-CSRF-TOKEN");
             }
         };
     }
