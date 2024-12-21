@@ -17,6 +17,7 @@ public class SwaggerConfig {
             operation.getResponses().addApiResponse("400", new ApiResponse().description("Parameter/RequestBody validation error"));
             operation.getResponses().addApiResponse("404", new ApiResponse().description("Not found"));
             operation.getResponses().addApiResponse("500", new ApiResponse().description("Any other error"));
+            operation.getResponses().addApiResponse("503", new ApiResponse().description("No connection with AD LDAP possible, likely not connected to the VPN."));
             return operation;
         };
     }

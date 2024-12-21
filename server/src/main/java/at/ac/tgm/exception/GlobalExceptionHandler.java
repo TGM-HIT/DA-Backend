@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ldap.CommunicationException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.authorization.ExpressionAuthorizationDecision;
 import org.springframework.validation.FieldError;
@@ -86,6 +87,13 @@ public class GlobalExceptionHandler {
             }
             return new ResponseEntity<>(body, headers, HttpStatus.FORBIDDEN);
         }
+    }
+    
+    @ExceptionHandler(CommunicationException.class)
+    public ResponseEntity<String> handler(CommunicationException e) {
+        String body = "Es konnte keine Verbindung zu AD LDAP hergestellt werden, wahrscheinlich sind Sie nicht mit dem VPN verbunden!";
+        System.err.println(body);
+        return new ResponseEntity<>(body, headers, HttpStatus.SERVICE_UNAVAILABLE);
     }
     
     @ExceptionHandler(Exception.class)
