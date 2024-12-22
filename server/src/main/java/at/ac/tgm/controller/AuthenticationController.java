@@ -70,8 +70,7 @@ public class AuthenticationController {
                                                    .orElseThrow(() -> new UsernameNotFoundException("Benutzer nicht gefunden"));
         
         Authentication authentication = null;
-        boolean simulateUser = false;
-        if (!simulateUser) {
+        if (loginRequest.getSimulate() == null || !loginRequest.getSimulate()) {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             user.getMail(),

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.CommunicationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.authorization.ExpressionAuthorizationDecision;
 import org.springframework.validation.FieldError;
@@ -87,6 +88,12 @@ public class GlobalExceptionHandler {
             }
             return new ResponseEntity<>(body, headers, HttpStatus.FORBIDDEN);
         }
+    }
+    
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handler(AccessDeniedException e) {
+        String body = e.getMessage();
+        return new ResponseEntity<>(body, headers, HttpStatus.FORBIDDEN);
     }
     
     @ExceptionHandler(CommunicationException.class)

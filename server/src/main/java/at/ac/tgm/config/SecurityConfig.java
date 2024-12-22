@@ -2,10 +2,10 @@ package at.ac.tgm.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -16,6 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
     
     @Bean
@@ -33,7 +34,8 @@ public class SecurityConfig {
         return new HttpSessionCsrfTokenRepository();
     }
     
-    @Bean CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler() {
+    @Bean
+    CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler() {
         return new CsrfTokenRequestAttributeHandler();
     }
     
@@ -51,13 +53,13 @@ public class SecurityConfig {
                     //csrf.csrfTokenRepository(cookieCsrfTokenRepository);
                     csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler);
                 })
-                .cors(Customizer.withDefaults())
                 .securityContext((context) -> context.securityContextRepository(securityContextRepository))
-                .sessionManagement((session) -> {
-                    //session.maximumSessions(1).maxSessionsPreventsLogin(true);
-                    session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
-                    //session.sessionFixation().migrateSession();
-                })
+                .authorizeHttpRequests((authorize) ->
+                        authorize
+                                .requestMatchers("/", "/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS).permitAll()
+                                .anyRequest().authenticated()
+                )
                 .build();
     }
     
