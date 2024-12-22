@@ -13,7 +13,7 @@ public class SwaggerConfig {
         // add error type to each operation
         return (operation, handlerMethod) -> {
             operation.getResponses().addApiResponse("401", new ApiResponse().description("Login required"));
-            operation.getResponses().addApiResponse("403", new ApiResponse().description("Not allowed for your role"));
+            operation.getResponses().addApiResponse("403", new ApiResponse().description("Not allowed for your role or X-CSRF-TOKEN not set"));
             operation.getResponses().addApiResponse("400", new ApiResponse().description("Parameter/RequestBody validation error"));
             operation.getResponses().addApiResponse("404", new ApiResponse().description("Not found"));
             operation.getResponses().addApiResponse("500", new ApiResponse().description("Any other error"));

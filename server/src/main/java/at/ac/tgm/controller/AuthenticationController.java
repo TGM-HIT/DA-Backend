@@ -63,7 +63,7 @@ public class AuthenticationController {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDto loginRequest, HttpSession session, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
         UserEntry user = (loginRequest.getUsername().contains("@")
                 ? userService.findByMail(loginRequest.getUsername())
                 : userService.findBysAMAccountName(loginRequest.getUsername()))
@@ -98,5 +98,12 @@ public class AuthenticationController {
         String userType = userEntry.getMail().contains("student") ? "student" : "teacher";
         
         return ResponseEntity.ok(Map.of("userType", userType));
+    }
+    
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        session.invalidate();
+        System.out.println("Session invalidated, User logged out successfully");
+        return ResponseEntity.ok("User logged out successfully");
     }
 }
