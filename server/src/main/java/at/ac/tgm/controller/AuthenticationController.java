@@ -7,6 +7,8 @@ import at.ac.tgm.dto.LoginRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
+    Logger logger = LoggerFactory.getLogger(this.getClass());
     
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -56,6 +59,8 @@ public class AuthenticationController {
         context.setAuthentication(authentication);
         securityContextRepository.saveContext(context, request, response);
         
+        logger.info("Login of " + user.getDisplayName());
+        
         return ResponseEntity.ok(authentication);
     }
     
@@ -65,9 +70,13 @@ public class AuthenticationController {
                 throw new IllegalArgumentException("Simulate just allowed with profile dev");
             }
             List<SimpleGrantedAuthority> authorities = user.getMemberOf().stream().map((memberOf) -> new SimpleGrantedAuthority(Util.getCnFromName(memberOf))).toList();
-            return new TestingAuthenticationToken(user.getMail(), null, grantedAuthoritiesMapper.mapAuthorities(authorities));
+            TestingAuthenticationToken authenticationToken = new TestingAuthenticationToken(user.getMail(), null, grantedAuthoritiesMapper.mapAuthorities(authorities));
+            authenticationToken.setDetails(user);
+            return authenticationToken;
         } else {
-            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getMail(), loginRequest.getPassword()));
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getMail(), loginRequest.getPassword());
+            authenticationToken.setDetails(user);
+            return authenticationManager.authenticate(authenticationToken);
         }
     }
     
