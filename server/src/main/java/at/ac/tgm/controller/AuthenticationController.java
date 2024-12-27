@@ -20,7 +20,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,30 +42,6 @@ public class AuthenticationController {
     
     @Autowired
     private UserService userService;
-    
-    /**
-     * This method is for getting the CSRF-Token in case of Cookie-Storage.
-     * <p>
-     * Usage:
-     * let csrf: string | null = null;
-     * <p>
-     * function csrfToken() {
-     * axios.get(domain + "/auth/csrf-token").then((response) => {
-     * csrf = response.data.token
-     * });
-     * }
-     * <p>
-     * axios.interceptors.request.use((request) => {
-     * if (!request.headers.has("X-CSRF-TOKEN")) {
-     * request.headers.set("X-CSRF-TOKEN", csrf)
-     * }
-     * return request;
-     * }
-     */
-    @GetMapping("/csrf-token")
-    public CsrfToken csrfToken(HttpServletRequest request) {
-        return (CsrfToken) request.getAttribute(CsrfToken.class.getName());
-    }
     
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {

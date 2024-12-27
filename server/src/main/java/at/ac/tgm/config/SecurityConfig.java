@@ -9,8 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -24,40 +24,40 @@ public class SecurityConfig {
         return new HttpSessionSecurityContextRepository();
     }
     
-    /*@Bean
-    public CookieCsrfTokenRepository cookieCsrfTokenRepository() {
-        return CookieCsrfTokenRepository.withHttpOnlyFalse();
-    }*/
-    
     @Bean
-    public HttpSessionCsrfTokenRepository httpSessionCsrfTokenRepository() {
-        return new HttpSessionCsrfTokenRepository();
+    public CookieCsrfTokenRepository cookieCsrfTokenRepository() {
+        CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        return cookieCsrfTokenRepository;
     }
     
     @Bean
-    CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler() {
+    public CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler() {
         return new CsrfTokenRequestAttributeHandler();
     }
     
+    /*
+    If you enable those defaults, CSRF-Token are automatically attached in the header:
+    axios.defaults.withCredentials = true
+    axios.defaults.withXSRFToken = true
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             SecurityContextRepository securityContextRepository,
-            //CookieCsrfTokenRepository cookieCsrfTokenRepository,
-            HttpSessionCsrfTokenRepository httpSessionCsrfTokenRepository,
+            CookieCsrfTokenRepository cookieCsrfTokenRepository,
             CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler
     ) throws Exception {
         return http
                 .csrf((csrf) -> {
-                    csrf.csrfTokenRepository(httpSessionCsrfTokenRepository);
-                    //csrf.csrfTokenRepository(cookieCsrfTokenRepository);
+                    csrf.csrfTokenRepository(cookieCsrfTokenRepository);
                     csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler);
+                    csrf.configure(http); // Wichtig, damit das neue Einstellungen übernommen werden
                 })
                 .securityContext((context) -> context.securityContextRepository(securityContextRepository))
                 .authorizeHttpRequests((authorize) ->
                         authorize
                                 .requestMatchers("/", "/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.OPTIONS).permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS).permitAll() // Für Preflight bei unterschiedlichen Ports
                                 .anyRequest().authenticated()
                 )
                 .build();
@@ -73,7 +73,7 @@ public class SecurityConfig {
                         .allowedMethods("*")
                         .allowCredentials(true)
                         .allowedOriginPatterns("http://localhost:[*]", "https://projekte.tgm.ac.at")
-                        .exposedHeaders("Access-Control-Allow-Origin", "X-CSRF-TOKEN");
+                        .exposedHeaders("Access-Control-Allow-Origin");
             }
         };
     }
