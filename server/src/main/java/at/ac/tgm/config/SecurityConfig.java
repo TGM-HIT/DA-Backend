@@ -56,7 +56,11 @@ public class SecurityConfig {
                 .securityContext((context) -> context.securityContextRepository(securityContextRepository))
                 .authorizeHttpRequests((authorize) ->
                         authorize
-                                .requestMatchers("/", "/auth/**").permitAll()
+                                .requestMatchers(
+                                        "/",
+                                        "/auth/**", // Login-Controller
+                                        "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/swagger-config" // OpenAPI Documentation
+                                ).permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS).permitAll() // Für Preflight bei unterschiedlichen Ports
                                 .anyRequest().authenticated()
                 )
