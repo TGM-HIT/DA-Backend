@@ -27,6 +27,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +35,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -57,7 +58,7 @@ public class AuthenticationController {
                                     {"username":"mpointner@tgm.ac.at", "password":"", "simulate":true}""")
                     }, schema = @Schema(implementation = LoginRequestDto.class), mediaType = MediaType.APPLICATION_JSON_VALUE)
             }))
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Authentication> authenticateUser(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
         UserEntry user = (loginRequest.getUsername().contains("@")
                 ? userService.findByMail(loginRequest.getUsername())
                 : userService.findBysAMAccountName(loginRequest.getUsername()))
@@ -90,10 +91,17 @@ public class AuthenticationController {
         }
     }
     
+    
+    @GetMapping("/csrf-token")
+    @Operation(summary = "The CSRF-Token is returned on any call as cookie but if you want to get it explicitly in the body, you can do so with this endpoint")
+    public CsrfToken csrfToken(HttpServletRequest request) {
+        return (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+    }
+    
     @GetMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
+    public ResponseEntity<String> logout(HttpSession session) {
         session.invalidate();
-        System.out.println("Session invalidated, User logged out successfully");
+        logger.info("Session invalidated, User logged out successfully");
         return ResponseEntity.ok("User logged out successfully");
     }
 }

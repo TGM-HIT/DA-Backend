@@ -4,7 +4,8 @@ import at.ac.tgm.ad.Roles;
 import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.ad.util.EntryBase;
-import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -19,15 +20,14 @@ import java.util.List;
 
 @RestController
 public class ADLDAPDemoController {
+    private static final Logger logger = LoggerFactory.getLogger(ADLDAPDemoController.class);
     
     @Autowired
     private UserService userService;
     
     @GetMapping({"", "/"})
-    public Authentication getAuthCurrentUser(HttpSession session) {
-        
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth;
+    public Authentication getAuthCurrentUser() {
+        return SecurityContextHolder.getContext().getAuthentication();
     }
     
     @Secured(Roles.LEHRER)
