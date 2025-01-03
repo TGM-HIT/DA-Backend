@@ -1,11 +1,14 @@
 package at.ac.tgm.config;
 
+import at.ac.tgm.exception.CustomAccessDeniedHandler;
+import at.ac.tgm.exception.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -54,6 +57,7 @@ public class SecurityConfig {
                     csrf.configure(http); // Wichtig, damit das neue Einstellungen übernommen werden
                 })
                 .securityContext((context) -> context.securityContextRepository(securityContextRepository))
+                .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize) ->
                         authorize
                                 .requestMatchers(
@@ -64,6 +68,10 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.OPTIONS).permitAll() // Für Preflight bei unterschiedlichen Ports
                                 .anyRequest().authenticated()
                 )
+                .exceptionHandling(exception -> {
+                    exception.accessDeniedHandler(new CustomAccessDeniedHandler());
+                    exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+                })
                 .build();
     }
     
