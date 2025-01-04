@@ -113,6 +113,7 @@ public class SecurityConfig {
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
                 response.setHeader("Access-Control-Allow-Headers", "*");
+                response.setContentType("text/plain");
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "You don't have the necessary role to access this resource");
             }
         };
@@ -130,7 +131,8 @@ public class SecurityConfig {
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
                 response.setHeader("Access-Control-Allow-Headers", "*");
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+                response.setContentType("text/plain");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "You must be logged-in to access this resource");
             }
         };
     }
