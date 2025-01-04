@@ -38,49 +38,49 @@ public class GlobalExceptionHandler {
             list.add(error.getField() + " " + error.getDefaultMessage());
         }
         String body = String.join("\n", list);
-        logger.info("MethodArgumentNotValidException", body);
+        logger.info("MethodArgumentNotValidException", e.getMessage());
         return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
     }
     
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handler(IllegalArgumentException e) {
+        logger.info("IllegalArgumentException", e.getMessage());
         String body = e.getMessage();
-        logger.info("IllegalArgumentException", body);
         return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
     }
     
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<String> handler(NoSuchElementException e) {
+        logger.info("NoSuchElementException", e.getMessage());
         String body = e.getMessage();
-        logger.info("NoSuchElementException", body);
         return new ResponseEntity<>(body, headers, HttpStatus.NOT_FOUND);
     }
     
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<String> handler(ResponseStatusException e) {
+        logger.info("ResponseStatusException", e.getMessage());
         String body = e.getReason() != null ? e.getReason() : e.getMessage();
-        logger.info("ResponseStatusException", body);
         return new ResponseEntity<>(body, headers, e.getStatusCode());
     }
     
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<String> handler(AccessDeniedException e) {
+        logger.info("AccessDeniedException", e.getMessage());
         String body = e.getMessage();
-        logger.info("AccessDeniedException", body);
         return new ResponseEntity<>(body, headers, HttpStatus.FORBIDDEN);
     }
     
     @ExceptionHandler(CommunicationException.class)
     public ResponseEntity<String> handler(CommunicationException e) {
+        logger.error("CommunicationException", e.getMessage());
         String body = "Es konnte keine Verbindung zu AD LDAP hergestellt werden, wahrscheinlich sind Sie nicht mit dem VPN verbunden!";
-        logger.error("CommunicationException", body);
         return new ResponseEntity<>(body, headers, HttpStatus.SERVICE_UNAVAILABLE);
     }
     
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handler(Exception e) {
+        logger.error("Exception", e.getMessage());
         String body = e.getMessage();
-        logger.error("Exception", body);
         return new ResponseEntity<>(body, headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
