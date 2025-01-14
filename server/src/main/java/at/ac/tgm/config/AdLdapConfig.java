@@ -36,7 +36,7 @@ public class AdLdapConfig {
         ActiveDirectoryLdapAuthenticationProvider authenticationProvider = new ActiveDirectoryLdapAuthenticationProvider(domain, url);
         authenticationProvider.setConvertSubErrorCodesToExceptions(true);
         authenticationProvider.setUseAuthenticationRequestCredentials(true);
-        //authenticationProvider.setSearchFilter("(&(objectClass=user)(sAMAccountName={1}))");
+        authenticationProvider.setSearchFilter("(&(objectClass=user)(sAMAccountName={1}))");
         authenticationProvider.setAuthoritiesMapper(grantedAuthoritiesMapper);
         return authenticationProvider;
     }
@@ -46,10 +46,10 @@ public class AdLdapConfig {
         return authorities -> {
             Set<GrantedAuthority> mappedAuthorities = new HashSet<>(authorities);
             if (mappedAuthorities.stream().anyMatch((authority) -> authority.getAuthority().contains("lehrer"))) {
-                mappedAuthorities.add(new SimpleGrantedAuthority(Roles.LEHRER));
+                mappedAuthorities.add(new SimpleGrantedAuthority(Roles.TEACHER));
             }
             if (mappedAuthorities.stream().anyMatch((authority) -> authority.getAuthority().contains("schueler"))) {
-                mappedAuthorities.add(new SimpleGrantedAuthority(Roles.SCHUELER));
+                mappedAuthorities.add(new SimpleGrantedAuthority(Roles.STUDENT));
             }
             return mappedAuthorities;
         };

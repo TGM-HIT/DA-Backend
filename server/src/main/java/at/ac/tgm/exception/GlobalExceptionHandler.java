@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.CommunicationException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -75,6 +76,13 @@ public class GlobalExceptionHandler {
         logger.error("CommunicationException", e.getMessage());
         String body = "Es konnte keine Verbindung zu AD LDAP hergestellt werden, wahrscheinlich sind Sie nicht mit dem VPN verbunden!";
         return new ResponseEntity<>(body, headers, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+    
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> handler(BadCredentialsException e) {
+        logger.info("BadCredentialsException", e.getMessage());
+        String body = "Ungültiger Benutzername oder Password!";
+        return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
     }
     
     @ExceptionHandler(Exception.class)

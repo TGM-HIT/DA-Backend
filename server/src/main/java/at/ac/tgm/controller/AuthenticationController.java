@@ -3,11 +3,8 @@ package at.ac.tgm.controller;
 import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.ad.util.Util;
+import at.ac.tgm.api.AuthenticationApi;
 import at.ac.tgm.dto.LoginRequestDto;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -15,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -28,13 +24,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/auth")
-public class AuthenticationController {
+public class AuthenticationController implements AuthenticationApi {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     
     @Autowired
@@ -52,13 +47,8 @@ public class AuthenticationController {
     @Autowired
     private UserService userService;
     
-    @PostMapping("/login")
-    @Operation(requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = {
-                    @Content(examples = {@ExampleObject(name = "Simulate Teacher Login", value = """
-                                    {"username":"mpointner@tgm.ac.at", "password":"", "simulate":true}""")
-                    }, schema = @Schema(implementation = LoginRequestDto.class), mediaType = MediaType.APPLICATION_JSON_VALUE)
-            }))
-    public ResponseEntity<Authentication> authenticateUser(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    @Override
+    public ResponseEntity<Authentication> authenticateUser(LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
         UserEntry user = (loginRequest.getUsername().contains("@")
                 ? userService.findByMail(loginRequest.getUsername())
                 : userService.findBysAMAccountName(loginRequest.getUsername()))
@@ -81,24 +71,22 @@ public class AuthenticationController {
                 throw new IllegalArgumentException("Simulate just allowed with profile dev");
             }
             List<SimpleGrantedAuthority> authorities = user.getMemberOf().stream().map((memberOf) -> new SimpleGrantedAuthority(Util.getCnFromName(memberOf))).toList();
-            TestingAuthenticationToken authenticationToken = new TestingAuthenticationToken(user.getMail(), null, grantedAuthoritiesMapper.mapAuthorities(authorities));
+            TestingAuthenticationToken authenticationToken = new TestingAuthenticationToken(user.getSAMAccountName(), null, grantedAuthoritiesMapper.mapAuthorities(authorities));
             authenticationToken.setDetails(user);
             return authenticationToken;
         } else {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getMail(), loginRequest.getPassword());
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getSAMAccountName(), loginRequest.getPassword());
             authenticationToken.setDetails(user);
             return authenticationManager.authenticate(authenticationToken);
         }
     }
     
-    
-    @GetMapping("/csrf-token")
-    @Operation(summary = "The CSRF-Token is returned on any call as cookie but if you want to get it explicitly in the body, you can do so with this endpoint")
+    @Override
     public CsrfToken csrfToken(HttpServletRequest request) {
         return (CsrfToken) request.getAttribute(CsrfToken.class.getName());
     }
     
-    @GetMapping("/logout")
+    @Override
     public ResponseEntity<String> logout(HttpSession session) {
         session.invalidate();
         logger.info("Session invalidated, User logged out successfully");
