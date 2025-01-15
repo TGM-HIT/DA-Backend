@@ -19,6 +19,8 @@ import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAu
 
 import javax.naming.Name;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,8 +65,9 @@ public class AdLdapConfig {
     @Bean
     public ObjectMapper registerObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule("MyNameSerializer");
+        SimpleModule module = new SimpleModule("MyObjectSerializer");
         module.addSerializer(Name.class, new NameJsonSerializer());
+        module.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
         mapper.registerModule(module);
         return mapper;
     }
@@ -81,6 +84,21 @@ public class AdLdapConfig {
         @Override
         public void serialize(Name value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
             jgen.writeString(value.toString());
+        }
+    }
+    
+    static class LocalDateTimeJsonSerializer extends StdSerializer<LocalDateTime> {
+        public LocalDateTimeJsonSerializer() {
+            this(null);
+        }
+        
+        public LocalDateTimeJsonSerializer(Class<LocalDateTime> t) {
+            super(t);
+        }
+        
+        @Override
+        public void serialize(LocalDateTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+            jgen.writeString(value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         }
     }
 }
