@@ -2,4 +2,4 @@ rootProject.name = 'DA-Backend'
 
 include 'server'
 include 'core'
-include 'beispiel'
+include 'eis'

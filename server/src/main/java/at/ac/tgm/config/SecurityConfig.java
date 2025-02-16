@@ -1,5 +1,4 @@
 package at.ac.tgm.config;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,24 +28,25 @@ import java.io.IOException;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
-public class SecurityConfig {
-    
+public class
+SecurityConfig {
+
     @Bean
     public SecurityContextRepository securityContextRepository() {
         return new HttpSessionSecurityContextRepository();
     }
-    
+
     @Bean
     public CookieCsrfTokenRepository cookieCsrfTokenRepository() {
         CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         return cookieCsrfTokenRepository;
     }
-    
+
     @Bean
     public CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler() {
         return new CsrfTokenRequestAttributeHandler();
     }
-    
+
     /*
     If you enable those defaults, CSRF-Token are automatically attached in the header:
     axios.defaults.withCredentials = true
@@ -63,6 +63,7 @@ public class SecurityConfig {
     ) throws Exception {
         return http
                 .csrf((csrf) -> {
+                    csrf.ignoringRequestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/auth/login");
                     csrf.csrfTokenRepository(cookieCsrfTokenRepository);
                     csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler);
                     csrf.configure(http); // Wichtig, damit das neue Einstellungen übernommen werden
@@ -85,7 +86,7 @@ public class SecurityConfig {
                 })
                 .build();
     }
-    
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
@@ -95,17 +96,17 @@ public class SecurityConfig {
                         .allowedHeaders("*")
                         .allowedMethods("*")
                         .allowCredentials(true)
-                        .allowedOriginPatterns("http://localhost:[*]", "https://projekte.tgm.ac.at")
+                        .allowedOriginPatterns("http://localhost:5173", "https://projekte.tgm.ac.at", "http://10.110.0.58:5173")
                         .exposedHeaders("Access-Control-Allow-Origin");
             }
         };
     }
-    
+
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return new AccessDeniedHandler() {
             private static final Logger logger = LoggerFactory.getLogger(AccessDeniedHandler.class);
-            
+
             @Override
             public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
                 logger.info("CustomAccessDeniedHandler", accessDeniedException.getMessage());
@@ -118,15 +119,15 @@ public class SecurityConfig {
             }
         };
     }
-    
+
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return new AuthenticationEntryPoint() {
             private static final Logger logger = LoggerFactory.getLogger(AuthenticationEntryPoint.class);
-            
+
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-                logger.info("CustomAuthenticationEntryPoint", authException.getMessage());
+                logger.info("CustomAuthenticationEntryPoint" + authException.getMessage(), authException.getMessage());
                 // Both header are important, else Axios Network error
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -136,5 +137,5 @@ public class SecurityConfig {
             }
         };
     }
-    
+
 }

@@ -21,16 +21,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface AuthenticationApi {
     @PostMapping("/login")
     @Operation(requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = {
-            @Content(examples = {@ExampleObject(name = "Simulate Teacher Login", value = """
-                                    {"username":"mpointner", "password":"", "simulate":true}""")
+            @Content(examples = {@ExampleObject(name = "Simulate Student Login", value = """
+                                    {"username":"nribinin", "password":"", "simulate":true}""")
             }, schema = @Schema(implementation = LoginRequestDto.class), mediaType = MediaType.APPLICATION_JSON_VALUE)
     }))
-    ResponseEntity<Authentication> authenticateUser(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response);
-    
+    ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response, HttpSession session);
+
     @GetMapping("/csrf-token")
     @Operation(summary = "The CSRF-Token is returned on any call as cookie but if you want to get it explicitly in the body, you can do so with this endpoint")
     CsrfToken csrfToken(HttpServletRequest request);
-    
-    @GetMapping("/logout")
+
+    @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session);
-}
+
+    @GetMapping({"", "/"})
+    public Authentication getAuthCurrentUser();
+    }

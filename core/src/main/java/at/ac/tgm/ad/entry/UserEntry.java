@@ -31,7 +31,7 @@ public class UserEntry {
     private @Attribute(name = "displayName") String displayName;
     private @Attribute(name = "distinguishedName") String distinguishedName;
     private @Attribute(name = "dSCorePropagationData") List<String> dSCorePropagationData;
-    private @Attribute(name = "employeeNumber") String employeeNumber;
+    private @Attribute(name = "employeeID") String employeeID;
     private @Attribute(name = "employeeType") String employeeType;
     private @Attribute(name = "extensionAttribute2") String extensionAttribute2;
     private @Attribute(name = "extensionAttribute4") String extensionAttribute4;

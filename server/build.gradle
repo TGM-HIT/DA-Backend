@@ -4,13 +4,15 @@ plugins {
 
 dependencies {
     implementation project(':core')
-    implementation project(':beispiel')
+    implementation project(':eis')
     
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
     implementation 'org.springframework.ldap:spring-ldap-core'
     implementation 'org.springframework.security:spring-security-ldap'
     implementation 'org.springframework.boot:spring-boot-starter-data-ldap'
     implementation 'com.unboundid:unboundid-ldapsdk'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.0.5'
+
 }
 
 bootJar.enabled = true
