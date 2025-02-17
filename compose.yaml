@@ -1,0 +1,14 @@
+services:
+  application:
+    container_name: DA-Backend
+    build:
+      dockerfile: ./Dockerfile
+    image: mpointner/da-backend:latest
+    ports:
+      - "8080:8080"
+  database:
+    container_name: DA-MariaDB
+    image: mariadb:latest
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}

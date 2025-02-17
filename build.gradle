@@ -58,6 +58,6 @@ allprojects{
         useJUnitPlatform()
     }
     
-    bootJar.enabled =  false
+    bootJar.enabled = true
     bootWar.enabled = false
 }
