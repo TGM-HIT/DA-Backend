@@ -16,9 +16,9 @@ public class Student {
     private Long id;
     private String vorname;
     private String nachname;
-    private String schuelerkennzahl; // spalte 5
+    private String studentKennzahl; // spalte 5
 
     @ManyToOne // Add cascade here
-    private Classroom classroom;
+    private Hitclass hitclass;
 }
 

@@ -22,9 +22,9 @@ public class Lesson {
     @ManyToOne() // Add cascade here
     private Subject subject;
 
-    // Referenz auf Classroom
+    // Referenz auf Hitclass
     @ManyToOne() // Add cascade here
-    private Classroom classroom;
+    private Hitclass hitclass;
 
     // Ein Unterricht kann mehrere Lehrer haben
     // und umgekehrt kann ein Lehrer mehrere Unterrichtseinheiten abdecken

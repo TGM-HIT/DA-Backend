@@ -2,7 +2,7 @@ package at.ac.tgm.controller;
 
 import at.ac.tgm.dto.*;
 import at.ac.tgm.ad.Roles;
-import at.ac.tgm.model.Classroom;
+import at.ac.tgm.model.Hitclass;
 import at.ac.tgm.model.Lesson;
 import at.ac.tgm.model.Student;
 import at.ac.tgm.model.Teacher;
@@ -27,16 +27,16 @@ public class AdminRestController {
 
     private final ImportService importService;
     private final DatabaseService databaseService;
-    private final ClassroomRepository classroomRepository;
+    private final HitclassRepository hitclassRepository;
     private final TeacherRepository teacherRepository;
     private final LessonRepository lessonRepository;
     private final StudentRepository studentRepository;
     private final AmpelRepository ampelRepository;
 
-    public AdminRestController(ImportService importService, DatabaseService databaseService, ClassroomRepository classroomRepository, TeacherRepository teacherRepository, LessonRepository lessonRepository, StudentRepository studentRepository, AmpelRepository ampelRepository) {
+    public AdminRestController(ImportService importService, DatabaseService databaseService, HitclassRepository hitclassRepository, TeacherRepository teacherRepository, LessonRepository lessonRepository, StudentRepository studentRepository, AmpelRepository ampelRepository) {
         this.importService = importService;
         this.databaseService = databaseService;
-        this.classroomRepository = classroomRepository;
+        this.hitclassRepository = hitclassRepository;
         this.teacherRepository = teacherRepository;
         this.lessonRepository = lessonRepository;
         this.studentRepository = studentRepository;
@@ -72,9 +72,9 @@ public class AdminRestController {
     }
     @Secured(Roles.SCHUELER)
     @PutMapping("/setKlassenvorstand")
-    public ResponseEntity<?> setKlassenvorstand(@RequestParam Long classroomId, @RequestParam Long teacherId) {
-        Optional<Classroom> classroomOpt = classroomRepository.findById(classroomId);
-        if (classroomOpt.isEmpty()) {
+    public ResponseEntity<?> setKlassenvorstand(@RequestParam Long hitclassId, @RequestParam Long teacherId) {
+        Optional<Hitclass> hitclassOpt = hitclassRepository.findById(hitclassId);
+        if (hitclassOpt.isEmpty()) {
             return ResponseEntity.status(404).body("Klasse nicht gefunden.");
         }
 
@@ -83,23 +83,23 @@ public class AdminRestController {
             return ResponseEntity.status(404).body("Lehrer nicht gefunden.");
         }
 
-        Classroom classroom = classroomOpt.get();
+        Hitclass hitclass = hitclassOpt.get();
         Teacher teacher = teacherOpt.get();
 
-        classroom.setKlassenvorstand(teacher);
-        classroomRepository.save(classroom);
+        hitclass.setKlassenvorstand(teacher);
+        hitclassRepository.save(hitclass);
 
         return ResponseEntity.ok("Klassenvorstand wurde gesetzt!");
     }
 
     @Secured(Roles.SCHUELER)
-    @GetMapping("/classrooms/with-teachers")
-    public ResponseEntity<?> getClassroomsWithTeachers() {
-        List<Classroom> classrooms = classroomRepository.findAll();
+    @GetMapping("/hitclasses/with-teachers")
+    public ResponseEntity<?> getHitclassWithTeachers() {
+        List<Hitclass> hitclasses = hitclassRepository.findAll();
 
-        List<ClassroomWithTeacherDto> dtoList = classrooms.stream().map(classroom -> {
+        List<HitclassWithTeacherDto> dtoList = hitclasses.stream().map(hitclass -> {
             // Alle Lektionen der Klasse abrufen
-            List<Lesson> lessons = lessonRepository.findByClassroomId(classroom.getId());
+            List<Lesson> lessons = lessonRepository.findByHitclassId(hitclass.getId());
 
             // Einzigartige Lehrer aus den Lektionen extrahieren
             List<TeacherDto> teacherDtos = lessons.stream()
@@ -109,13 +109,13 @@ public class AdminRestController {
                     .collect(Collectors.toList());
 
             // Klassenvorstand Name abrufen
-            String klassenvorstandName = (classroom.getKlassenvorstand() != null)
-                    ? classroom.getKlassenvorstand().getName()
+            String klassenvorstandName = (hitclass.getKlassenvorstand() != null)
+                    ? hitclass.getKlassenvorstand().getName()
                     : null;
 
-            return new ClassroomWithTeacherDto(
-                    classroom.getId(),
-                    classroom.getName(),
+            return new HitclassWithTeacherDto(
+                    hitclass.getId(),
+                    hitclass.getName(),
                     klassenvorstandName,
                     teacherDtos
             );
@@ -128,28 +128,28 @@ public class AdminRestController {
     @PostMapping("/newStudent")
     public ResponseEntity<?> createStudent(@RequestBody CreateStudentDto dto) {
         // 1) Prüfen, ob diese Kennzahl schon existiert
-        boolean alreadyExists = studentRepository.existsBySchuelerkennzahl(dto.getSchuelerkennzahl());
+        boolean alreadyExists = studentRepository.existsByStudentKennzahl(dto.getStudentKennzahl());
         if (alreadyExists) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
-                    .body("Es existiert bereits ein Schüler mit der Kennzahl: " + dto.getSchuelerkennzahl());
+                    .body("Es existiert bereits ein Schüler mit der Kennzahl: " + dto.getStudentKennzahl());
         }
 
-        // 2) Classroom-ID aus dem DTO holen und Classroom suchen
-        Optional<Classroom> classroomOpt = classroomRepository.findById(dto.getClassroomId());
-        if (classroomOpt.isEmpty()) {
+        // 2) Hitclass-ID aus dem DTO holen und Hitclass suchen
+        Optional<Hitclass> hitclassOpt = hitclassRepository.findById(dto.getHitclassId());
+        if (hitclassOpt.isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Classroom not found with id=" + dto.getClassroomId());
+                    .body("Hitclass not found with id=" + dto.getHitclassId());
         }
-        Classroom classroom = classroomOpt.get();
+        Hitclass hitclass = hitclassOpt.get();
 
         // 3) Neuen Student anlegen
         Student student = Student.builder()
                 .vorname(dto.getVorname())
                 .nachname(dto.getNachname())
-                .schuelerkennzahl(dto.getSchuelerkennzahl())
-                .classroom(classroom)
+                .studentKennzahl(dto.getStudentKennzahl())
+                .hitclass(hitclass)
                 .build();
 
         // 4) Speichern
@@ -160,11 +160,11 @@ public class AdminRestController {
     }
 
     @Secured(Roles.SCHUELER)
-    @GetMapping("/classrooms")
-    public ResponseEntity<?> getAllClassrooms() {
-        List<Classroom> classrooms = classroomRepository.findAll();
+    @GetMapping("/hitclasses")
+    public ResponseEntity<?> getAllHitclasses() {
+        List<Hitclass> hitclasses = hitclassRepository.findAll();
         // Reduziere auf ID + Name
-        List<Map<String, Object>> result = classrooms.stream().map(c -> {
+        List<Map<String, Object>> result = hitclasses.stream().map(c -> {
             Map<String, Object> item = new HashMap<>();
             item.put("id", c.getId());
             item.put("name", c.getName());
@@ -192,7 +192,7 @@ public class AdminRestController {
     public ResponseEntity<?> getKVStudents() {
         List<Student> students = studentRepository.findAll();
         List<StudentDto> dtos = students.stream()
-                .map(t -> new StudentDto(t.getVorname(), t.getNachname(), t.getSchuelerkennzahl(), t.getClassroom().getName(), t.getId()))
+                .map(t -> new StudentDto(t.getVorname(), t.getNachname(), t.getStudentKennzahl(), t.getHitclass().getName(), t.getId()))
                 .toList();
         return ResponseEntity.ok(dtos);
     }
@@ -202,16 +202,16 @@ public class AdminRestController {
     public ResponseEntity<?> getAllLessons() {
         List<Lesson> lessons = lessonRepository.findAll();
         List<LessonsDto> dtos = lessons.stream()
-                .map(t -> new LessonsDto(t.getId(), t.getSubject().getLangbezeichnung(),t.getClassroom().getName()))
+                .map(t -> new LessonsDto(t.getId(), t.getSubject().getLangbezeichnung(),t.getHitclass().getName()))
                 .toList();
         return ResponseEntity.ok(dtos);
     }
 
     @Secured(Roles.SCHUELER)
-    @DeleteMapping("/deleteStudent/{schuelerkennzahl}")
+    @DeleteMapping("/deleteStudent/{studentKennzahl}")
     @Transactional
-    public ResponseEntity<?> deleteStudent(@PathVariable String schuelerkennzahl) {
-        studentRepository.deleteBySchuelerkennzahl(schuelerkennzahl);
+    public ResponseEntity<?> deleteStudent(@PathVariable String studentKennzahl) {
+        studentRepository.deleteByStudentKennzahl(studentKennzahl);
         return ResponseEntity.noContent().build();
     }
 
@@ -278,11 +278,11 @@ public class AdminRestController {
         // 2) Felder aktualisieren
         student.setVorname(dto.getVorname());
         student.setNachname(dto.getNachname());
-        student.setSchuelerkennzahl(dto.getSchuelerkennzahl());
+        student.setStudentKennzahl(dto.getStudentKennzahl());
         // 3) Klasse
-        Classroom classroom = classroomRepository.findById(dto.getClassroomId())
-                .orElseThrow(() -> new RuntimeException("Classroom not found"));
-        student.setClassroom(classroom);
+        Hitclass hitclass = hitclassRepository.findById(dto.getHitclassId())
+                .orElseThrow(() -> new RuntimeException("Hitclass not found"));
+        student.setHitclass(hitclass);
         // 4) Speichern
         studentRepository.save(student);
 

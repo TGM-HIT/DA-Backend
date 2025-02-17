@@ -8,10 +8,10 @@ import lombok.Setter;
 public class LessonsDto {
     private Long id;
     private String subjectName;
-    private String classRoomName;
-    public LessonsDto(Long id, String subjectName, String classRoomName) {
+    private String hitclassName;
+    public LessonsDto(Long id, String subjectName, String hitclassName) {
         this.id = id;
         this.subjectName = subjectName;
-        this.classRoomName = classRoomName;
+        this.hitclassName = hitclassName;
     }
 }

@@ -17,7 +17,7 @@ public class DatabaseService {
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
     private final SubjectRepository subjectRepository;
-    private final ClassroomRepository classroomRepository;
+    private final HitclassRepository hitclassRepository;
     // Füge weitere Repositories hinzu, falls notwendig
 
     @Autowired
@@ -27,7 +27,7 @@ public class DatabaseService {
             StudentRepository studentRepository,
             TeacherRepository teacherRepository,
             SubjectRepository subjectRepository,
-            ClassroomRepository classroomRepository
+            HitclassRepository hitclassRepository
             // Initialisiere weitere Repositories
     ) {
         this.ampelRepository = ampelRepository;
@@ -35,7 +35,7 @@ public class DatabaseService {
         this.studentRepository = studentRepository;
         this.teacherRepository = teacherRepository;
         this.subjectRepository = subjectRepository;
-        this.classroomRepository = classroomRepository;
+        this.hitclassRepository = hitclassRepository;
         // Initialisiere weitere Repositories
     }
 
@@ -69,7 +69,7 @@ public class DatabaseService {
             logger.info("Alle Fach-Daten gelöscht.");
 
             // 6. Klasse löschen
-            classroomRepository.deleteAll();
+            hitclassRepository.deleteAll();
             logger.info("Alle Klassen-Daten gelöscht.");
 
             // Füge hier weitere Entitäten entsprechend hinzu

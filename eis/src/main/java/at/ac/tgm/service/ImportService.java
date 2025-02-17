@@ -15,7 +15,7 @@ import java.util.*;
 public class ImportService {
 
     private final TeacherRepository teacherRepository;
-    private final ClassroomRepository classroomRepository;
+    private final HitclassRepository hitclassRepository;
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
     private final LessonRepository lessonRepository;
@@ -30,12 +30,12 @@ public class ImportService {
     );
 
     public ImportService(TeacherRepository teacherRepository,
-                         ClassroomRepository classroomRepository,
+                         HitclassRepository hitclassRepository,
                          StudentRepository studentRepository,
                          SubjectRepository subjectRepository,
                          LessonRepository lessonRepository) {
         this.teacherRepository = teacherRepository;
-        this.classroomRepository = classroomRepository;
+        this.hitclassRepository = hitclassRepository;
         this.studentRepository = studentRepository;
         this.subjectRepository = subjectRepository;
         this.lessonRepository = lessonRepository;
@@ -70,7 +70,7 @@ public class ImportService {
 
         // Spalten (Index von 0 an gezählt)
         String klasse = cols[1].trim();
-        String schuelerkennzahl = cols[4].trim();
+        String studentKennzahl = cols[4].trim();
         String nachname = cols[5].trim();
         String vorname = cols[6].trim();
         String gegenstandsart = cols[11].trim();
@@ -83,21 +83,21 @@ public class ImportService {
             return;
         }
 
-        // 1) Classroom holen/erzeugen
-        Classroom classroom = classroomRepository.findByName(klasse)
+        // 1) Hitclass holen/erzeugen
+        Hitclass hitclass = hitclassRepository.findByName(klasse)
                 .orElseGet(() -> {
-                    Classroom newClassroom = Classroom.builder().name(klasse).build();
-                    return classroomRepository.save(newClassroom);
+                    Hitclass newHitclass = Hitclass.builder().name(klasse).build();
+                    return hitclassRepository.save(newHitclass);
                 });
 
         // 2) Student holen oder anlegen
-        Student student = studentRepository.findBySchuelerkennzahl(schuelerkennzahl)
+        Student student = studentRepository.findByStudentKennzahl(studentKennzahl)
                 .orElseGet(() -> {
                     Student newStudent = Student.builder()
                             .vorname(vorname)
                             .nachname(nachname)
-                            .schuelerkennzahl(schuelerkennzahl)
-                            .classroom(classroom)
+                            .studentKennzahl(studentKennzahl)
+                            .hitclass(hitclass)
                             .build();
                     return studentRepository.save(newStudent);
                 });
@@ -114,11 +114,11 @@ public class ImportService {
                 });
 
         // 4) Lesson holen oder anlegen
-        Lesson lesson = lessonRepository.findBySubjectIdAndClassroomId(subject.getId(), classroom.getId())
+        Lesson lesson = lessonRepository.findBySubjectIdAndHitclassId(subject.getId(), hitclass.getId())
                 .orElseGet(() -> {
                     Lesson newLesson = Lesson.builder()
                             .subject(subject)
-                            .classroom(classroom)
+                            .hitclass(hitclass)
                             .build();
                     return lessonRepository.save(newLesson);
                 });
@@ -152,15 +152,15 @@ public class ImportService {
                 teachers.add(teacher);
 
                 // Klassenvorstand bei "Allgemeines"
-                if (gegenstandsart.equalsIgnoreCase("Allgemeines") && classroom.getKlassenvorstand() == null) {
-                    classroom.setKlassenvorstand(teacher);
+                if (gegenstandsart.equalsIgnoreCase("Allgemeines") && hitclass.getKlassenvorstand() == null) {
+                    hitclass.setKlassenvorstand(teacher);
                 }
             }
         }
 
 
         // Keine else-Klausel mehr, um Klassenvorstand nicht auf null zu setzen
-        classroomRepository.save(classroom);
+        hitclassRepository.save(hitclass);
 
         // 6) Lehrer zu Lesson hinzufügen
         if (lesson.getTeachers() == null) {

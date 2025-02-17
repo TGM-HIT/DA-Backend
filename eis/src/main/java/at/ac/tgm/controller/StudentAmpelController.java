@@ -51,22 +51,22 @@ public class StudentAmpelController {
         String employeeID = userEntry.getEmployeeID();
 
         // 3) Student in DB suchen
-        Optional<Student> studentOptional = studentRepository.findBySchuelerkennzahl(employeeID);
+        Optional<Student> studentOptional = studentRepository.findByStudentKennzahl(employeeID);
         if (studentOptional.isEmpty()) {
             // Student nicht gefunden → 404 zurückgeben
             return ResponseEntity.status(404).body(new ErrorResponseDto("User not found in local Database", 404));
         }
         Student student = studentOptional.get();
         // 4) Ampeln abfragen
-        List<Ampel> ampelList = ampelRepository.findByStudentSchuelerkennzahl(employeeID);
+        List<Ampel> ampelList = ampelRepository.findByStudentStudentKennzahl(employeeID);
 
         // 5) Mapping in Dtos
         List<AmpelDto> dtoList = ampelList.stream().map(ampel -> {
             Subject subject = ampel.getLesson().getSubject();
             Teacher teacher = ampel.getTeacher();
             Lesson lesson = ampel.getLesson();
-            Classroom classroom = lesson.getClassroom();
-            String classroomName = (classroom != null) ? classroom.getName() : null;
+            Hitclass hitclass = lesson.getHitclass();
+            String hitclassName = (hitclass != null) ? hitclass.getName() : null;
 
             return AmpelDto.builder()
                     .ampelId(ampel.getId())
@@ -80,7 +80,7 @@ public class StudentAmpelController {
                     .farbe((ampel.getFarbe() != null) ? ampel.getFarbe().name() : null)
                     .bemerkung(ampel.getBemerkung())
                     .updatedAt(ampel.getUpdatedAt())
-                    .classroomName(classroomName)
+                    .hitclassName(hitclassName)
                     .lessonId(lesson.getId())
                     .build();
         }).toList();

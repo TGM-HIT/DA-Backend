@@ -8,8 +8,8 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Student, Long> {
     // ggf. eigene Query-Methoden
 
-    // z.B. damit wir nach schuelerkennzahl suchen können
-    Optional<Student> findBySchuelerkennzahl(String schuelerkennzahl);
-    void deleteBySchuelerkennzahl(String schuelerkennzahl);
-    boolean existsBySchuelerkennzahl(String schuelerkennzahl);
+    // z.B. damit wir nach studentKennzahl suchen können
+    Optional<Student> findByStudentKennzahl(String studentKennzahl);
+    void deleteByStudentKennzahl(String studentKennzahl);
+    boolean existsByStudentKennzahl(String studentKennzahl);
 }

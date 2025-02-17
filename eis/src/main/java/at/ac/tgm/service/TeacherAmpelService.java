@@ -96,7 +96,7 @@ public class TeacherAmpelService {
         Subject subj = ampel.getLesson().getSubject();
         Teacher t = ampel.getTeacher();
         Student s = ampel.getStudent();
-        Classroom c = ampel.getLesson().getClassroom();
+        Hitclass c = ampel.getLesson().getHitclass();
         Lesson lesson = ampel.getLesson();
 
         return AmpelDto.builder()
@@ -108,7 +108,7 @@ public class TeacherAmpelService {
                 .subjectKurzbezeichnung(subj.getKurzbezeichnung())
                 .subjectLangbezeichnung(subj.getLangbezeichnung())
                 .gegenstandsart(subj.getGegenstandsart())
-                .classroomName(c.getName())
+                .hitclassName(c.getName())
                 .farbe((ampel.getFarbe() != null) ? ampel.getFarbe().name() : null)
                 .bemerkung(ampel.getBemerkung())
                 .updatedAt(ampel.getUpdatedAt())
@@ -137,7 +137,7 @@ public class TeacherAmpelService {
                 .farbe("")                              // Leer oder Standard (z. B. "GRAU")
                 .bemerkung("")                          // Keine Bemerkung
                 .updatedAt(null)                          // noch kein Datum
-                .classroomName(lesson.getClassroom().getName())
+                .hitclassName(lesson.getHitclass().getName())
                 .lessonId(lesson.getId())
                 .build();
     }
@@ -151,12 +151,12 @@ public class TeacherAmpelService {
         //    Hier mal teacher.getLessons() als Beispiel:
         Set<Lesson> lessons = teacher.getLessons();
 
-        // 3) Pro Lesson alle Students => lesson.getClassroom().getStudents()
+        // 3) Pro Lesson alle Students => lesson.getHitclass().getStudents()
         //    => Ampel-Eintrag suchen oder leeres DTO
         List<AmpelDto> result = new ArrayList<>();
         for (Lesson lesson : lessons) {
             // Alle Schüler in der Klasse
-            Set<Student> students = lesson.getClassroom().getStudents();
+            Set<Student> students = lesson.getHitclass().getStudents();
             for (Student student : students) {
                 // Ampel-Eintrag suchen
                 Optional<Ampel> existing = ampelRepository.findByLessonIdAndStudentIdAndTeacherId(

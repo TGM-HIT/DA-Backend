@@ -8,15 +8,15 @@ import lombok.Setter;
 public class StudentDto {
     private String firstName;
     private String lastName;
-    private String schuelerkennzahl;
-    private String classroom;
+    private String studentKennzahl;
+    private String hitclass;
     private Long id;
 
-    public StudentDto(String firstName, String lastName, String schuelerkennzahl, String classroom, Long id) {
+    public StudentDto(String firstName, String lastName, String studentKennzahl, String hitclass, Long id) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.schuelerkennzahl = schuelerkennzahl;
-        this.classroom = classroom;
+        this.studentKennzahl = studentKennzahl;
+        this.hitclass = hitclass;
         this.id = id;
     }
 

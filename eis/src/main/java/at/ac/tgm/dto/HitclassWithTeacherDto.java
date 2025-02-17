@@ -2,14 +2,14 @@ package at.ac.tgm.dto;
 
 import java.util.List;
 
-public class ClassroomWithTeacherDto {
+public class HitclassWithTeacherDto {
     private Long id;
     private String name;
     private String klassenvorstand; // Name des Klassenvorstands
     private List<TeacherDto> teachers; // Liste der Lehrer
 
     // Konstruktor
-    public ClassroomWithTeacherDto(Long id, String name, String klassenvorstand, List<TeacherDto> teachers) {
+    public HitclassWithTeacherDto(Long id, String name, String klassenvorstand, List<TeacherDto> teachers) {
         this.id = id;
         this.name = name;
         this.klassenvorstand = klassenvorstand;

@@ -11,6 +11,6 @@ public class UpdateStudentDto {
     private Long id;
     private String vorname;
     private String nachname;
-    private String schuelerkennzahl;
-    private Long classroomId; // ID der gewählten Klasse (aus dem Dropdown)
+    private String studentKennzahl;
+    private Long hitclassId; // ID der gewählten Klasse (aus dem Dropdown)
 }

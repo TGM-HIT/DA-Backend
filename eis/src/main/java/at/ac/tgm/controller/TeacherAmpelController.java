@@ -9,7 +9,7 @@ import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.model.*;
 import at.ac.tgm.repository.AmpelRepository;
-import at.ac.tgm.repository.ClassroomRepository;
+import at.ac.tgm.repository.HitclassRepository;
 import at.ac.tgm.repository.TeacherRepository;
 import at.ac.tgm.service.TeacherAmpelService;
 import jakarta.servlet.http.HttpSession;
@@ -29,15 +29,15 @@ public class TeacherAmpelController {
 
     private final TeacherAmpelService teacherAmpelService;
     private final TeacherRepository teacherRepository;
-    private final ClassroomRepository classroomRepository;
+    private final HitclassRepository hitclassRepository;
     private final AmpelRepository ampelRepository;
     @Autowired
     private UserService userService;
 
-    public TeacherAmpelController(TeacherAmpelService teacherAmpelService, TeacherRepository teacherRepository, ClassroomRepository classroomRepository, AmpelRepository ampelRepository) {
+    public TeacherAmpelController(TeacherAmpelService teacherAmpelService, TeacherRepository teacherRepository, HitclassRepository hitclassRepository, AmpelRepository ampelRepository) {
         this.teacherAmpelService = teacherAmpelService;
         this.teacherRepository = teacherRepository;
-        this.classroomRepository = classroomRepository;
+        this.hitclassRepository = hitclassRepository;
         this.ampelRepository = ampelRepository;
     }
 
@@ -138,11 +138,11 @@ public class TeacherAmpelController {
         Teacher teacher = teacherOptional.get();
 
         // 2) Alle Klassen, die diesen Teacher als Klassenvorstand haben
-        List<Classroom> kvClassrooms = classroomRepository.findAllByKlassenvorstand(teacher);
+        List<Hitclass> kvHitclasses = hitclassRepository.findAllByKlassenvorstand(teacher);
 
         // 3) Alle Schüler sammeln
         List<TeacherKVAmpelDto> result = new ArrayList<>();
-        for (Classroom c : kvClassrooms) {
+        for (Hitclass c : kvHitclasses) {
             for (Student s : c.getStudents()) {
                 // 3a) Ampel-Liste für *diesen* Schüler (alle Teacher, alle Fächer)
                 List<Ampel> ampelList = ampelRepository.findAllByStudentId(s.getId());
@@ -166,7 +166,7 @@ public class TeacherAmpelController {
                 TeacherKVAmpelDto studentDto = new TeacherKVAmpelDto();
                 studentDto.setStudentId(s.getId());
                 studentDto.setStudentName(s.getNachname() + " " + s.getVorname());
-                studentDto.setSchuelerkennzahl(s.getSchuelerkennzahl());
+                studentDto.setStudentKennzahl(s.getStudentKennzahl());
                 studentDto.setAmpelEntries(ampelDtos);
 
                 result.add(studentDto);

@@ -12,7 +12,7 @@ import java.util.List;
 public class TeacherKVAmpelDto {
     private Long studentId;
     private String studentName;
-    private String schuelerkennzahl;
+    private String studentKennzahl;
     private List<AmpelDto> ampelEntries;
 
 }

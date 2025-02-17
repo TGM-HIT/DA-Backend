@@ -12,7 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Classroom {
+public class Hitclass {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +23,9 @@ public class Classroom {
     @ManyToOne(cascade = CascadeType.ALL) // Add cascade here
     private Teacher klassenvorstand;
 
-    @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL) // Add cascade here
+    @OneToMany(mappedBy = "hitclass", cascade = CascadeType.ALL) // Add cascade here
     private Set<Student> students = new HashSet<>();
 
-    @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL) // Add cascade here
+    @OneToMany(mappedBy = "hitclass", cascade = CascadeType.ALL) // Add cascade here
     private Set<Lesson> lessons = new HashSet<>();
 }

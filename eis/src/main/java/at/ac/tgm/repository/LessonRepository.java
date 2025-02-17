@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
-    Optional<Lesson> findBySubjectIdAndClassroomId(Long subjectId, Long classroomId);
-    List<Lesson> findByClassroomId(Long classroomId);
+    Optional<Lesson> findBySubjectIdAndHitclassId(Long subjectId, Long hitclassId);
+    List<Lesson> findByHitclassId(Long hitclass);
 
 }

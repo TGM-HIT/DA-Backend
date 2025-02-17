@@ -19,7 +19,7 @@ public class AmpelDto {
     private String subjectKurzbezeichnung;
     private String subjectLangbezeichnung;
     private String gegenstandsart;
-    private String classroomName;
+    private String hitclassName;
     private String farbe;
     private String bemerkung;
     private LocalDateTime updatedAt;
