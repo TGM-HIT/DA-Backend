@@ -18,9 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +28,6 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -39,9 +36,6 @@ public class AuthenticationController implements AuthenticationApi {
     
     @Autowired
     private AuthenticationManager authenticationManager;
-    
-    @Autowired
-    private GrantedAuthoritiesMapper grantedAuthoritiesMapper;
     
     @Autowired
     private UserDetailsContextMapper userDetailsContextMapper;
@@ -80,14 +74,10 @@ public class AuthenticationController implements AuthenticationApi {
             }
             List<SimpleGrantedAuthority> authoritiesWithGroups = user.getMemberOf().stream().map((memberOf) -> new SimpleGrantedAuthority(Util.getCnFromName(memberOf))).toList();
             
-            // Add Admin Role if applicable
-            DirContextAdapter dirContextAdapter = new DirContextAdapter(user.getId());
-            UserDetails userDetails = userDetailsContextMapper.mapUserFromContext(dirContextAdapter, user.getSAMAccountName(), authoritiesWithGroups);
+            // Add Admin, Teacher and Student Role if applicable
+            UserDetails userDetails = userDetailsContextMapper.mapUserFromContext(new DirContextAdapter(user.getId()), user.getSAMAccountName(), authoritiesWithGroups);
             
-            // Add Teacher or Student Role if applicable
-            Collection<? extends GrantedAuthority> authoritiesWithGroupsAndRoles = grantedAuthoritiesMapper.mapAuthorities(userDetails.getAuthorities());
-            
-            TestingAuthenticationToken authenticationToken = new TestingAuthenticationToken(user.getSAMAccountName(), null, authoritiesWithGroupsAndRoles);
+            TestingAuthenticationToken authenticationToken = new TestingAuthenticationToken(user.getSAMAccountName(), null, userDetails.getAuthorities());
             authenticationToken.setDetails(user);
             return authenticationToken;
         } else {

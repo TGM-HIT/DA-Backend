@@ -15,7 +15,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
@@ -38,12 +37,11 @@ public class AdLdapConfig {
     private List<String> admins;
     
     @Bean
-    ActiveDirectoryLdapAuthenticationProvider authenticationProvider(GrantedAuthoritiesMapper grantedAuthoritiesMapper, UserDetailsContextMapper userDetailsContextMapper) {
+    ActiveDirectoryLdapAuthenticationProvider authenticationProvider(UserDetailsContextMapper userDetailsContextMapper) {
         ActiveDirectoryLdapAuthenticationProvider authenticationProvider = new ActiveDirectoryLdapAuthenticationProvider(domain, url);
         authenticationProvider.setConvertSubErrorCodesToExceptions(true);
         authenticationProvider.setUseAuthenticationRequestCredentials(true);
         authenticationProvider.setSearchFilter("(&(objectClass=user)(sAMAccountName={1}))");
-        authenticationProvider.setAuthoritiesMapper(grantedAuthoritiesMapper);
         authenticationProvider.setUserDetailsContextMapper(userDetailsContextMapper);
         return authenticationProvider;
     }
@@ -57,22 +55,14 @@ public class AdLdapConfig {
                 if (admins != null && admins.contains(username)) {
                     mappedAuthorities.add(new SimpleGrantedAuthority(Roles.ADMIN));
                 }
+                if (authorities.stream().anyMatch((authority) -> authority.getAuthority().contains("lehrer"))) {
+                    mappedAuthorities.add(new SimpleGrantedAuthority(Roles.TEACHER));
+                }
+                if (authorities.stream().anyMatch((authority) -> authority.getAuthority().contains("schueler"))) {
+                    mappedAuthorities.add(new SimpleGrantedAuthority(Roles.STUDENT));
+                }
                 return super.mapUserFromContext(ctx, username, mappedAuthorities);
             }
-        };
-    }
-    
-    @Bean
-    public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
-        return authorities -> {
-            Set<GrantedAuthority> mappedAuthorities = new HashSet<>(authorities);
-            if (mappedAuthorities.stream().anyMatch((authority) -> authority.getAuthority().contains("lehrer"))) {
-                mappedAuthorities.add(new SimpleGrantedAuthority(Roles.TEACHER));
-            }
-            if (mappedAuthorities.stream().anyMatch((authority) -> authority.getAuthority().contains("schueler"))) {
-                mappedAuthorities.add(new SimpleGrantedAuthority(Roles.STUDENT));
-            }
-            return mappedAuthorities;
         };
     }
     
