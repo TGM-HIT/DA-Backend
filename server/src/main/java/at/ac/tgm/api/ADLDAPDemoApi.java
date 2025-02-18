@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("")
 public interface ADLDAPDemoApi {
     @GetMapping({"", "/"})
-    Authentication getAuthCurrentUser();
+    Authentication getAuthCurrentUser(Authentication authentication);
     
     @Secured(Roles.TEACHER)
     @GetMapping("/list/lehrer")
