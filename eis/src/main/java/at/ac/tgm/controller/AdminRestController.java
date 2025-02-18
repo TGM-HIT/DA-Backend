@@ -46,7 +46,7 @@ public class AdminRestController {
     /**
      * Nimmt das hochgeladene CSV-File entgegen und ruft den ImportService auf.
      */
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @PostMapping("/upload")
     public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file) {
         try {
@@ -60,7 +60,7 @@ public class AdminRestController {
 
         }
     }
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @DeleteMapping("/deleteAll")
     public ResponseEntity<String> deleteAllData() {
         try {
@@ -70,7 +70,7 @@ public class AdminRestController {
             return ResponseEntity.status(500).body("Fehler beim Löschen der Daten: " + e.getMessage());
         }
     }
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @PutMapping("/setKlassenvorstand")
     public ResponseEntity<?> setKlassenvorstand(@RequestParam Long hitclassId, @RequestParam Long teacherId) {
         Optional<Hitclass> hitclassOpt = hitclassRepository.findById(hitclassId);
@@ -92,7 +92,7 @@ public class AdminRestController {
         return ResponseEntity.ok("Klassenvorstand wurde gesetzt!");
     }
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @GetMapping("/hitclasses/with-teachers")
     public ResponseEntity<?> getHitclassWithTeachers() {
         List<Hitclass> hitclasses = hitclassRepository.findAll();
@@ -124,7 +124,7 @@ public class AdminRestController {
         return ResponseEntity.ok(dtoList);
     }
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @PostMapping("/newStudent")
     public ResponseEntity<?> createStudent(@RequestBody CreateStudentDto dto) {
         // 1) Prüfen, ob diese Kennzahl schon existiert
@@ -159,7 +159,7 @@ public class AdminRestController {
         return ResponseEntity.ok("Neuer Schüler (ID=" + saved.getId() + ") erfolgreich angelegt.");
     }
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @GetMapping("/hitclasses")
     public ResponseEntity<?> getAllHitclasses() {
         List<Hitclass> hitclasses = hitclassRepository.findAll();
@@ -174,7 +174,7 @@ public class AdminRestController {
         return ResponseEntity.ok(result);
     }
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @GetMapping("/getAllTeachers")
     public ResponseEntity<List<TeacherDto>> getAllLehrer() {
         List<Teacher> teachers = teacherRepository.findAll();
@@ -187,7 +187,7 @@ public class AdminRestController {
         return ResponseEntity.ok(dtos);
     }
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @GetMapping("/getAllStudents")
     public ResponseEntity<?> getKVStudents() {
         List<Student> students = studentRepository.findAll();
@@ -197,7 +197,7 @@ public class AdminRestController {
         return ResponseEntity.ok(dtos);
     }
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @GetMapping("/getAllLessons")
     public ResponseEntity<?> getAllLessons() {
         List<Lesson> lessons = lessonRepository.findAll();
@@ -207,7 +207,7 @@ public class AdminRestController {
         return ResponseEntity.ok(dtos);
     }
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @DeleteMapping("/deleteStudent/{studentKennzahl}")
     @Transactional
     public ResponseEntity<?> deleteStudent(@PathVariable String studentKennzahl) {
@@ -215,7 +215,7 @@ public class AdminRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @DeleteMapping("/deleteTeacher/{teacherid}")
     @Transactional
     public ResponseEntity<?> deleteTeacher(@PathVariable Long teacherid) {
@@ -235,7 +235,7 @@ public class AdminRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @PostMapping("/newTeacher")
     public ResponseEntity<?> createTeacher(@RequestBody CreateTeacherDto dto) {
         if (dto.getName() == null || dto.getName().isEmpty()) {
@@ -269,7 +269,7 @@ public class AdminRestController {
                 .body("Neuer Lehrer (ID=" + saved.getId() + ") erfolgreich angelegt.");
     }
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @PutMapping("/updateStudent")
     public ResponseEntity<?> updateStudent(@RequestBody UpdateStudentDto dto) {
         // 1) Student laden
@@ -289,13 +289,13 @@ public class AdminRestController {
         return ResponseEntity.ok("Student erfolgreich aktualisiert.");
     }
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @DeleteMapping("/deleteAllAmpel")
     public ResponseEntity<?> deleteAllAmpel() {
         ampelRepository.deleteAll();
         return ResponseEntity.ok("Alle Ampel erfolgreich gelöscht.");
     }
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @Transactional // Wichtig: sorgt für einen Transaktionskontext
     @PutMapping("/updateTeacher")
     public ResponseEntity<?> updateTeacherLessons(@RequestBody UpdateTeacherDto dto) {
@@ -345,7 +345,7 @@ public class AdminRestController {
     }
 
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.ADMIN)
     @GetMapping("/getAllTeachersWithLessons")
     public List<TeacherWithLessonsDto> getAllTeachersWithLessons() {
         List<Teacher> teacherList = teacherRepository.findAll();
