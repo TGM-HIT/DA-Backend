@@ -25,7 +25,7 @@ public interface AuthenticationApi {
                                     {"username":"nribinin", "password":"", "simulate":true}""")
             }, schema = @Schema(implementation = LoginRequestDto.class), mediaType = MediaType.APPLICATION_JSON_VALUE)
     }))
-    ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response, HttpSession session);
+    ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response);
 
     @GetMapping("/csrf-token")
     @Operation(summary = "The CSRF-Token is returned on any call as cookie but if you want to get it explicitly in the body, you can do so with this endpoint")

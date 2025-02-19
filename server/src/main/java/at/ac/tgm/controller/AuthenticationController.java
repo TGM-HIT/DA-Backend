@@ -57,7 +57,7 @@ public class AuthenticationController implements AuthenticationApi {
     private UserService userService;
     
     @Override
-    public ResponseEntity<?> authenticateUser(LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response,HttpSession session) {
+    public ResponseEntity<?> authenticateUser(LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
         UserEntry user = (loginRequest.getUsername().contains("@")
                 ? userService.findByMail(loginRequest.getUsername())
                 : userService.findBysAMAccountName(loginRequest.getUsername()))
@@ -69,11 +69,6 @@ public class AuthenticationController implements AuthenticationApi {
         context.setAuthentication(authentication);
         securityContextRepository.saveContext(context, request, response);
 
-        session.setAttribute("sAMAccountName", authentication.getName());
-        Optional<UserEntry> userEntryOptional = userService.findBysAMAccountName(authentication.getName());
-        if (userEntryOptional.isEmpty()) {
-            return ResponseEntity.status(404).body("User not found in LDAP");
-        }
         logger.info("Login of " + user.getDisplayName());
         
         return ResponseEntity.ok(authentication);

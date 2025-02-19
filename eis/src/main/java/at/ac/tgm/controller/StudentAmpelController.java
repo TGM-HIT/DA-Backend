@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,8 +37,8 @@ public class StudentAmpelController {
 
     @Secured(Roles.SCHUELER)
     @GetMapping("/getSchueler")
-    public ResponseEntity<?> getAmpelForStudent(HttpSession session) {
-        String sAMAccountName = (String) session.getAttribute("sAMAccountName");
+    public ResponseEntity<?> getAmpelForStudent(Authentication authentication) {
+        String sAMAccountName = authentication.getName();
 
         // 1) Prüfen, ob wir überhaupt einen gültigen Login haben
         Optional<UserEntry> userEntryOptional = userService.findBysAMAccountName(sAMAccountName);

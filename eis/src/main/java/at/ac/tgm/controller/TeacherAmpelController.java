@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -43,8 +44,8 @@ public class TeacherAmpelController {
 
     @Secured(Roles.LEHRER)
     @GetMapping("/getLehrer")
-    public ResponseEntity<?> getAmpelForTeacher(HttpSession session) {
-        String sAMAccountName = (String) session.getAttribute("sAMAccountName");
+    public ResponseEntity<?> getAmpelForTeacher(Authentication authentication) {
+        String sAMAccountName = authentication.getName();
 
         if (sAMAccountName == null || sAMAccountName.isEmpty()) {
             return ResponseEntity.status(401).body(new ErrorResponseDto("Nicht authentifiziert.", 401));
@@ -69,8 +70,9 @@ public class TeacherAmpelController {
 
     @Secured(Roles.LEHRER)
     @PostMapping
-    public ResponseEntity<?> createAmpelForTeacher(@RequestBody AmpelRequestDto dto, HttpSession session) {
-        String sAMAccountName = (String) session.getAttribute("sAMAccountName");
+    public ResponseEntity<?> createAmpelForTeacher(@RequestBody AmpelRequestDto dto, Authentication authentication) {
+        String sAMAccountName = authentication.getName();
+
         if (sAMAccountName == null || sAMAccountName.isEmpty()) {
             return ResponseEntity.status(401).body(new ErrorResponseDto("Nicht authentifiziert.", 401));
         }
@@ -100,8 +102,9 @@ public class TeacherAmpelController {
      */
     @Secured(Roles.LEHRER)
     @PutMapping
-    public ResponseEntity<?> updateAmpelForTeacher(@RequestBody AmpelRequestDto dto, HttpSession session) {
-        String sAMAccountName = (String) session.getAttribute("sAMAccountName");
+    public ResponseEntity<?> updateAmpelForTeacher(@RequestBody AmpelRequestDto dto, Authentication authentication) {
+        String sAMAccountName = authentication.getName();
+
         if (sAMAccountName == null || sAMAccountName.isEmpty()) {
             return ResponseEntity.status(401).body(new ErrorResponseDto("Nicht authentifiziert.", 401));
         }
@@ -128,8 +131,8 @@ public class TeacherAmpelController {
     }
     @Secured(Roles.LEHRER)
     @GetMapping("/kv/getStudents")
-    public ResponseEntity<?> getKvStudents(HttpSession session) {
-        String sAMAccountName = (String) session.getAttribute("sAMAccountName");
+    public ResponseEntity<?> getKvStudents(Authentication authentication) {
+        String sAMAccountName = authentication.getName();
         Optional<UserEntry> userEntryOptional = userService.findBysAMAccountName(sAMAccountName);
         UserEntry userEntry = userEntryOptional.get();
         String ldapName = userEntry.getName();
