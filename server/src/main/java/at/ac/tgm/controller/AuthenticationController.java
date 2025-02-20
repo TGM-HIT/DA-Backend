@@ -13,15 +13,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +38,7 @@ public class AuthenticationController implements AuthenticationApi {
     private AuthenticationManager authenticationManager;
     
     @Autowired
-    private GrantedAuthoritiesMapper grantedAuthoritiesMapper;
+    private UserDetailsContextMapper userDetailsContextMapper;
     
     @Autowired
     private Environment env;
@@ -70,8 +72,12 @@ public class AuthenticationController implements AuthenticationApi {
             if (!env.matchesProfiles("dev")) {
                 throw new IllegalArgumentException("Simulate just allowed with profile dev");
             }
-            List<SimpleGrantedAuthority> authorities = user.getMemberOf().stream().map((memberOf) -> new SimpleGrantedAuthority(Util.getCnFromName(memberOf))).toList();
-            TestingAuthenticationToken authenticationToken = new TestingAuthenticationToken(user.getSAMAccountName(), null, grantedAuthoritiesMapper.mapAuthorities(authorities));
+            List<SimpleGrantedAuthority> authoritiesWithGroups = user.getMemberOf().stream().map((memberOf) -> new SimpleGrantedAuthority(Util.getCnFromName(memberOf))).toList();
+            
+            // Add Admin, Teacher and Student Role if applicable
+            UserDetails userDetails = userDetailsContextMapper.mapUserFromContext(new DirContextAdapter(user.getId()), user.getSAMAccountName(), authoritiesWithGroups);
+            
+            TestingAuthenticationToken authenticationToken = new TestingAuthenticationToken(user.getSAMAccountName(), null, userDetails.getAuthorities());
             authenticationToken.setDetails(user);
             return authenticationToken;
         } else {

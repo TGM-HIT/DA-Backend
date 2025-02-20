@@ -14,6 +14,7 @@ Für die Active Directory LDAP Anbindung muss auf der Root eine `.env` Datei ang
 ```
 AD_USER=insertTGMEmailAdressHere
 AD_PASSWORD=insertTGMPasswortHere
+ADMINS=mmustermann,emustermann
 ```
 
 ## Gradle Projektstruktur
