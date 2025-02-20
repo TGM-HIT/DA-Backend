@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,8 +23,8 @@ public class ADLDAPDemoController implements ADLDAPDemoApi {
     private UserService userService;
     
     @Override
-    public Authentication getAuthCurrentUser() {
-        return SecurityContextHolder.getContext().getAuthentication();
+    public Authentication getAuthCurrentUser(Authentication authentication) {
+        return authentication;
     }
     
     @Override
