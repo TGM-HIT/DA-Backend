@@ -12,7 +12,6 @@ public interface UserRepository extends LdapRepository<UserEntry> {
     Optional<UserEntry> findBySn(String sn);
     Optional<UserEntry> findByMail(String email);
     Optional<UserEntry> findBysAMAccountName(String sAMAccountName);
-    
     /*
     BUG: findAll() nicht nutzen, da das base-Attribute in der @Entry Annotation nicht beachtet wird und damit immer alle Nutzer auflistet werden:
     https://github.com/spring-projects/spring-data-ldap/issues/446
