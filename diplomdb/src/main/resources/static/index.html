@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Diplom DB – Test Interface</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f0f0f0; }
+        header { background: #333; color: #fff; padding: 10px; }
+        header nav a { color: #fff; margin-right: 15px; text-decoration: none; }
+        header nav a:hover { text-decoration: underline; }
+        ul { list-style: none; padding: 0; }
+        li { margin: 10px 0; }
+        .description { color: #555; font-size: 0.9rem; }
+        a.link { font-size: 1.1rem; color: #3498db; text-decoration: none; }
+        a.link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<!-- Gemeinsamer Header -->
+<header>
+    <nav>
+        <a href="/index.html">Home</a>
+        <a href="/login_test.html">Login Test</a>
+        <a href="/betreuer_test.html">Betreuer Verwaltung</a>
+        <a href="/projects_test.html">Projekte (Diplomarbeit Controller)</a>
+        <a href="/documents_test.html">Dokumente</a>
+        <a href="/milestones_test.html">Meilensteine</a>
+        <a href="/project_applications_test.html">Projekt-Bewerbungen</a>
+        <a href="/schueler_test.html">Schüler Verwaltung</a>
+        <a href="/user_test.html">User Test</a>
+    </nav>
+    <div id="headerLoginSection">
+        <label>Username:
+            <input type="text" id="headerUsername">
+        </label>
+        <label>Password:
+            <input type="password" id="headerPassword">
+        </label>
+        <button id="headerLoginBtn">Login</button>
+    </div>
+</header>
+<hr>
+
+<h1>Diplom DB – Test Interface</h1>
+<p>Willkommen! Wähle einen der folgenden Bereiche, um die jeweiligen API‑Funktionen zu testen:</p>
+<ul>
+    <li>
+        <a class="link" href="/login_test.html">Login &amp; CSRF Test</a>
+        <div class="description">Testet den Login-Flow, das Abrufen des CSRF-Tokens und Logout.</div>
+    </li>
+    <li>
+        <a class="link" href="/betreuer_test.html">Betreuer Verwaltung</a>
+        <div class="description">Testseite für Betreuer-Funktionen: Refresh, Liste abrufen, Status/Kapazität ändern, Export.</div>
+    </li>
+    <li>
+        <a class="link" href="/projects_test.html">Projekte (Diplomarbeit Controller)</a>
+        <div class="description">Erstellen eines Projekts inkl. Lastenheft, Abruf aller Projekte, Projekt-Review und Lehrerzuweisung.</div>
+    </li>
+    <li>
+        <a class="link" href="/documents_test.html">Dokumente</a>
+        <div class="description">Upload, Abruf, Bewertung, Download und Löschung von Dokumenten.</div>
+    </li>
+    <li>
+        <a class="link" href="/milestones_test.html">Meilensteine</a>
+        <div class="description">Erstellen, Abrufen, Ändern und Löschen von Meilensteinen für Projekte.</div>
+    </li>
+    <li>
+        <a class="link" href="/project_applications_test.html">Projekt-Bewerbungen</a>
+        <div class="description">Erstellen, Abrufen, Übersicht, Finalisieren und Löschen von Bewerbungen für Projekte.</div>
+    </li>
+    <li>
+        <a class="link" href="/schueler_test.html">Schüler Verwaltung</a>
+        <div class="description">Import und Abruf der Schülerdaten (LDAP) für Jahrgang 4/5.</div>
+    </li>
+    <li>
+        <a class="link" href="/user_test.html">User &amp; LDAP Suche</a>
+        <div class="description">Testet Funktionen rund um LDAP-Benutzer: Details, Gruppen und Suche nach Mail oder CN.</div>
+    </li>
+</ul>
+
+<script>
+    // Gemeinsame Login-Funktion aus dem Header übernehmen
+    let csrfToken = null;
+    document.getElementById('headerLoginBtn').addEventListener('click', async () => {
+        const username = document.getElementById('headerUsername').value;
+        const password = document.getElementById('headerPassword').value;
+        const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+            credentials: 'include'
+        });
+        const data = await res.json();
+        alert("Login: " + JSON.stringify(data, null, 2));
+        // Nach Login den CSRF Token abrufen
+        const csrfRes = await fetch('/api/csrf-token', { method: 'GET', credentials: 'include' });
+        const csrfData = await csrfRes.json();
+        csrfToken = csrfData.csrfToken;
+        alert("CSRF Token: " + csrfToken);
+        // Bei Erfolg Loginbereich ausblenden
+        if(data.status === 'success'){
+            document.getElementById('headerLoginSection').style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>

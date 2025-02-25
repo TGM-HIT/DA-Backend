@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .response { border: 1px solid #ccc; padding: 10px; background: #f9f9f9; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+<!-- Gemeinsamer Header -->
+<header style="background: #333; color: #fff; padding: 10px;">
+    <nav>
+        <a href="/index.html" style="color: #fff; margin-right: 15px;">Home</a>
+        <a href="/login_test.html" style="color: #fff; margin-right: 15px;">Login Test</a>
+        <a href="/betreuer_test.html" style="color: #fff; margin-right: 15px;">Betreuer Test</a>
+        <a href="/projects_test.html" style="color: #fff; margin-right: 15px;">Projekte Test</a>
+        <a href="/documents_test.html" style="color: #fff; margin-right: 15px;">Dokumente Test</a>
+        <a href="/milestones_test.html" style="color: #fff; margin-right: 15px;">Meilensteine Test</a>
+        <a href="/project_applications_test.html" style="color: #fff; margin-right: 15px;">Bewerbungen Test</a>
+        <a href="/schueler_test.html" style="color: #fff; margin-right: 15px;">Schüler Test</a>
+        <a href="/user_test.html" style="color: #fff;">User Test</a>
+    </nav>
+    <div id="headerLoginSection">
+        <label style="color: #fff;">Username:
+            <input type="text" id="headerUsername">
+        </label>
+        <label style="color: #fff;">Password:
+            <input type="password" id="headerPassword">
+        </label>
+        <button id="headerLoginBtn">Login</button>
+    </div>
+</header>
+<hr>
+
+<h1>Login Test</h1>
+<p>Nutze das Login-Formular im Header, um Dich anzumelden. Nach erfolgreichem Login wird der CSRF Token abgerufen.</p>
+<div class="response" id="responseArea"></div>
+
+<script>
+    let csrfToken = null;
+    document.getElementById('headerLoginBtn').addEventListener('click', async () => {
+        const username = document.getElementById('headerUsername').value;
+        const password = document.getElementById('headerPassword').value;
+        const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+            credentials: 'include'
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = "Login Response:\n" + JSON.stringify(data, null, 2);
+        // Nach Login CSRF Token abrufen
+        const csrfRes = await fetch('/api/csrf-token', { method: 'GET', credentials: 'include' });
+        const csrfData = await csrfRes.json();
+        csrfToken = csrfData.csrfToken;
+        document.getElementById('responseArea').textContent += "\n\nCSRF Token: " + csrfToken;
+        if(data.status === 'success'){
+            document.getElementById('headerLoginSection').style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>
