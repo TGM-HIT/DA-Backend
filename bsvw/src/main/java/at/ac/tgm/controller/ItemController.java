@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(Consts.BEISPIEL_PATH_PREFIX + "/item")
+@RequestMapping(Consts.BSVW_PATH_PREFIX + "/item")
 public class ItemController {
     private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
-    
+
     @Autowired
     private ItemService service;
     
