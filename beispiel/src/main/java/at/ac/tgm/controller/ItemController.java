@@ -23,7 +23,7 @@ public class ItemController {
     @Autowired
     private ItemService service;
     
-    @Secured(Roles.LEHRER)
+    @Secured(Roles.TEACHER)
     @GetMapping
     public ResponseEntity<List<ItemDto>> getAllItems() {
         return ResponseEntity.ok(service.getAllItems());

@@ -35,7 +35,7 @@ public class StudentAmpelController {
     }
 
 
-    @Secured(Roles.SCHUELER)
+    @Secured(Roles.STUDENT)
     @GetMapping("/getSchueler")
     public ResponseEntity<?> getAmpelForStudent(Authentication authentication) {
         String sAMAccountName = authentication.getName();

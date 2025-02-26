@@ -17,14 +17,14 @@ public interface ADLDAPDemoApi {
     @GetMapping({"", "/"})
     Authentication getAuthCurrentUser(Authentication authentication);
     
-    @Secured(Roles.LEHRER)
+    @Secured(Roles.TEACHER)
     @GetMapping("/list/lehrer")
     List<String> listLehrer();
     
     @GetMapping("/find/{surname}")
     ResponseEntity<UserEntry> findUser(@PathVariable("surname") String surname);
     
-    @Secured({Roles.SCHUELER, Roles.LEHRER})
+    @Secured({Roles.STUDENT, Roles.TEACHER})
     @GetMapping("/list/schueler")
     List<Name> entities();
 }

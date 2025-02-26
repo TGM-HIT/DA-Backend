@@ -40,7 +40,7 @@ public class AmpelController {
      * POST /api/ampel
      * Legt einen neuen Ampel-Eintrag an.
      */
-    @Secured(Roles.LEHRER)
+    @Secured(Roles.TEACHER)
     @PostMapping
     public Ampel createAmpel(@RequestBody AmpelRequestDto dto) {
         // 1) Lesson laden
@@ -73,7 +73,7 @@ public class AmpelController {
      * Aktualisiert einen vorhandenen Ampel-Eintrag.
      */
 
-    @Secured(Roles.LEHRER)
+    @Secured(Roles.TEACHER)
     @PutMapping("/{ampelId}")
     public Ampel updateAmpel(@PathVariable Long ampelId, @RequestBody AmpelRequestDto dto) {
         // 1) Vorhandenes Ampel-Objekt laden
@@ -110,7 +110,7 @@ public class AmpelController {
         // 4) Speichern & zurückgeben
         return ampelRepository.save(ampel);
     }
-    @Secured(Roles.LEHRER)
+    @Secured(Roles.TEACHER)
     @DeleteMapping
     public ResponseEntity<?> deleteAmpel(
             @RequestParam Long lessonId,

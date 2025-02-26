@@ -42,7 +42,7 @@ public class TeacherAmpelController {
         this.ampelRepository = ampelRepository;
     }
 
-    @Secured(Roles.LEHRER)
+    @Secured(Roles.TEACHER)
     @GetMapping("/getLehrer")
     public ResponseEntity<?> getAmpelForTeacher(Authentication authentication) {
         String sAMAccountName = authentication.getName();
@@ -68,7 +68,7 @@ public class TeacherAmpelController {
         return ResponseEntity.ok(teacherAmpelService.getAllAmpelForTeacher(teacher.getId()));
     }
 
-    @Secured(Roles.LEHRER)
+    @Secured(Roles.TEACHER)
     @PostMapping
     public ResponseEntity<?> createAmpelForTeacher(@RequestBody AmpelRequestDto dto, Authentication authentication) {
         String sAMAccountName = authentication.getName();
@@ -100,7 +100,7 @@ public class TeacherAmpelController {
     /**
      * Ändert einen bestehenden Ampel-Eintrag für den aktuell authentifizierten Lehrer.
      */
-    @Secured(Roles.LEHRER)
+    @Secured(Roles.TEACHER)
     @PutMapping
     public ResponseEntity<?> updateAmpelForTeacher(@RequestBody AmpelRequestDto dto, Authentication authentication) {
         String sAMAccountName = authentication.getName();
@@ -129,7 +129,7 @@ public class TeacherAmpelController {
             return ResponseEntity.status(500).body(new ErrorResponseDto("Interner Serverfehler.", 500)); // Internal Server Error
         }
     }
-    @Secured(Roles.LEHRER)
+    @Secured(Roles.TEACHER)
     @GetMapping("/kv/getStudents")
     public ResponseEntity<?> getKvStudents(Authentication authentication) {
         String sAMAccountName = authentication.getName();
