@@ -16,14 +16,14 @@ public class SwaggerConfig {
      *
      * @return das OpenAPI-Objekt mit den definierten API-Informationen und externen Dokumentationsdetails
      */
-    /* @Bean
+    @Bean
     public OpenAPI diplomarbeitOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title("Diplomarbeit API")
                         .description("Dokumentation der Diplomarbeit REST API")
-                        .version("v1.2")); // TODO: Version überprüfen build gradle
+                        .version("v1.0")); // TODO: Version überprüfen build gradle
 
-    } */
+    }
 
     @Bean
     public OperationCustomizer operationCustomizer() {
