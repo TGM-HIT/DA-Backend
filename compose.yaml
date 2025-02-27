@@ -14,5 +14,7 @@ services:
     container_name: DA-MariaDB
     image: mariadb:latest
     restart: always
+    ports:
+      - "3306:3306"
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
