@@ -5,7 +5,7 @@ plugins {
     id 'org.springframework.boot' version '3.3.4'
 }
 
-allprojects{
+allprojects {
     group = 'at.ac.tgm'
     version = '0.0.1-SNAPSHOT'
     
@@ -58,6 +58,20 @@ allprojects{
         useJUnitPlatform()
     }
     
-    bootJar.enabled = true
-    bootWar.enabled = false
+    
+    springBoot {
+        mainClass = 'at.ac.tgm.Application'
+    }
+    
+    bootJar {
+        mainClass = 'at.ac.tgm.Application'
+    }
+    bootWar {
+        mainClass = 'at.ac.tgm.Application'
+    }
+    
+}
+
+dependencies {
+    implementation project(':server')
 }
