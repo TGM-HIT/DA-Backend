@@ -1,5 +1,6 @@
 package at.ac.tgm.diplomarbeit.diplomdb.controller;
 
+import at.ac.tgm.ad.Roles;
 import at.ac.tgm.diplomarbeit.diplomdb.dto.DokumentDTO;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Diplomarbeit;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Dokument;
@@ -14,7 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.PathResource;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,7 +78,7 @@ public class DokumentController {
      * @param erstellerSamAccountName Der sAMAccountName des Erstellers.
      * @return ResponseEntity mit dem erstellten Dokument-Datentransferobjekt.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @PostMapping("/upload")
     public ResponseEntity<DokumentDTO> uploadDocument(
             @RequestParam("file") MultipartFile file,
@@ -141,7 +142,7 @@ public class DokumentController {
      * @param id Die eindeutige ID des Dokuments.
      * @return ResponseEntity mit dem herunterzuladenden Resource-Objekt.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping("/download/{id}")
     public ResponseEntity<Resource> downloadDocument(@PathVariable Long id) {
         LOGGER.debug("Download Dokument: {}", id);
@@ -181,7 +182,7 @@ public class DokumentController {
      * @param sortDirection Sortierrichtung ("asc" oder "desc"); Standard ist "asc".
      * @return ResponseEntity mit einer Liste von Dokument-Datentransferobjekten.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping
     public ResponseEntity<List<DokumentDTO>> getAllDocuments(
             @RequestParam(required = false) String search,
@@ -243,7 +244,7 @@ public class DokumentController {
      * @param id Die eindeutige ID des Dokuments.
      * @return ResponseEntity mit dem Dokument-Datentransferobjekt.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping("/{id}")
     public ResponseEntity<DokumentDTO> getDocumentById(@PathVariable Long id) {
         LOGGER.debug("GET /documents/{}", id);
@@ -262,7 +263,7 @@ public class DokumentController {
      * @param dokumentDTO Das Datentransferobjekt mit den aktualisierten Dokumentendaten.
      * @return ResponseEntity mit dem aktualisierten Dokument-Datentransferobjekt.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @PutMapping("/{id}")
     public ResponseEntity<DokumentDTO> updateDocument(@PathVariable Long id, @RequestBody DokumentDTO dokumentDTO) {
         LOGGER.info("Update Dokument: {}", id);
@@ -312,7 +313,7 @@ public class DokumentController {
      * @param comment Optionaler Kommentar zur Bewertung.
      * @return ResponseEntity mit dem aktualisierten Dokument-Datentransferobjekt.
      */
-    @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
+    @Secured({Roles.TEACHER, Roles.ADMIN})
     @PutMapping("/{id}/rating")
     public ResponseEntity<DokumentDTO> updateDocumentRating(
             @PathVariable Long id,
@@ -351,7 +352,7 @@ public class DokumentController {
      * @param id Die eindeutige ID des zu löschenden Dokuments.
      * @return ResponseEntity ohne Inhalt, wenn das Löschen erfolgreich war.
      */
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @Secured(Roles.ADMIN)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDocument(@PathVariable Long id) {
         LOGGER.warn("Lösche Dokument: {}", id);
@@ -409,29 +410,5 @@ public class DokumentController {
      */
     private boolean userExistsInLdap(String sAMAccountName) {
         return userService.findBysAMAccountName(sAMAccountName).isPresent();
-    }
-
-    // ---------------------------
-    // Einfache Exception-Handler
-    // ---------------------------
-
-    /**
-     * Fängt ungültige Eingaben ab (HTTP 400) und gibt eine JSON-Fehlermeldung zurück.
-     */
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", ex.getMessage());
-        return ResponseEntity.badRequest().body(error);
-    }
-
-    /**
-     * Fängt nicht gefundene Ressourcen ab (HTTP 404) und gibt eine JSON-Fehlermeldung zurück.
-     */
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 }

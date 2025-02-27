@@ -1,13 +1,13 @@
 package at.ac.tgm.diplomarbeit.diplomdb.controller;
 
+import at.ac.tgm.ad.Roles;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Betreuer;
 import at.ac.tgm.diplomarbeit.diplomdb.service.BetreuerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +34,6 @@ import java.util.List;
  *   Exportiert die Betreuerliste in den Formaten CSV, Excel oder PDF. Es können optionale Filter-
  *   und Sortierparameter übergeben werden.
  */
-
 @RestController
 @RequestMapping("/api/betreuer")
 public class BetreuerController {
@@ -54,7 +53,7 @@ public class BetreuerController {
      *
      * @return ResponseEntity mit einer Bestätigungsmeldung, dass die Betreuerliste erfolgreich aktualisiert wurde.
      */
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @Secured(Roles.ADMIN)
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshBetreuerList() {
         LOGGER.info("Refreshing Betreuer list from LDAP...");
@@ -75,7 +74,7 @@ public class BetreuerController {
      * @param status Optionaler Filter für den Status.
      * @return ResponseEntity mit der Liste der Betreuer, die den angegebenen Kriterien entsprechen.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping
     public ResponseEntity<List<Betreuer>> getBetreuer(
             @RequestParam(required = false) String search,
@@ -100,7 +99,7 @@ public class BetreuerController {
      * @param newStatus Der neue Status, der gesetzt werden soll.
      * @return ResponseEntity mit dem aktualisierten Betreuer-Objekt.
      */
-    @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
+    @Secured({Roles.TEACHER, Roles.ADMIN})
     @PutMapping("/sam/{samAccountName}/status")
     public ResponseEntity<Betreuer> setBetreuerStatusBySam(
             @PathVariable String samAccountName,
@@ -122,12 +121,12 @@ public class BetreuerController {
      * @param maxProjekte Die neue maximale Anzahl von Projekten, die der Lehrer betreuen kann.
      * @return ResponseEntity mit dem aktualisierten Betreuer-Objekt.
      */
-    @PreAuthorize("hasAnyRole('TEACHER')")
+    @Secured(Roles.TEACHER)
     @PutMapping("/capacity/self")
     public ResponseEntity<Betreuer> updateOwnCapacity(
             @RequestParam int maxProjekte
     ) {
-        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentUser = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
         LOGGER.info("Lehrer {} aktualisiert eigene Kapazität auf: maxProjekte={}", currentUser, maxProjekte);
         Betreuer updated = betreuerService.updateBetreuerCapacityBySam(currentUser, maxProjekte);
         AUDIT_LOGGER.info("Betreuerkapazität von Lehrer {} wurde aktualisiert auf: maxProjekte={}", currentUser, maxProjekte);
@@ -145,7 +144,7 @@ public class BetreuerController {
      * @param maxProjekte Die neue maximale Anzahl von Projekten, die der Betreuer betreuen darf.
      * @return ResponseEntity mit dem aktualisierten Betreuer-Objekt.
      */
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @Secured(Roles.ADMIN)
     @PutMapping("/sam/{samAccountName}/capacity")
     public ResponseEntity<Betreuer> updateTeacherCapacity(
             @PathVariable String samAccountName,
@@ -171,7 +170,7 @@ public class BetreuerController {
      * @param status Optionaler Filter für den Status.
      * @return ResponseEntity, die die exportierten Daten als Byte-Array enthält und entsprechende HTTP-Header gesetzt hat.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping("/export")
     public ResponseEntity<byte[]> exportBetreuerList(
             @RequestParam String format,

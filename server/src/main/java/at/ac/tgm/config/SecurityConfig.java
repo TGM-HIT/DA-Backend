@@ -91,6 +91,8 @@ public class SecurityConfig {
                                                 "/project_applications_test.html",
                                                 "/schueler_test.html",
                                                 "/user_test.html",
+                                                "/login.html",
+                                                "/api_test.html",
                                                 // API-Endpunkte für Login, Logout und CSRF-Token abrufen erlauben
                                                 "/api/login",
                                                 "/api/logout",

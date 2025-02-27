@@ -1,10 +1,13 @@
 package at.ac.tgm.diplomarbeit.diplomdb.controller;
 
-import at.ac.tgm.diplomarbeit.diplomdb.service.SchuelerService;
+import at.ac.tgm.ad.Roles;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Schueler;
+import at.ac.tgm.diplomarbeit.diplomdb.service.SchuelerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,7 +41,7 @@ public class SchuelerController {
      * @param year Der Jahrgang, für den die Schülerdaten importiert werden sollen ("4" oder "5").
      * @return ResponseEntity mit einer Bestätigungsmeldung oder einer Fehlermeldung bei ungültigem Jahrgang.
      */
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @Secured(Roles.ADMIN)
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshSchuelerList(@RequestParam String year) {
         if (!("4".equals(year) || "5".equals(year))) {
@@ -59,7 +62,7 @@ public class SchuelerController {
      * @param sortDirection Die Sortierrichtung, entweder "asc" (aufsteigend) oder "desc" (absteigend). Standard ist "asc".
      * @return ResponseEntity mit einer Liste der Schüler, die den angegebenen Filter- und Sortierkriterien entsprechen.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping
     public ResponseEntity<List<Schueler>> getSchueler(
             @RequestParam(required = false) String search,

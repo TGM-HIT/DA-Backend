@@ -1,14 +1,17 @@
 package at.ac.tgm.diplomarbeit.diplomdb.controller;
 
+import at.ac.tgm.ad.Roles;
 import at.ac.tgm.diplomarbeit.diplomdb.dto.MeilensteinDTO;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Diplomarbeit;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Meilenstein;
 import at.ac.tgm.diplomarbeit.diplomdb.exception.ResourceNotFoundException;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DiplomarbeitRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.MeilensteinRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,7 +52,7 @@ public class MeilensteinController {
      * @param meilensteinDTO Das Datentransferobjekt mit den Meilenstein-Daten.
      * @return ResponseEntity mit dem erstellten Meilenstein-Datentransferobjekt.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @PostMapping("/{projektId}/milestones")
     public ResponseEntity<MeilensteinDTO> createMeilenstein(
             @PathVariable Long projektId,
@@ -76,7 +79,7 @@ public class MeilensteinController {
      * @param projektId Die ID des Projekts.
      * @return ResponseEntity mit einer Liste von Meilenstein-Datentransferobjekten.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping("/{projektId}/milestones")
     public ResponseEntity<List<MeilensteinDTO>> getMilestonesByProject(@PathVariable Long projektId) {
         Diplomarbeit projekt = diplomarbeitRepository.findById(projektId)
@@ -106,7 +109,7 @@ public class MeilensteinController {
      * @param newStatus Der neue Status, der gesetzt werden soll.
      * @return ResponseEntity mit dem aktualisierten Meilenstein-Datentransferobjekt.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @PutMapping("/{projektId}/milestones/{milestoneId}/status")
     public ResponseEntity<MeilensteinDTO> updateMilestoneStatus(
             @PathVariable Long projektId,
@@ -155,7 +158,7 @@ public class MeilensteinController {
      * @param newName Der neue Name für den Meilenstein.
      * @return ResponseEntity mit dem aktualisierten Meilenstein-Datentransferobjekt.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @PutMapping("/{projektId}/milestones/{milestoneId}/name")
     public ResponseEntity<MeilensteinDTO> updateMilestoneName(
             @PathVariable Long projektId,
@@ -189,7 +192,7 @@ public class MeilensteinController {
      * @param milestoneId Die ID des zu löschenden Meilensteins.
      * @return ResponseEntity ohne Inhalt, wenn der Löschvorgang erfolgreich war.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @DeleteMapping("/{projektId}/milestones/{milestoneId}")
     public ResponseEntity<Void> deleteMilestone(
             @PathVariable Long projektId,

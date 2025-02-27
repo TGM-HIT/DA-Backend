@@ -1,5 +1,6 @@
 package at.ac.tgm.diplomarbeit.diplomdb.controller;
 
+import at.ac.tgm.ad.Roles;
 import at.ac.tgm.diplomarbeit.diplomdb.dto.GroupDTO;
 import at.ac.tgm.diplomarbeit.diplomdb.dto.UserDTO;
 import at.ac.tgm.ad.entry.UserEntry;
@@ -9,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -48,7 +49,7 @@ public class UserController {
      * @param samAccountName Der sAMAccountName des zu testenden Benutzers.
      * @return ResponseEntity mit einer Bestätigung, ob der Benutzer gefunden wurde.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping("/test-ldap-user/{samAccountName}")
     public ResponseEntity<String> testLdapUser(@PathVariable String samAccountName) {
         LOGGER.debug("Test LDAP user: {}", samAccountName);
@@ -66,7 +67,7 @@ public class UserController {
      * @param samAccountName Der sAMAccountName des Benutzers.
      * @return ResponseEntity mit dem UserDTO, das die Benutzerinformationen enthält.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping("/users/{samAccountName}")
     public ResponseEntity<UserDTO> getUserDetails(@PathVariable String samAccountName) {
         LOGGER.debug("GET /users/{}", samAccountName);
@@ -87,7 +88,7 @@ public class UserController {
      * @param samAccountName Der sAMAccountName des Benutzers.
      * @return ResponseEntity mit einem Set von GroupDTO, das die Gruppeninformationen enthält.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping("/users/{samAccountName}/groups")
     public ResponseEntity<Set<GroupDTO>> getUserGroups(@PathVariable String samAccountName) {
         LOGGER.debug("GET /users/{}/groups", samAccountName);
@@ -111,7 +112,7 @@ public class UserController {
      * @param mail Die Mail-Adresse, nach der gesucht werden soll.
      * @return ResponseEntity mit dem UserDTO, falls ein Benutzer gefunden wird.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping("/users/searchByMail")
     public ResponseEntity<UserDTO> searchUserByMail(@RequestParam String mail) {
         LOGGER.debug("GET /users/searchByMail?mail={}", mail);
@@ -136,7 +137,7 @@ public class UserController {
      * @param cn Der Common Name, nach dem gesucht werden soll.
      * @return ResponseEntity mit dem UserDTO, falls ein Benutzer gefunden wird.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping("/users/searchByCN")
     public ResponseEntity<UserDTO> searchUserByCN(@RequestParam String cn) {
         LOGGER.debug("GET /users/searchByCN?cn={}", cn);
@@ -176,7 +177,7 @@ public class UserController {
      * @param group Das GroupEntry-Objekt.
      * @return Das resultierende GroupDTO mit den entsprechenden Gruppendaten.
      */
-    private GroupDTO mapToGroupDTO(GroupEntry group) {
+    private GroupDTO mapToGroupDTO(at.ac.tgm.ad.entry.GroupEntry group) {
         GroupDTO dto = new GroupDTO();
         dto.setCn(group.getCn());
         dto.setDisplayName(group.getDisplayName());

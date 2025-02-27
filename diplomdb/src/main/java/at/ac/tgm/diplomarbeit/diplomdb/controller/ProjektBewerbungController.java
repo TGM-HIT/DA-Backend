@@ -1,5 +1,6 @@
 package at.ac.tgm.diplomarbeit.diplomdb.controller;
 
+import at.ac.tgm.ad.Roles;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.ProjektBewerbung;
 import at.ac.tgm.diplomarbeit.diplomdb.service.ProjektBewerbungService;
 import at.ac.tgm.diplomarbeit.diplomdb.service.ProjektBewerbungService.UserBewerbungOverviewDTO;
@@ -7,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -48,7 +49,7 @@ public class ProjektBewerbungController {
      * @param bewerbung Das Bewerbung-Objekt aus dem Request-Body.
      * @return ResponseEntity mit dem erstellten Bewerbung-Objekt.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @PostMapping
     public ResponseEntity<ProjektBewerbung> createApplication(@RequestBody ProjektBewerbung bewerbung) {
         LOGGER.info("Erstelle Bewerbung: projektId={}, user(angefragt)={}, prioritaet={}",
@@ -85,7 +86,7 @@ public class ProjektBewerbungController {
      * @param sortBy Optionales Sortierkriterium.
      * @return ResponseEntity mit einer Liste von Bewerbungen.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping
     public ResponseEntity<List<ProjektBewerbung>> getApplications(
             @RequestParam(required = false) String user,
@@ -108,7 +109,7 @@ public class ProjektBewerbungController {
      *
      * @return ResponseEntity mit einer Liste von UserBewerbungOverviewDTO, gruppiert nach Benutzer.
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping("/overview")
     public ResponseEntity<List<ProjektBewerbungService.UserBewerbungOverviewDTO>> getApplicationsOverview() {
         LOGGER.debug("GET /project-applications/overview");
@@ -126,7 +127,7 @@ public class ProjektBewerbungController {
      * @param id Die ID der zu löschenden Bewerbung.
      * @return ResponseEntity ohne Inhalt, wenn die Löschung erfolgreich war.
      */
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @Secured(Roles.ADMIN)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteApplication(@PathVariable Long id) {
         LOGGER.warn("Lösche Bewerbung: id={}", id);

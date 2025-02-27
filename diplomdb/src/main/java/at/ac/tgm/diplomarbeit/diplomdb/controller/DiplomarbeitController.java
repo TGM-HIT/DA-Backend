@@ -1,5 +1,6 @@
 package at.ac.tgm.diplomarbeit.diplomdb.controller;
 
+import at.ac.tgm.ad.Roles;
 import at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitResponseDTO;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Betreuer;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Diplomarbeit;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,7 +67,7 @@ public class DiplomarbeitController {
      * HTTP-Methode: POST
      * URL: /api/projects/create-with-lastenheft
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @PostMapping("/create-with-lastenheft")
     public ResponseEntity<DiplomarbeitResponseDTO> createProjectWithLastenheft(
             @RequestParam("titel") String titel,
@@ -160,7 +161,7 @@ public class DiplomarbeitController {
      * HTTP-Methode: PUT
      * URL: /api/projects/assign-teacher-by-id/self
      */
-    @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
+    @Secured({Roles.TEACHER, Roles.ADMIN})
     @PutMapping("/assign-teacher-by-id/self")
     public ResponseEntity<DiplomarbeitResponseDTO> assignSelfTeacherToProjectById(
             @RequestParam Long projectId
@@ -202,7 +203,7 @@ public class DiplomarbeitController {
      * HTTP-Methode: PUT
      * URL: /api/projects/assign-teacher-by-id/admin
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Secured(Roles.ADMIN)
     @PutMapping("/assign-teacher-by-id/admin")
     public ResponseEntity<DiplomarbeitResponseDTO> assignTeacherToProjectByIdAdmin(
             @RequestParam Long projectId,
@@ -245,7 +246,7 @@ public class DiplomarbeitController {
      * HTTP-Methode: PUT
      * URL: /api/projects/{id}/review
      */
-    @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
+    @Secured({Roles.TEACHER, Roles.ADMIN})
     @PutMapping("/{id}/review")
     public ResponseEntity<DiplomarbeitResponseDTO> reviewProject(
             @PathVariable Long id,
@@ -277,7 +278,7 @@ public class DiplomarbeitController {
      * HTTP-Methode: POST
      * URL: /api/projects
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @PostMapping
     public ResponseEntity<DiplomarbeitResponseDTO> createProject(@RequestBody at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitDTO diplomarbeitDTO) {
         LOGGER.info("Erstelle Projekt: {}", diplomarbeitDTO.getTitel());
@@ -357,8 +358,8 @@ public class DiplomarbeitController {
      * HTTP-Methode: GET
      * URL: /api/projects
      */
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
     public ResponseEntity<List<at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitResponseDTO>> getAllProjects(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String vonDatum,
@@ -426,7 +427,7 @@ public class DiplomarbeitController {
      * HTTP-Methode: GET
      * URL: /api/projects/{id}
      */
-    @PreAuthorize("hasAnyRole('STUDENT','TEACHER','ADMIN')")
+    @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
     @GetMapping("/{id}")
     public ResponseEntity<at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitResponseDTO> getProjectById(@PathVariable Long id) {
         LOGGER.debug("GET /projects/{}", id);
@@ -446,7 +447,7 @@ public class DiplomarbeitController {
      *   und der neue Lehrer wird inkrementiert (nach Prüfung der Kapazität).
      * - Wird kein neuer Betreuer gesetzt, so wird ggf. der alte Eintrag entfernt und dessen Zählwert reduziert.
      */
-    @PreAuthorize("hasAnyRole('TEACHER','ADMIN')")
+    @Secured({Roles.TEACHER, Roles.ADMIN})
     @PutMapping("/{id}")
     public ResponseEntity<at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitResponseDTO> updateProject(@PathVariable Long id, @RequestBody at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitDTO diplomarbeitDTO) {
         LOGGER.info("Aktualisiere Projekt: {}", id);
@@ -520,7 +521,7 @@ public class DiplomarbeitController {
      * HTTP-Methode: DELETE
      * URL: /api/projects/{id}
      */
-    @PreAuthorize("hasRole('ADMIN')")
+    @Secured(Roles.ADMIN)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         LOGGER.warn("Lösche Projekt: {}", id);
@@ -561,15 +562,5 @@ public class DiplomarbeitController {
         dto.setMitarbeiterSamAccountNames(diplomarbeit.getMitarbeiterSamAccountNames());
         dto.setAblehnungsgrund(diplomarbeit.getAblehnungsgrund());
         return dto;
-    }
-
-    /**
-     * Exception Handler für IllegalStateException, um passende Fehlermeldungen in der HTTP Response zurückzugeben.
-     */
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalStateException(IllegalStateException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }
