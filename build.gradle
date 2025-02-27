@@ -58,17 +58,15 @@ allprojects {
         useJUnitPlatform()
     }
     
-    
-    springBoot {
-        mainClass = 'at.ac.tgm.Application'
-    }
-    
     bootJar {
+        enabled = true
         mainClass = 'at.ac.tgm.Application'
     }
     bootWar {
+        enabled = true
         mainClass = 'at.ac.tgm.Application'
     }
+    war.enabled = false
     
 }
 

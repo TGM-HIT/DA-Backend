@@ -6,6 +6,10 @@ services:
     image: mpointner/da-backend:latest
     ports:
       - "8080:8080"
+    environment:
+      AD_USER: ${AD_USER}
+      AD_PASSWORD: ${AD_PASSWORD}
+      ADMINS: ${ADMINS}
   database:
     container_name: DA-MariaDB
     image: mariadb:latest
