@@ -1,29 +1,41 @@
+name: da-backend
 services:
   application:
-    container_name: DA-Backend
+    container_name: SpringBoot
     build:
       dockerfile: ./Dockerfile
     image: mpointner/da-backend:latest
     ports:
       - "8080:8080"
     environment:
-      AD_USER: ${AD_USER}
-      AD_PASSWORD: ${AD_PASSWORD}
-      ADMINS: ${ADMINS}
+      - AD_USER=${AD_USER}
+      - AD_PASSWORD=${AD_PASSWORD}
+      - ADMINS=${ADMINS}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
     depends_on:
-      - database
+      database:
+        condition: service_started
+    networks:
+      - DA-Backend
+
   database:
-    container_name: DA-MariaDB
+    container_name: MariaDB
     image: mariadb:latest
     restart: always
     ports:
       - "3306:3306"
     environment:
-      MARIADB_ROOT_PASSWORD: root
-      MYSQL_USER: root
-      MYSQL_PASSWORD: rootpw
-      MYSQL_DATABASE: dev
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
     volumes:
       - database:/var/lib/mysql
+    networks:
+      - DA-Backend
+
+networks:
+  DA-Backend:
+    driver: bridge
+
 volumes:
   database:
