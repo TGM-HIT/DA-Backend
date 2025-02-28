@@ -1,6 +1,8 @@
 # DA-Backend
 
-Gemeinsames Spring Boot Backend für Diplomarbeitsprojekte
+Gemeinsames Spring Boot Backend für Diplomarbeitsprojekte.
+
+Für eine Beispielimplementierung eines Frontends siehe [DA Frontend Vue Template](https://github.com/TGM-HIT/DA-Frontend-Vue-Template).
 
 ## Voraussetzungen
 
@@ -12,9 +14,11 @@ Getestet mit:
 Für die Active Directory LDAP Anbindung muss auf der Root eine `.env` Datei angelegt werden, welche Folgendes enthält:
 
 ```
-AD_USER=insertTGMEmailAdressHere
-AD_PASSWORD=insertTGMPasswortHere
-ADMINS=mmustermann,emustermann
+AD_USER=REPLACE_TGM_USER
+AD_PASSWORD=REPLACE_TGM_PASSWORD
+ADMINS=REPLACE_TGM_USER_1,REPLACE_TGM_USER_2
+MARIADB_ROOT_PASSWORD=REPLACE_DATABASE_PASSWORD
+MARIADB_DATABASE=REPLACE_DATABASE_NAME
 ```
 
 ## Gradle Projektstruktur
