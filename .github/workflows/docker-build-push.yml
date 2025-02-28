@@ -3,6 +3,8 @@ name: ci
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   docker:
@@ -27,4 +29,4 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: mpointner/da-backend:latest
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/da-backend:latest
