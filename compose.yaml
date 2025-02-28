@@ -10,6 +10,8 @@ services:
       AD_USER: ${AD_USER}
       AD_PASSWORD: ${AD_PASSWORD}
       ADMINS: ${ADMINS}
+    depends_on:
+      - database
   database:
     container_name: DA-MariaDB
     image: mariadb:latest
@@ -17,4 +19,11 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_ROOT_PASSWORD: root
+      MYSQL_USER: root
+      MYSQL_PASSWORD: rootpw
+      MYSQL_DATABASE: dev
+    volumes:
+      - database:/var/lib/mysql
+volumes:
+  database:
