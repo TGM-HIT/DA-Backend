@@ -69,4 +69,15 @@ public class UserService {
                 lehrer.getMemberOf().stream().map(member -> groupRepository.findByCn(Util.getCnFromName(member)).orElse(null)).filter(Objects::nonNull).collect(Collectors.toSet());
         lehrer.setGroups(groups);
     }
+
+    /**
+     * Neue öffentliche Methode, um einen Benutzer inkl. Gruppen zu laden.
+     */
+    public Optional<UserEntry> findBysAMAccountNameWithGroups(String sAMAccountName) {
+        Optional<UserEntry> userOpt = findBysAMAccountName(sAMAccountName);
+        if (userOpt.isPresent()) {
+            loadGroupMembers(userOpt.get());
+        }
+        return userOpt;
+    }
 }

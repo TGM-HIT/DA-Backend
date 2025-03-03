@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Betreuer Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        label, button { display: block; margin: 10px 0; }
+        input { width: 300px; }
+        .response { border: 1px solid #ccc; padding: 10px; background: #f9f9f9; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+<!-- Gemeinsamer Header -->
+<header style="background: #333; color: #fff; padding: 10px;">
+    <nav>
+        <a href="/index.html" style="color: #fff; margin-right: 15px;">Home</a>
+        <a href="/login_test.html" style="color: #fff; margin-right: 15px;">Login Test</a>
+        <a href="/betreuer_test.html" style="color: #fff; margin-right: 15px;">Betreuer Test</a>
+        <a href="/projects_test.html" style="color: #fff; margin-right: 15px;">Projekte Test</a>
+        <a href="/documents_test.html" style="color: #fff; margin-right: 15px;">Dokumente Test</a>
+        <a href="/milestones_test.html" style="color: #fff; margin-right: 15px;">Meilensteine Test</a>
+        <a href="/project_applications_test.html" style="color: #fff; margin-right: 15px;">Bewerbungen Test</a>
+        <a href="/schueler_test.html" style="color: #fff; margin-right: 15px;">Schüler Test</a>
+        <a href="/user_test.html" style="color: #fff;">User Test</a>
+    </nav>
+    <div id="headerLoginSection">
+        <label style="color: #fff;">Username:
+            <input type="text" id="headerUsername">
+        </label>
+        <label style="color: #fff;">Password:
+            <input type="password" id="headerPassword">
+        </label>
+        <button id="headerLoginBtn">Login</button>
+    </div>
+</header>
+<hr>
+
+<h1>Betreuer Test</h1>
+
+<button id="refreshBtn">Refresh Betreuer-Liste (POST /api/betreuer/refresh)</button>
+
+<h3>Get Betreuer-Liste (GET /api/betreuer)</h3>
+<button id="getListBtn">Liste abrufen</button>
+
+<h3>Status ändern</h3>
+<label>sAMAccountName:
+    <input type="text" id="statusSam">
+</label>
+<label>Neuer Status:
+    <input type="text" id="newStatus">
+</label>
+<button id="updateStatusBtn">Status ändern (PUT /api/betreuer/sam/{samAccountName}/status)</button>
+
+<h3>Kapazität aktualisieren</h3>
+<label>sAMAccountName:
+    <input type="text" id="capacitySam">
+</label>
+<label>Neue maxProjekte:
+    <input type="number" id="newCapacity">
+</label>
+<button id="updateCapacityBtn">Kapazität aktualisieren (PUT /api/betreuer/sam/{samAccountName}/capacity)</button>
+
+<h3>Export Betreuer</h3>
+<label>Format (csv, excel, pdf):
+    <input type="text" id="exportFormat" placeholder="csv">
+</label>
+<button id="exportBtn">Exportieren (GET /api/betreuer/export)</button>
+
+<h3>Response:</h3>
+<pre class="response" id="responseArea"></pre>
+
+<script>
+    let csrfToken = null;
+    async function getCsrf() {
+        if (!csrfToken) {
+            const res = await fetch('/api/csrf-token', { method: 'GET', credentials: 'include' });
+            const data = await res.json();
+            csrfToken = data.csrfToken;
+        }
+    }
+
+    // Header Login (falls noch nicht erfolgt)
+    document.getElementById('headerLoginBtn').addEventListener('click', async () => {
+        const username = document.getElementById('headerUsername').value;
+        const password = document.getElementById('headerPassword').value;
+        const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+            credentials: 'include'
+        });
+        const data = await res.json();
+        alert("Login Response: " + JSON.stringify(data, null, 2));
+        const csrfRes = await fetch('/api/csrf-token', { method: 'GET', credentials: 'include' });
+        const csrfData = await csrfRes.json();
+        csrfToken = csrfData.csrfToken;
+        alert("CSRF Token: " + csrfToken);
+        if(data.status === 'success'){
+            document.getElementById('headerLoginSection').style.display = 'none';
+        }
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', async () => {
+        await getCsrf();
+        const res = await fetch('/api/betreuer/refresh', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'X-CSRF-TOKEN': csrfToken }
+        });
+        const text = await res.text();
+        document.getElementById('responseArea').textContent = text;
+    });
+
+    document.getElementById('getListBtn').addEventListener('click', async () => {
+        await getCsrf();
+        const res = await fetch('/api/betreuer', {
+            method: 'GET',
+            credentials: 'include',
+            headers: { 'X-CSRF-TOKEN': csrfToken }
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
+    });
+
+    document.getElementById('updateStatusBtn').addEventListener('click', async () => {
+        await getCsrf();
+        const sam = document.getElementById('statusSam').value;
+        const newStatus = document.getElementById('newStatus').value;
+        const url = `/api/betreuer/sam/${encodeURIComponent(sam)}/status?newStatus=${encodeURIComponent(newStatus)}`;
+        const res = await fetch(url, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: { 'X-CSRF-TOKEN': csrfToken }
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
+    });
+
+    document.getElementById('updateCapacityBtn').addEventListener('click', async () => {
+        await getCsrf();
+        const sam = document.getElementById('capacitySam').value;
+        const newCap = document.getElementById('newCapacity').value;
+        const url = `/api/betreuer/sam/${encodeURIComponent(sam)}/capacity?maxProjekte=${encodeURIComponent(newCap)}`;
+        const res = await fetch(url, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: { 'X-CSRF-TOKEN': csrfToken }
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', async () => {
+        await getCsrf();
+        const format = document.getElementById('exportFormat').value || 'csv';
+        const url = `/api/betreuer/export?format=${encodeURIComponent(format)}`;
+        const res = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { 'X-CSRF-TOKEN': csrfToken }
+        });
+        if (res.ok) {
+            const blob = await res.blob();
+            let filename = `betreuer_list.${format}`;
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            document.getElementById('responseArea').textContent = "Export erfolgreich: " + filename;
+        } else {
+            const text = await res.text();
+            document.getElementById('responseArea').textContent = `Fehler: ${res.status}\n${text}`;
+        }
+    });
+</script>
+</body>
+</html>

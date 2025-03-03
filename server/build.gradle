@@ -1,6 +1,7 @@
 dependencies {
     implementation project(':core')
     implementation project(':beispiel')
+    implementation project(':diplomdb')
     
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
     implementation 'org.springframework.ldap:spring-ldap-core'
