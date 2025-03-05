@@ -89,7 +89,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handle(BadCredentialsException e) {
         logger.error("BadCredentialsException", e.getMessage());
         String body = e.getMessage();
-        return new ResponseEntity<>(body, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)

@@ -3,11 +3,12 @@ package at.ac.tgm.repository;
 
 import at.ac.tgm.model.Ampel;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-
+@Repository
 public interface AmpelRepository extends JpaRepository<Ampel, Long> {
 
     List<Ampel> findByStudentId(Long studentId);

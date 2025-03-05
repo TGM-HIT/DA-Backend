@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface AuthenticationApi {
     @PostMapping("/login")
     @Operation(requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = {
-            @Content(examples = {@ExampleObject(name = "Simulate Student Login", value = """
-                                    {"username":"nribinin", "password":"", "simulate":true}""")
+            @Content(examples = {@ExampleObject(name = "Simulate Teacher Login", value = """
+                                    {"username":"mpointner", "password":"", "simulate":true}""")
             }, schema = @Schema(implementation = LoginRequestDto.class), mediaType = MediaType.APPLICATION_JSON_VALUE)
     }))
     ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response);

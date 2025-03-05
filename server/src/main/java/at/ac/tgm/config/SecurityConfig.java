@@ -96,7 +96,7 @@ SecurityConfig {
                         .allowedHeaders("*")
                         .allowedMethods("*")
                         .allowCredentials(true)
-                        .allowedOriginPatterns("http://localhost:5173", "https://projekte.tgm.ac.at", "http://10.110.0.58:5173", "http://10.0.106.103:5173")
+                        .allowedOriginPatterns("http://localhost:5173:[*]", "https://projekte.tgm.ac.at")
                         .exposedHeaders("Access-Control-Allow-Origin");
             }
         };

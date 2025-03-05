@@ -47,14 +47,7 @@ public class TeacherAmpelController {
     public ResponseEntity<?> getAmpelForTeacher(Authentication authentication) {
         String sAMAccountName = authentication.getName();
 
-        if (sAMAccountName == null || sAMAccountName.isEmpty()) {
-            return ResponseEntity.status(401).body(new ErrorResponseDto("Nicht authentifiziert.", 401));
-        }
-
         Optional<UserEntry> userEntryOptional = userService.findBysAMAccountName(sAMAccountName);
-        if (userEntryOptional.isEmpty()) {
-            return ResponseEntity.status(404).body(new ErrorResponseDto("Lehrer nicht gefunden.", 404));
-        }
 
         UserEntry userEntry = userEntryOptional.get();
         String ldapName = userEntry.getName();
@@ -73,15 +66,7 @@ public class TeacherAmpelController {
     public ResponseEntity<?> createAmpelForTeacher(@RequestBody AmpelRequestDto dto, Authentication authentication) {
         String sAMAccountName = authentication.getName();
 
-        if (sAMAccountName == null || sAMAccountName.isEmpty()) {
-            return ResponseEntity.status(401).body(new ErrorResponseDto("Nicht authentifiziert.", 401));
-        }
-
-
         Optional<Teacher> teacherOptional = teacherAmpelService.getTeacherBySAMAccountName(sAMAccountName);
-        if (teacherOptional.isEmpty()) {
-            return ResponseEntity.status(404).body(new ErrorResponseDto("Lehrer in der Datenbank nicht gefunden.", 404));
-        }
 
         Teacher teacher = teacherOptional.get();
 
@@ -105,14 +90,7 @@ public class TeacherAmpelController {
     public ResponseEntity<?> updateAmpelForTeacher(@RequestBody AmpelRequestDto dto, Authentication authentication) {
         String sAMAccountName = authentication.getName();
 
-        if (sAMAccountName == null || sAMAccountName.isEmpty()) {
-            return ResponseEntity.status(401).body(new ErrorResponseDto("Nicht authentifiziert.", 401));
-        }
-
         Optional<Teacher> teacherOptional = teacherAmpelService.getTeacherBySAMAccountName(sAMAccountName);
-        if (teacherOptional.isEmpty()) {
-            return ResponseEntity.status(404).body(new ErrorResponseDto("Lehrer in der Datenbank nicht gefunden.", 404));
-        }
 
         Teacher teacher = teacherOptional.get();
 
@@ -131,7 +109,7 @@ public class TeacherAmpelController {
     }
     @Secured(Roles.TEACHER)
     @GetMapping("/kv/getStudents")
-    public ResponseEntity<?> getKvStudents(Authentication authentication) {
+    public ResponseEntity<List<TeacherKVAmpelDto>> getKvStudents(Authentication authentication) {
         String sAMAccountName = authentication.getName();
         Optional<UserEntry> userEntryOptional = userService.findBysAMAccountName(sAMAccountName);
         UserEntry userEntry = userEntryOptional.get();

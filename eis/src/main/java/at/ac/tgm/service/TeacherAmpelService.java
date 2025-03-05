@@ -22,14 +22,10 @@ public class TeacherAmpelService {
     private final LessonRepository lessonRepository;
     private final AmpelRepository ampelRepository;
     private final StudentRepository studentRepository;
-    @Autowired
     private final UserService userService;
 
-    public TeacherAmpelService(TeacherRepository teacherRepository,
-                               LessonRepository lessonRepository,
-                               AmpelRepository ampelRepository,
-                               StudentRepository studentRepository,
-                               UserService userService) {
+    @Autowired
+    public TeacherAmpelService(TeacherRepository teacherRepository, LessonRepository lessonRepository, AmpelRepository ampelRepository, StudentRepository studentRepository, UserService userService) {
         this.teacherRepository = teacherRepository;
         this.lessonRepository = lessonRepository;
         this.ampelRepository = ampelRepository;
@@ -37,7 +33,6 @@ public class TeacherAmpelService {
         this.userService = userService;
     }
 
-    // create or update
     public AmpelDto createOrUpdateAmpel(AmpelRequestDto dto) {
         if (dto.getLessonId() == null || dto.getStudentId() == null || dto.getTeacherId() == null) {
             throw new RuntimeException("lessonId, studentId, teacherId must not be null");
@@ -49,7 +44,6 @@ public class TeacherAmpelService {
 
         Ampel ampel;
         if (existingOpt.isPresent()) {
-            // Update
             ampel = existingOpt.get();
             if (dto.getFarbe() != null) {
                 ampel.setFarbe(AmpelFarbe.valueOf(dto.getFarbe()));

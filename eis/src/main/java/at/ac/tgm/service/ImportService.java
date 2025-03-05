@@ -2,6 +2,7 @@ package at.ac.tgm.service;
 
 import at.ac.tgm.model.*;
 import at.ac.tgm.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +30,7 @@ public class ImportService {
             "Mag.Dr.", "Ing.Dipl.-Päd.", "MMag.Dr.", "Dipl.-Ing.(FH)", "Dipl.-Ing.Dr.", "MAS"
     );
 
+    @Autowired
     public ImportService(TeacherRepository teacherRepository,
                          HitclassRepository hitclassRepository,
                          StudentRepository studentRepository,

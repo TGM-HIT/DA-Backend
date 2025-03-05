@@ -112,7 +112,7 @@ public class AmpelController {
     }
     @Secured(Roles.TEACHER)
     @DeleteMapping
-    public ResponseEntity<?> deleteAmpel(
+    public ResponseEntity<String> deleteAmpel(
             @RequestParam Long lessonId,
             @RequestParam Long studentId,
             @RequestParam Long teacherId
@@ -120,7 +120,7 @@ public class AmpelController {
         // Hier ggf. Authentifizierung prüfen oder Teacher-Check
         // Dann:
         teacherAmpelService.deleteAmpel(lessonId, studentId, teacherId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Ampel erfolgreich gelöscht");
     }
 
 }

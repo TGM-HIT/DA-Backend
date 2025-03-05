@@ -1,4 +1,5 @@
 package at.ac.tgm.config;
+
 import at.ac.tgm.Application;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;

@@ -42,10 +42,6 @@ public class StudentAmpelController {
 
         // 1) Prüfen, ob wir überhaupt einen gültigen Login haben
         Optional<UserEntry> userEntryOptional = userService.findBysAMAccountName(sAMAccountName);
-        if (userEntryOptional.isEmpty()) {
-            // Hier könnte man 401 oder 403 zurückgeben
-            return ResponseEntity.status(404).body(List.of());
-        }
 
         // 2) Mitarbeiter- / Schülerkennung holen
         UserEntry userEntry = userEntryOptional.get();

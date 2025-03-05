@@ -48,7 +48,7 @@ public class AdminRestController {
      */
     @Secured(Roles.ADMIN)
     @PostMapping("/upload")
-    public ResponseEntity<?> handleFileUpload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> handleFileUpload(@RequestParam("file") MultipartFile file) {
         try {
             importService.importCsv(file);
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Map.of("message", "File uploaded and processed successfully!"));
@@ -72,7 +72,7 @@ public class AdminRestController {
     }
     @Secured(Roles.ADMIN)
     @PutMapping("/setKlassenvorstand")
-    public ResponseEntity<?> setKlassenvorstand(@RequestParam Long hitclassId, @RequestParam Long teacherId) {
+    public ResponseEntity<String> setKlassenvorstand(@RequestParam Long hitclassId, @RequestParam Long teacherId) {
         Optional<Hitclass> hitclassOpt = hitclassRepository.findById(hitclassId);
         if (hitclassOpt.isEmpty()) {
             return ResponseEntity.status(404).body("Klasse nicht gefunden.");
@@ -94,7 +94,7 @@ public class AdminRestController {
 
     @Secured(Roles.ADMIN)
     @GetMapping("/hitclasses/with-teachers")
-    public ResponseEntity<?> getHitclassWithTeachers() {
+    public ResponseEntity<List<HitclassWithTeacherDto>> getHitclassWithTeachers() {
         List<Hitclass> hitclasses = hitclassRepository.findAll();
 
         List<HitclassWithTeacherDto> dtoList = hitclasses.stream().map(hitclass -> {
@@ -126,7 +126,7 @@ public class AdminRestController {
 
     @Secured(Roles.ADMIN)
     @PostMapping("/newStudent")
-    public ResponseEntity<?> createStudent(@RequestBody CreateStudentDto dto) {
+    public ResponseEntity<String> createStudent(@RequestBody CreateStudentDto dto) {
         // 1) Prüfen, ob diese Kennzahl schon existiert
         boolean alreadyExists = studentRepository.existsByStudentKennzahl(dto.getStudentKennzahl());
         if (alreadyExists) {
@@ -161,7 +161,7 @@ public class AdminRestController {
 
     @Secured(Roles.ADMIN)
     @GetMapping("/hitclasses")
-    public ResponseEntity<?> getAllHitclasses() {
+    public ResponseEntity<List<Map<String, Object>>> getAllHitclasses() {
         List<Hitclass> hitclasses = hitclassRepository.findAll();
         // Reduziere auf ID + Name
         List<Map<String, Object>> result = hitclasses.stream().map(c -> {
@@ -210,15 +210,15 @@ public class AdminRestController {
     @Secured(Roles.ADMIN)
     @DeleteMapping("/deleteStudent/{studentKennzahl}")
     @Transactional
-    public ResponseEntity<?> deleteStudent(@PathVariable String studentKennzahl) {
+    public ResponseEntity<String> deleteStudent(@PathVariable String studentKennzahl) {
         studentRepository.deleteByStudentKennzahl(studentKennzahl);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Student mit Kennzahl " + studentKennzahl + " erfolgreich gelöscht.");
     }
 
     @Secured(Roles.ADMIN)
     @DeleteMapping("/deleteTeacher/{teacherid}")
     @Transactional
-    public ResponseEntity<?> deleteTeacher(@PathVariable Long teacherid) {
+    public ResponseEntity<String> deleteTeacher(@PathVariable Long teacherid) {
         Teacher teacher = teacherRepository.findById(teacherid)
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
 
@@ -232,12 +232,12 @@ public class AdminRestController {
 
         // Jetzt kann der Teacher gefahrlos gelöscht werden
         teacherRepository.delete(teacher);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Lehrer mit ID " + teacherid + " erfolgreich gelöscht.");
     }
 
     @Secured(Roles.ADMIN)
     @PostMapping("/newTeacher")
-    public ResponseEntity<?> createTeacher(@RequestBody CreateTeacherDto dto) {
+    public ResponseEntity<String> createTeacher(@RequestBody CreateTeacherDto dto) {
         if (dto.getName() == null || dto.getName().isEmpty()) {
             return ResponseEntity.badRequest().body("Name is required");
         }
@@ -271,7 +271,7 @@ public class AdminRestController {
 
     @Secured(Roles.ADMIN)
     @PutMapping("/updateStudent")
-    public ResponseEntity<?> updateStudent(@RequestBody UpdateStudentDto dto) {
+    public ResponseEntity<String> updateStudent(@RequestBody UpdateStudentDto dto) {
         // 1) Student laden
         Student student = studentRepository.findById(dto.getId())
                 .orElseThrow(() -> new RuntimeException("Student not found"));
@@ -291,14 +291,14 @@ public class AdminRestController {
 
     @Secured(Roles.ADMIN)
     @DeleteMapping("/deleteAllAmpel")
-    public ResponseEntity<?> deleteAllAmpel() {
+    public ResponseEntity<String> deleteAllAmpel() {
         ampelRepository.deleteAll();
         return ResponseEntity.ok("Alle Ampel erfolgreich gelöscht.");
     }
     @Secured(Roles.ADMIN)
     @Transactional // Wichtig: sorgt für einen Transaktionskontext
     @PutMapping("/updateTeacher")
-    public ResponseEntity<?> updateTeacherLessons(@RequestBody UpdateTeacherDto dto) {
+    public ResponseEntity<String> updateTeacherLessons(@RequestBody UpdateTeacherDto dto) {
         // 1) Lehrer laden
         Optional<Teacher> optTeacher = teacherRepository.findById(dto.getId());
         if (optTeacher.isEmpty()) {
@@ -347,12 +347,11 @@ public class AdminRestController {
 
     @Secured(Roles.ADMIN)
     @GetMapping("/getAllTeachersWithLessons")
-    public List<TeacherWithLessonsDto> getAllTeachersWithLessons() {
+    public ResponseEntity<List<TeacherWithLessonsDto>> getAllTeachersWithLessons() {
         List<Teacher> teacherList = teacherRepository.findAll();
 
-        return teacherList.stream()
+        List<TeacherWithLessonsDto> dtoList = teacherList.stream()
                 .map(teacher -> {
-                    // Sammle lessonIds:
                     List<Long> lessonIds = teacher.getLessons().stream()
                             .map(Lesson::getId)
                             .collect(Collectors.toList());
@@ -363,5 +362,7 @@ public class AdminRestController {
                     );
                 })
                 .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtoList);
     }
 }
