@@ -4,7 +4,7 @@ services:
     container_name: SpringBoot
     build:
       dockerfile: ./Dockerfile
-    image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_IMAGE}:latest
+    image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_IMAGE}:${DOCKERHUB_TAG}
     ports:
       - "8080:8080"
     environment:
@@ -13,6 +13,7 @@ services:
       - ADMINS=${ADMINS}
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_PORT=${MARIADB_PORT}
     depends_on:
       database:
         condition: service_started
@@ -24,10 +25,11 @@ services:
     image: mariadb:latest
     restart: always
     ports:
-      - "3306:3306"
+      - "${MARIADB_PORT}:3306"
     environment:
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_PORT=${MARIADB_PORT}
     volumes:
       - database:/var/lib/mysql
     networks:
