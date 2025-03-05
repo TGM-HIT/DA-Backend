@@ -1,7 +1,3 @@
-plugins {
-    id 'war'
-}
-
 dependencies {
     implementation project(':core')
     implementation project(':eis')
@@ -14,6 +10,3 @@ dependencies {
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.0.5'
 
 }
-
-bootJar.enabled = true
-bootWar.enabled = true
