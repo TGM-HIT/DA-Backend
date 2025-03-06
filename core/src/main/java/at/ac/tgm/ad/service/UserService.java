@@ -45,15 +45,6 @@ public class UserService {
         return user;
     }
     
-    public Optional<UserEntry> findByMail(String email) {
-        Optional<UserEntry> user = userRepository.findByMail(email);
-        return user;
-    }
-    public Optional<UserEntry> findBysAMAccountName(String sAMAccountName) {
-        Optional<UserEntry> user = userRepository.findBysAMAccountName(sAMAccountName);
-        return user;
-    }
-    
     public List<String> listUserCNs(String entryBase) {
         return ldapTemplate.list(entryBase);
     }
@@ -69,4 +60,15 @@ public class UserService {
                 lehrer.getMemberOf().stream().map(member -> groupRepository.findByCn(Util.getCnFromName(member)).orElse(null)).filter(Objects::nonNull).collect(Collectors.toSet());
         lehrer.setGroups(groups);
     }
+
+    public Optional<UserEntry> findByMail(String email) {
+        Optional<UserEntry> user = userRepository.findByMail(email);
+        return user;
+    }
+    public Optional<UserEntry> findBysAMAccountName(String sAMAccountName) {
+        Optional<UserEntry> user = userRepository.findBysAMAccountName(sAMAccountName);
+        return user;
+    }
+
+
 }

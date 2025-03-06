@@ -19,6 +19,8 @@ services:
         condition: service_started
     networks:
       - DA-Backend
+    links:
+      - database
 
   database:
     container_name: MariaDB
