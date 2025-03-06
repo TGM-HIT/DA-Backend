@@ -63,6 +63,7 @@ public class SecurityConfig {
     ) throws Exception {
         return http
                 .csrf((csrf) -> {
+                    csrf.ignoringRequestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/auth/login");
                     csrf.csrfTokenRepository(cookieCsrfTokenRepository);
                     csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler);
                     csrf.configure(http); // Wichtig, damit das neue Einstellungen übernommen werden
@@ -95,7 +96,7 @@ public class SecurityConfig {
                         .allowedHeaders("*")
                         .allowedMethods("*")
                         .allowCredentials(true)
-                        .allowedOriginPatterns("http://localhost:[*]", "https://projekte.tgm.ac.at")
+                        .allowedOriginPatterns("http://localhost", "http://localhost:[*]", "https://projekte.tgm.ac.at")
                         .exposedHeaders("Access-Control-Allow-Origin");
             }
         };

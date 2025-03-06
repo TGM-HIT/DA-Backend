@@ -61,7 +61,7 @@ public class AuthenticationController implements AuthenticationApi {
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(authentication);
         securityContextRepository.saveContext(context, request, response);
-        
+
         logger.info("Login of " + user.getDisplayName());
         
         return ResponseEntity.ok(authentication);
@@ -97,5 +97,11 @@ public class AuthenticationController implements AuthenticationApi {
         session.invalidate();
         logger.info("Session invalidated, User logged out successfully");
         return ResponseEntity.ok("User logged out successfully");
+    }
+
+    @Override
+    public Authentication getAuthCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth;
     }
 }
