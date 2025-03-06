@@ -96,7 +96,7 @@ public class SecurityConfig {
                         .allowedHeaders("*")
                         .allowedMethods("*")
                         .allowCredentials(true)
-                        .allowedOriginPatterns("http://localhost:[*]", "https://projekte.tgm.ac.at")
+                        .allowedOriginPatterns("http://localhost", "http://localhost:[*]", "https://projekte.tgm.ac.at")
                         .exposedHeaders("Access-Control-Allow-Origin");
             }
         };

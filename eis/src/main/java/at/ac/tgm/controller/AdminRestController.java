@@ -1,5 +1,6 @@
 package at.ac.tgm.controller;
 
+import at.ac.tgm.Consts;
 import at.ac.tgm.dto.*;
 import at.ac.tgm.ad.Roles;
 import at.ac.tgm.model.Hitclass;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping(Consts.EIS_PATH_PREFIX + "/api/admin")
 public class AdminRestController {
 
     private final ImportService importService;

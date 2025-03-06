@@ -1,5 +1,6 @@
 package at.ac.tgm.controller;
 
+import at.ac.tgm.Consts;
 import at.ac.tgm.dto.AmpelDto;
 import at.ac.tgm.dto.AmpelRequestDto;
 import at.ac.tgm.dto.ErrorResponseDto;
@@ -25,7 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/teacher-ampel")
+@RequestMapping(Consts.EIS_PATH_PREFIX + "/api/teacher-ampel")
 public class TeacherAmpelController {
 
     private final TeacherAmpelService teacherAmpelService;

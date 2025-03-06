@@ -1,16 +1,11 @@
 package at.ac.tgm.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TeacherDto {
     private Long id;
     private String name;
-
-    public TeacherDto(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 }

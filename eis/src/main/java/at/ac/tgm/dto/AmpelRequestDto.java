@@ -1,13 +1,12 @@
 package at.ac.tgm.dto;
 
+import at.ac.tgm.model.Ampel;
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Setter
-@Getter
 public class AmpelRequestDto {
     private Long lessonId;
     private Long studentId;

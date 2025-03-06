@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
-@Setter
 public class AmpelDto {
     private Long ampelId;
     private Long teacherId;

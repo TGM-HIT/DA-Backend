@@ -18,13 +18,15 @@ services:
         condition: service_started
     networks:
       - DA-Backend
+    links:
+      - database
 
   database:
     container_name: MariaDB
     image: mariadb:latest
     restart: always
     ports:
-      - "3306:3306"
+      - "${MARIADB_PORT}:3306"
     environment:
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MARIADB_DATABASE=${MARIADB_DATABASE}

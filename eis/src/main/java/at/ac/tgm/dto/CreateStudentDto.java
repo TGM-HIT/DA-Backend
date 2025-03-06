@@ -2,8 +2,7 @@ package at.ac.tgm.dto;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

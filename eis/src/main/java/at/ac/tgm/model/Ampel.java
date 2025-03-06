@@ -1,5 +1,6 @@
 package at.ac.tgm.model;
 
+import at.ac.tgm.Consts;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
+@Table(name = Consts.EIS_TABLE_PREFIX + "AMPELEIS")
 public class Ampel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,5 +1,6 @@
 package at.ac.tgm.controller;
 
+import at.ac.tgm.Consts;
 import at.ac.tgm.dto.AmpelRequestDto;
 import at.ac.tgm.ad.Roles;
 import at.ac.tgm.model.*;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/api/ampel")
+@RequestMapping(Consts.EIS_PATH_PREFIX + "/api/ampel")
 public class AmpelController {
 
     private final AmpelRepository ampelRepository;
@@ -82,7 +83,7 @@ public class AmpelController {
 
         // 2) Felder aktualisieren (wenn gewünscht)
         if (dto.getFarbe() != null) {
-            ampel.setFarbe(AmpelFarbe.valueOf(dto.getFarbe()));
+            ampel.setFarbe(AmpelFarbe.valueOf(dto.getFarbe().toString()));
         }
         if (dto.getBemerkung() != null) {
             ampel.setBemerkung(dto.getBemerkung());

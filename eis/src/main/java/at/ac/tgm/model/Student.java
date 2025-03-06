@@ -1,5 +1,6 @@
 package at.ac.tgm.model;
 
+import at.ac.tgm.Consts;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = Consts.EIS_TABLE_PREFIX + "EISSTUDENT")
 public class Student {
 
     @Id

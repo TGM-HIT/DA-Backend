@@ -47,6 +47,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handler(IllegalArgumentException e) {
         logger.info("IllegalArgumentException", e.getMessage());
         String body = e.getMessage();
+        System.out.println("IllegalArgumentException: " + e.getMessage());
         return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
     }
 
@@ -85,6 +86,7 @@ public class GlobalExceptionHandler {
         System.out.println(e);
         return new ResponseEntity<>(body, headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handle(BadCredentialsException e) {
         logger.error("BadCredentialsException", e.getMessage());
@@ -98,5 +100,4 @@ public class GlobalExceptionHandler {
         String body = e.getMessage();
         return new ResponseEntity<>(body, headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 }
