@@ -1,6 +1,5 @@
 package at.ac.tgm.controller;
 
-import at.ac.tgm.TestConfiguration;
 import at.ac.tgm.ad.Roles;
 import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.service.UserService;
@@ -28,7 +27,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.naming.InvalidNameException;
@@ -40,12 +38,11 @@ import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest(classes = {AuthenticationApi.class, AuthenticationController.class, AdLdapConfig.class})
-@ContextConfiguration(classes = TestConfiguration.class) // Ensure dotenv is loaded
 class AuthenticationControllerTest {
     
     public static final String TEACHER_USERNAME = "mpointner";
     public static final String STUDENT_USERNAME = "mmustermann";
-    public static final String ADMIN_USERNAME = "${APPLICATION_ADMINS}";
+    public static final String ADMIN_USERNAME = "admin";
     public static final String PASSWORD = "1234";
     public static final SimpleGrantedAuthority GROUP_STUDENT = new SimpleGrantedAuthority("schueler1AHIT");
     public static final SimpleGrantedAuthority GROUP_TEACHER = new SimpleGrantedAuthority("lehrer1AHIT");;
