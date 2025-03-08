@@ -50,7 +50,7 @@ public class AuthenticationController implements AuthenticationApi {
     private UserService userService;
     
     @Override
-    public ResponseEntity<Authentication> authenticateUser(LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Authentication> login(LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
         UserEntry user = (loginRequest.getUsername().contains("@")
                 ? userService.findByMail(loginRequest.getUsername())
                 : userService.findBysAMAccountName(loginRequest.getUsername()))

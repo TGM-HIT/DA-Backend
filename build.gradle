@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'war'
     id 'io.spring.dependency-management' version '1.1.6'
-    id 'org.springframework.boot' version '3.3.4'
+    id 'org.springframework.boot' version '3.4.0'
 }
 
 allprojects {
@@ -43,7 +43,7 @@ allprojects {
         annotationProcessor 'org.projectlombok:lombok'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
         implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
         implementation 'org.mapstruct:mapstruct:1.6.3'
@@ -54,7 +54,7 @@ allprojects {
         implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.0'
     }
     
-    tasks.named('test') {
+    test {
         useJUnitPlatform()
     }
     
