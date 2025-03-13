@@ -4,85 +4,57 @@
     <meta charset="UTF-8">
     <title>Login-Simulation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!--
-      Dieses Stylesheet sorgt für ein ansprechendes, responsives Layout des Login-Formulars.
-      Bitte passe ggf. die Styles an Deine Bedürfnisse an.
-    -->
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif; background-color: #f2f2f2;
+            margin: 0; padding: 0;
         }
+        header { background: #333; color: #fff; padding: 10px; }
+        header nav a { color: #fff; margin-right: 15px; text-decoration: none; }
+        header nav a:hover { text-decoration: underline; }
         .login-container {
-            max-width: 400px;
-            margin: 80px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
+            max-width: 400px; margin: 80px auto; background-color: #fff;
+            padding: 20px; border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        .login-container h2 {
-            margin-bottom: 20px;
-            text-align: center;
+        .login-container h2 { margin-bottom: 20px; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"], input[type="password"] {
+            width: 100%; padding: 10px; box-sizing: border-box;
+            border: 1px solid #ccc; border-radius: 3px;
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
-        .form-group.checkbox {
-            display: flex;
-            align-items: center;
-        }
-        .form-group.checkbox input[type="checkbox"] {
-            margin-right: 10px;
-        }
+        .form-group.checkbox { display: flex; align-items: center; }
+        .form-group.checkbox input[type="checkbox"] { margin-right: 10px; }
         .login-btn {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 3px;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
+            width: 100%; padding: 10px; background-color: #007bff;
+            border: none; border-radius: 3px; color: #fff;
+            font-size: 16px; cursor: pointer;
         }
-        .login-btn:hover {
-            background-color: #0056b3;
-        }
-        .message {
-            margin-top: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .error {
-            color: #d9534f;
-        }
-        .success {
-            color: #5cb85c;
-        }
+        .login-btn:hover { background-color: #0056b3; }
+        .message { margin-top: 15px; text-align: center; font-weight: bold; }
+        .error { color: #d9534f; }
+        .success { color: #5cb85c; }
     </style>
 </head>
 <body>
+<header>
+    <nav>
+        <a href="/index.html">Home</a>
+        <a href="/login.html">Login</a>
+        <a href="/betreuer_test.html">Betreuer Test</a>
+        <a href="/projects_test.html">Projekte Test</a>
+        <a href="/documents_test.html">Dokumente Test</a>
+        <a href="/milestones_test.html">Meilensteine Test</a>
+        <a href="/project_applications_test.html">Bewerbungen Test</a>
+        <a href="/schueler_test.html">Schüler Test</a>
+        <a href="/user_test.html">User Test</a>
+    </nav>
+</header>
+<hr>
+
 <div class="login-container">
     <h2>Login-Simulation</h2>
-    <!--
-      Das Formular sammelt den Benutzernamen, das Passwort und ob der Simulationsmodus aktiviert ist.
-      Hinweis: Die Checkbox "Simulation aktivieren" sollte nur im Dev-Profil genutzt werden.
-    -->
     <form id="loginForm">
         <div class="form-group">
             <label for="username">Benutzername/Email:</label>
@@ -102,35 +74,20 @@
 </div>
 
 <script>
-    /**
-     * Dieses Script übernimmt die Logik zur Authentifizierung via REST-Endpunkt.
-     * Es holt (falls notwendig) zunächst den CSRF-Token und sendet dann den Login-Request.
-     * Bei Erfolg oder Fehler wird eine entsprechende Nachricht im Formular angezeigt.
-     */
-
-    // Eventlistener für das Formular, um die Standard-Formularübermittlung zu unterbinden.
     document.getElementById('loginForm').addEventListener('submit', async function(event) {
-        event.preventDefault(); // Verhindere die Standardübermittlung des Formulars
+        event.preventDefault();
         const messageDiv = document.getElementById('message');
-        messageDiv.textContent = ''; // Lösche vorherige Meldungen
+        messageDiv.textContent = '';
 
-        // Erfasse die Eingabedaten aus dem Formular
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
         const simulate = document.getElementById('simulate').checked;
 
-        // Erstelle das Request-Payload als JSON-Objekt
-        const loginPayload = {
-            username: username,
-            password: password,
-            simulate: simulate
-        };
-
-        // Protokollierung des Login-Versuchs (ohne sensible Daten)
+        const loginPayload = { username, password, simulate };
         console.info('Login-Versuch für Benutzer:', username);
 
         try {
-            // Optional: Abruf des CSRF-Tokens von /auth/csrf-token (wird benötigt, falls CSRF-Schutz aktiv ist)
+            // 1) CSRF-Token abrufen
             const csrfResponse = await fetch('/auth/csrf-token', {
                 method: 'GET',
                 credentials: 'include'
@@ -138,36 +95,34 @@
             if (!csrfResponse.ok) {
                 throw new Error('CSRF-Token konnte nicht abgerufen werden.');
             }
-            // Es wird erwartet, dass das CSRF-Token als JSON mit "headerName" und "token" zurückgegeben wird.
             const csrfData = await csrfResponse.json();
             const csrfToken = csrfData.token;
             const csrfHeaderName = csrfData.headerName;
             console.info('CSRF-Token erhalten:', csrfToken);
 
-            // Sende den Login-Request an den Endpunkt /auth/login
+            // 2) Login-Request an /auth/login
             const response = await fetch('/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    [csrfHeaderName]: csrfToken // Füge den CSRF-Token-Header hinzu
+                    [csrfHeaderName]: csrfToken
                 },
                 credentials: 'include',
                 body: JSON.stringify(loginPayload)
             });
 
-            // Falls der Server einen Fehler zurückliefert, lese den Fehlertext
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(errorText || 'Login fehlgeschlagen.');
             }
 
-            // Bei erfolgreicher Authentifizierung wird die Antwort als JSON ausgewertet
-            const authResult = await response.json();
             console.info('Login erfolgreich für Benutzer:', username);
             messageDiv.textContent = 'Login erfolgreich!';
             messageDiv.className = 'message success';
+
+            // Optional: window.location.href = '/index.html';
+
         } catch (error) {
-            // Protokolliere den Fehler in der Konsole und zeige eine Fehlermeldung an
             console.error('Login-Fehler:', error);
             messageDiv.textContent = 'Fehler: ' + error.message;
             messageDiv.className = 'message error';

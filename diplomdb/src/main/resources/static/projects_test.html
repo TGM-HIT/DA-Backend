@@ -5,39 +5,44 @@
     <title>Projekte Test</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
+        header { background: #333; color: #fff; padding: 10px; }
+        header nav a { color: #fff; margin-right: 15px; text-decoration: none; }
+        header nav a:hover { text-decoration: underline; }
         label, button { display: block; margin: 8px 0; }
-        input, textarea { width: 300px; }
+        input, textarea, select { width: 300px; }
         .response { border: 1px solid #ccc; padding: 10px; background: #f9f9f9; white-space: pre-wrap; margin-top: 10px; }
     </style>
+    <script>
+        let csrfToken = null;
+        let csrfHeaderName = null;
+        async function getCsrfToken() {
+            if (!csrfToken) {
+                const response = await fetch('/auth/csrf-token', { credentials: 'include' });
+                if (!response.ok) throw new Error('CSRF-Token konnte nicht abgerufen werden.');
+                const data = await response.json();
+                csrfToken = data.token;
+                csrfHeaderName = data.headerName;
+                console.log('CSRF-Token geladen:', csrfToken, 'Header:', csrfHeaderName);
+            }
+        }
+    </script>
 </head>
 <body>
-<!-- Gemeinsamer Header -->
-<header style="background: #333; color: #fff; padding: 10px;">
+<header>
     <nav>
-        <a href="/index.html" style="color: #fff; margin-right: 15px;">Home</a>
-        <a href="/login_test.html" style="color: #fff; margin-right: 15px;">Login Test</a>
-        <a href="/betreuer_test.html" style="color: #fff; margin-right: 15px;">Betreuer Test</a>
-        <a href="/projects_test.html" style="color: #fff; margin-right: 15px;">Projekte Test</a>
-        <a href="/documents_test.html" style="color: #fff; margin-right: 15px;">Dokumente Test</a>
-        <a href="/milestones_test.html" style="color: #fff; margin-right: 15px;">Meilensteine Test</a>
-        <a href="/project_applications_test.html" style="color: #fff; margin-right: 15px;">Bewerbungen Test</a>
-        <a href="/schueler_test.html" style="color: #fff; margin-right: 15px;">Schüler Test</a>
-        <a href="/user_test.html" style="color: #fff;">User Test</a>
+        <a href="/index.html">Home</a>
+        <a href="/login.html">Login</a>
+        <a href="/betreuer_test.html">Betreuer Test</a>
+        <a href="/projects_test.html">Projekte Test</a>
+        <a href="/documents_test.html">Dokumente Test</a>
+        <a href="/milestones_test.html">Meilensteine Test</a>
+        <a href="/project_applications_test.html">Bewerbungen Test</a>
+        <a href="/schueler_test.html">Schüler Test</a>
+        <a href="/user_test.html">User Test</a>
     </nav>
-    <div id="headerLoginSection">
-        <label style="color: #fff;">Username:
-            <input type="text" id="headerUsername">
-        </label>
-        <label style="color: #fff;">Password:
-            <input type="password" id="headerPassword">
-        </label>
-        <button id="headerLoginBtn">Login</button>
-    </div>
 </header>
 <hr>
-
 <h1>Projekte Test</h1>
-
 <h2>Projekt mit Lastenheft erstellen</h2>
 <label>Titel:
     <input type="text" id="projTitle">
@@ -78,52 +83,23 @@
 <label>Projekt-ID:
     <input type="text" id="assignProjId">
 </label>
-<label>(Optional) Lehrer sAMAccountName (für Admin):
-    <input type="text" id="assignTeacherSam">
-</label>
-<label>Zuweisungsmodus:
+<label>Modus:
     <select id="assignMode">
         <option value="self">Selbst (Lehrer)</option>
         <option value="admin">Admin</option>
     </select>
 </label>
-<button id="assignTeacherBtn">Lehrer zuweisen (PUT /api/projects/assign-teacher-by-id/...)</button>
+<label>(Bei Admin-Modus) Lehrer sAMAccountName:
+    <input type="text" id="assignTeacherSam">
+</label>
+<button id="assignTeacherBtn">Lehrer zuweisen</button>
 
 <h3>Response:</h3>
 <pre class="response" id="responseArea"></pre>
 
 <script>
-    let csrfToken = null;
-    async function getCsrf() {
-        if (!csrfToken) {
-            const res = await fetch('/api/csrf-token', { method: 'GET', credentials: 'include' });
-            const data = await res.json();
-            csrfToken = data.csrfToken;
-        }
-    }
-    // Header Login (falls noch nicht erfolgt)
-    document.getElementById('headerLoginBtn').addEventListener('click', async () => {
-        const username = document.getElementById('headerUsername').value;
-        const password = document.getElementById('headerPassword').value;
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-            credentials: 'include'
-        });
-        const data = await res.json();
-        alert("Login Response: " + JSON.stringify(data, null, 2));
-        const csrfRes = await fetch('/api/csrf-token', { method: 'GET', credentials: 'include' });
-        const csrfData = await csrfRes.json();
-        csrfToken = csrfData.csrfToken;
-        alert("CSRF Token: " + csrfToken);
-        if(data.status === 'success'){
-            document.getElementById('headerLoginSection').style.display = 'none';
-        }
-    });
-
     document.getElementById('createProjBtn').addEventListener('click', async () => {
-        await getCsrf();
+        await getCsrfToken();
         const title = document.getElementById('projTitle').value;
         const desc = document.getElementById('projDesc').value;
         const start = document.getElementById('projStart').value;
@@ -131,57 +107,55 @@
         const members = document.getElementById('projMembers').value.split(',').map(s => s.trim()).filter(s => s);
         const fileInput = document.getElementById('projFile');
         if (!fileInput.files.length) {
-            document.getElementById('responseArea').textContent = "Bitte eine Datei auswählen!";
+            document.getElementById('responseArea').textContent = "Bitte eine Lastenheft-Datei auswählen!";
             return;
         }
         const file = fileInput.files[0];
-
         const formData = new FormData();
         formData.append("titel", title);
         formData.append("beschreibung", desc);
         formData.append("startDatum", start);
         formData.append("endDatum", end);
-        members.forEach(m => formData.append("mitglieder", m));
+        members.forEach(member => formData.append("mitglieder", member));
         formData.append("lastenheft", file);
-
         const res = await fetch('/api/projects/create-with-lastenheft', {
             method: 'POST',
             credentials: 'include',
-            headers: { 'X-CSRF-TOKEN': csrfToken },
+            headers: { [csrfHeaderName]: csrfToken },
             body: formData
         });
         const data = await res.json();
         document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
     });
-
     document.getElementById('getProjBtn').addEventListener('click', async () => {
-        await getCsrf();
+        await getCsrfToken();
         const res = await fetch('/api/projects', {
             method: 'GET',
             credentials: 'include',
-            headers: { 'X-CSRF-TOKEN': csrfToken }
+            headers: { [csrfHeaderName]: csrfToken }
         });
         const data = await res.json();
         document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
     });
-
     document.getElementById('reviewProjBtn').addEventListener('click', async () => {
-        await getCsrf();
+        await getCsrfToken();
         const projId = document.getElementById('reviewProjId').value;
         const decision = document.getElementById('reviewDecision').value;
         const reason = document.getElementById('reviewReason').value;
-        const url = `/api/projects/${encodeURIComponent(projId)}/review?decision=${encodeURIComponent(decision)}&reason=${encodeURIComponent(reason)}`;
+        let url = `/api/projects/${encodeURIComponent(projId)}/review?decision=${encodeURIComponent(decision)}`;
+        if(reason.trim()){
+            url += `&reason=${encodeURIComponent(reason)}`;
+        }
         const res = await fetch(url, {
             method: 'PUT',
             credentials: 'include',
-            headers: { 'X-CSRF-TOKEN': csrfToken }
+            headers: { [csrfHeaderName]: csrfToken }
         });
         const data = await res.json();
         document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
     });
-
     document.getElementById('assignTeacherBtn').addEventListener('click', async () => {
-        await getCsrf();
+        await getCsrfToken();
         const projId = document.getElementById('assignProjId').value;
         const mode = document.getElementById('assignMode').value;
         let url = "";
@@ -194,7 +168,7 @@
         const res = await fetch(url, {
             method: 'PUT',
             credentials: 'include',
-            headers: { 'X-CSRF-TOKEN': csrfToken }
+            headers: { [csrfHeaderName]: csrfToken }
         });
         const data = await res.json();
         document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
