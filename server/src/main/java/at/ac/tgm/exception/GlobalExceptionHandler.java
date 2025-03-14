@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ldap.AuthenticationException;
 import org.springframework.ldap.CommunicationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -79,14 +80,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, headers, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handler(Exception e) {
-        logger.error("Exception", e.getMessage());
-        String body = e.getMessage();
-        System.out.println(e);
-        return new ResponseEntity<>(body, headers, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handle(BadCredentialsException e) {
         logger.error("BadCredentialsException", e.getMessage());
@@ -97,6 +90,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<String> handle(UsernameNotFoundException e) {
         logger.error("UsernameNotFoundException", e.getMessage());
+        String body = e.getMessage();
+        return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<String> handle(AuthenticationException e) {
+        logger.error("AuthenticationException", e.getMessage());
+        String body = "Username oder Password ungültig";
+        return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handler(Exception e) {
+        logger.error("Exception", e.getMessage());
         String body = e.getMessage();
         return new ResponseEntity<>(body, headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
