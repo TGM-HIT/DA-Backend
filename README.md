@@ -52,6 +52,12 @@ axios.defaults.xsrfHeaderName = "X-XSRF-TOKEN"
 Login/Logout unter [/auth/login](http://localhost:8080/swagger-ui/index.html#/authentication-controller/authenticateUser) (siehe Beispiel in der Swagger-Ui) bzw. [/auth/logout](http://localhost:8080/swagger-ui/index.html#/authentication-controller/logout).
 Ausnahmen für Pfade, die ohne Login erreichbar sein sollen, können in der [SecurityConfig](server/src/main/java/at/ac/tgm/config/SecurityConfig.java) -> securityFilterChain ausgenommen werden.
 
+### Simulate User
+
+Login mit einem anderen Account ist möglich, indem die Anwendung mit aktivem Profil "dev" gestartet wird (In IntelliJ: Application -> Edit Configuration -> Actives Profiles -> "dev" hinzufügen).
+Damit kann zum Beispiel die Zugriffsrechte einer anderen Rolle getestet werden.
+Aufruf mit `simulate = true`, Password ist egal.
+
 ### Autorisierung
 
 ```java
@@ -75,17 +81,20 @@ Erlaubte Request-Domains können in der [SecurityConfig](server/src/main/java/at
 
 1. Lösen Sie Ihre Features in eigenen Branches, welche das Projektkürzel enthalten, z.B.: `beispiel/ampeln-eintragen`.
 2. Mergen Sie Ihre Features in den Projekt-Branch (z.B.: `beispiel`), bestenfalls nachdem ein Teammitglied die Änderungen des Feature-Branch reviewed hat. Halten Sie den Projekt-Branch in regelmäßig aktuell mit dem main-branch (durch *Rebase beispiel onto main* / *Merge main into beispiel*).
-3. Bei Meilensteinen (abgeschlossenen Funktionsumfang Frontend & Backend) erstellen Sie einen Pull Request auf den main und weisen Sie Ihren DA-Betreuer als Assignee zu.
+3. Bei Meilensteinen (abgeschlossenen Funktionsumfang Frontend & Backend) erstellen Sie einen Pull Request auf den main, weisen Sie Ihren DA-Betreuer als Assignee zu und fordern Sie einen Review an.
 4. Betreuer genehmigt (approved) den Pull Request oder verlangt Änderungen (siehe *Genehmigung Betreuer* und *Diskussionen lösen*).
 5. Sie können den Pull Request selbst mergen, sobald alle Checks erfüllt sind (*Betreuer-Genehmigung vorhanden*, *action läuft durch*, *alle Diskussionen gelöst* und *keine Merge-Konflikte mit main*)
 
 ### Genehmigung Betreuer
 
 Die Verantwortung der Betreuer ist auf Konflikte zwischen verschiedenen DA-Projekten zu achten, insbesondere:
+
 * Keine Namensüberschneidungen bei gemeinsam genutzten Resourcen (Tabellen, Request-Pfade, LDAP-Repository)
 * Konfigurationen (application.properties, SecurityConfig) sind allgemein genug gehalten und mit allen Projekte kompatibel.
 
 Dazu reicht es sich die Änderungen im **server** und **core** genauer anzuschauen, im Projekt-Modul reicht ein Überfliegen und z.B.: auf kollisionsfreie Tabellenbenennung (`@Table(name = Consts.BEISPIEL_TABLE_PREFIX + "ITEM")`) oder Pfadbenennung (`@RequestMapping(Consts.BEISPIEL_PATH_PREFIX + "/item")`) zu achten.
+
+Als alternative Ansprechperson für Reviews/Approvals steht Prof. Michael Pointner (Account: mpointner) zur Verfügung.
 
 ### Diskussionen lösen 
 
