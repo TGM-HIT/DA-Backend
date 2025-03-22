@@ -5,8 +5,7 @@ import at.ac.tgm.ad.Roles;
 import at.ac.tgm.dto.ItemDto;
 import at.ac.tgm.service.ItemService;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +16,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping(Consts.BEISPIEL_PATH_PREFIX + "/item")
+@Slf4j
 public class ItemController {
-    private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
-    
     @Autowired
     private ItemService service;
     

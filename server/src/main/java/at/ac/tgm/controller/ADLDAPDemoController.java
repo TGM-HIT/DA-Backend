@@ -4,8 +4,7 @@ import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.ad.util.EntryBase;
 import at.ac.tgm.api.ADLDAPDemoApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,9 +15,8 @@ import javax.naming.Name;
 import java.util.List;
 
 @RestController
+@Slf4j
 public class ADLDAPDemoController implements ADLDAPDemoApi {
-    private static final Logger logger = LoggerFactory.getLogger(ADLDAPDemoController.class);
-    
     @Autowired
     private UserService userService;
     
