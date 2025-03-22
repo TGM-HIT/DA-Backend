@@ -105,11 +105,11 @@ public class SecurityConfig {
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return new AccessDeniedHandler() {
-            private static final Logger logger = LoggerFactory.getLogger(AccessDeniedHandler.class);
+            private static final Logger log = LoggerFactory.getLogger(AccessDeniedHandler.class);
             
             @Override
             public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-                logger.info("CustomAccessDeniedHandler", accessDeniedException.getMessage());
+                log.info("CustomAccessDeniedHandler {}", accessDeniedException.getMessage());
                 // Both header are important, else Axios Network error
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -123,11 +123,11 @@ public class SecurityConfig {
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return new AuthenticationEntryPoint() {
-            private static final Logger logger = LoggerFactory.getLogger(AuthenticationEntryPoint.class);
+            private static final Logger log = LoggerFactory.getLogger(AuthenticationEntryPoint.class);
             
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-                logger.info("CustomAuthenticationEntryPoint", authException.getMessage());
+                log.info("CustomAuthenticationEntryPoint {}", authException.getMessage());
                 // Both header are important, else Axios Network error
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");

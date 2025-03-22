@@ -3,17 +3,15 @@ package at.ac.tgm.service;
 import at.ac.tgm.dto.ItemDto;
 import at.ac.tgm.mapper.ItemMapper;
 import at.ac.tgm.repository.ItemRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class ItemService {
-    private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
-    
     @Autowired
     private ItemRepository repository;
     @Autowired
