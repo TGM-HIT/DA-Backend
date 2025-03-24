@@ -10,10 +10,11 @@ services:
     environment:
       - AD_USER=${AD_USER}
       - AD_PASSWORD=${AD_PASSWORD}
+      - APPLICATION_PORT=8080 # No need to change the default port and expose it within a container
       - APPLICATION_ADMINS=${APPLICATION_ADMINS:-}
-      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD:-root}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MARIADB_DATABASE=${MARIADB_DATABASE:-da}
-      - MARIADB_PORT=${MARIADB_PORT:-3306}
+      - MARIADB_PORT=3306
     depends_on:
       database:
         condition: service_started
@@ -29,8 +30,9 @@ services:
     ports:
       - ${MARIADB_PORT:-3306}:3306
     environment:
-      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD:-root}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MARIADB_DATABASE=${MARIADB_DATABASE:-da}
+      - MARIADB_PORT=3306 # No need to change the default port and expose it within a container
     volumes:
       - database:/var/lib/mysql
     networks:
