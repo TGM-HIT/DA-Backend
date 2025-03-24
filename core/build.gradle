@@ -1,4 +1,5 @@
 dependencies {
+    // LDAP
     implementation 'org.springframework.ldap:spring-ldap-core'
     implementation 'org.springframework.security:spring-security-ldap'
     implementation 'org.springframework.boot:spring-boot-starter-data-ldap'
