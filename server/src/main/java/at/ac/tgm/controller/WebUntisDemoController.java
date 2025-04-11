@@ -19,8 +19,12 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/webuntis")
 public class WebUntisDemoController {
+    private final Session session;
+    
     @Autowired
-    private Session session;
+    public WebUntisDemoController(Session session) {
+        this.session = session;
+    }
     
     @GetMapping("/weeklyTimetable/person/{id}")
     public String getWeeklyTimetableOfPerson(@PathVariable int id) throws IOException {
