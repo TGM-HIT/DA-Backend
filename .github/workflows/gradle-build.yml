@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    name: "gradle build test"
     runs-on: ubuntu-latest
     permissions:
       contents: read
