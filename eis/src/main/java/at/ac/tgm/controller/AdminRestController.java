@@ -212,6 +212,7 @@ public class AdminRestController {
     @DeleteMapping("/deleteStudent/{studentKennzahl}")
     @Transactional
     public ResponseEntity<String> deleteStudent(@PathVariable String studentKennzahl) {
+        ampelRepository.deleteByStudentStudentKennzahl(studentKennzahl);
         studentRepository.deleteByStudentKennzahl(studentKennzahl);
         return ResponseEntity.ok("Student mit Kennzahl " + studentKennzahl + " erfolgreich gelöscht.");
     }
