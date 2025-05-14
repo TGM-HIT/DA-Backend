@@ -29,7 +29,7 @@ import java.util.List;
  * - DELETE /api/project-applications/{id}: Löschen einer Bewerbung – nur für Administratoren.
  */
 @RestController
-@RequestMapping("/api/project-applications")
+@RequestMapping("/diplomdb/api/project-applications")
 public class ProjektBewerbungController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjektBewerbungController.class);

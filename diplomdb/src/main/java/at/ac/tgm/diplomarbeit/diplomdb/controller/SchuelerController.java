@@ -25,7 +25,7 @@ import java.util.List;
  * - GET /api/schueler: Ruft die Schülerliste ab, optional gefiltert nach einem Suchbegriff und sortiert nach einem angegebenen Feld.
  */
 @RestController
-@RequestMapping("/api/schueler")
+@RequestMapping("/diplomdb/api/schueler")
 public class SchuelerController {
 
     @Autowired

@@ -35,7 +35,7 @@ import java.util.List;
  *   und Sortierparameter übergeben werden.
  */
 @RestController
-@RequestMapping("/api/betreuer")
+@RequestMapping("/diplomdb/api/betreuer")
 public class BetreuerController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BetreuerController.class);

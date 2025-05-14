@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * - DELETE /api/projects/{projektId}/milestones/{milestoneId}: Löschen eines Meilensteins.
  */
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/diplomdb/api/projects")
 public class MeilensteinController {
 
     @Autowired

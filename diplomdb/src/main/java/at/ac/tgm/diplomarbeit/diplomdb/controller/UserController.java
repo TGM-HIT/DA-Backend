@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * - GET /api/users/searchByCN: Sucht einen Benutzer anhand des Common Name (CN).
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/diplomdb/api")
 public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
