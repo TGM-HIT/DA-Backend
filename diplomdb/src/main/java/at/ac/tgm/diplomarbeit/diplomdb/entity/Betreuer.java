@@ -3,13 +3,15 @@ package at.ac.tgm.diplomarbeit.diplomdb.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import static at.ac.tgm.Consts.DIPLOMDB_TABLE_PREFIX;
+
 /**
  * Entität zur Repräsentation eines Betreuers in der Diplomarbeitsdatenbank.
  * Diese Klasse enthält grundlegende Informationen über einen Betreuer,
  * einschließlich seiner Identifikation, Kontaktdaten und Kapazitätsangaben.
  */
 @Entity
-@Table(name = "betreuer")
+@Table(name = DIPLOMDB_TABLE_PREFIX + "betreuer")
 @Getter
 @Setter
 @NoArgsConstructor

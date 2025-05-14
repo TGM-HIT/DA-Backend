@@ -7,13 +7,15 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import static at.ac.tgm.Consts.DIPLOMDB_TABLE_PREFIX;
+
 /**
  * Entität zur Darstellung einer Diplomarbeit bzw. eines Projekts.
  * Diese Klasse enthält alle relevanten Informationen zum Projekt, wie Titel, Beschreibung,
  * Status, Zeitrahmen, zugehöriger Betreuer und beteiligte Mitarbeiter.
  */
 @Entity
-@Table(name = "diplomarbeit")
+@Table(name = DIPLOMDB_TABLE_PREFIX + "diplomarbeit")
 @Setter
 @Getter
 @NoArgsConstructor

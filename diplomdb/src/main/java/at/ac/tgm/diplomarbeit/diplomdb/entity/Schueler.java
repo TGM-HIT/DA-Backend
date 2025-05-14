@@ -3,13 +3,15 @@ package at.ac.tgm.diplomarbeit.diplomdb.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import static at.ac.tgm.Consts.DIPLOMDB_TABLE_PREFIX;
+
 /**
  * Entität zur Darstellung eines Schülers.
  * Der Schüler wird über seinen SamAccountName eindeutig identifiziert und enthält
  * persönliche Informationen wie Vorname, Nachname, E-Mail-Adresse und Anzeigename.
  */
 @Entity
-@Table(name = "schueler")
+@Table(name = DIPLOMDB_TABLE_PREFIX + "schueler")
 @Getter
 @Setter
 @NoArgsConstructor

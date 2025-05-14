@@ -5,13 +5,15 @@ import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static at.ac.tgm.Consts.DIPLOMDB_TABLE_PREFIX;
+
 /**
  * Entität zur Darstellung einer Bewerbung für ein Projekt.
  * Eine Bewerbung enthält Informationen zum zugehörigen Projekt, dem Bewerber, der Priorität der Bewerbung
  * sowie eventuelle Team-Mitglieder. Die Kombination aus Projekt, Bewerber und Priorität muss eindeutig sein.
  */
 @Entity
-@Table(name = "projekt_bewerbung",
+@Table(name = DIPLOMDB_TABLE_PREFIX + "projekt_bewerbung",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"projekt_id", "sam_account_name", "prioritaet"})
         }
