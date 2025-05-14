@@ -5,6 +5,7 @@ import at.ac.tgm.diplomarbeit.diplomdb.dto.MeilensteinDTO;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Diplomarbeit;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Meilenstein;
 import at.ac.tgm.diplomarbeit.diplomdb.exception.ResourceNotFoundException;
+import at.ac.tgm.diplomarbeit.diplomdb.mapper.MeilensteinMapper;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DiplomarbeitRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.MeilensteinRepository;
 import org.slf4j.Logger;
@@ -67,7 +68,7 @@ public class MeilensteinController {
         neu.setDiplomarbeit(projekt);
 
         Meilenstein saved = meilensteinRepository.save(neu);
-        return ResponseEntity.status(201).body(mapToDTO(saved));
+        return ResponseEntity.status(201).body(MeilensteinMapper.toDTO(saved));
     }
 
     /**
@@ -90,7 +91,7 @@ public class MeilensteinController {
                 .collect(Collectors.toList());
 
         List<MeilensteinDTO> dtos = meilensteine.stream()
-                .map(this::mapToDTO)
+                .map(MeilensteinMapper::toDTO)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(dtos);
@@ -143,7 +144,7 @@ public class MeilensteinController {
         }
 
         meilensteinRepository.save(meilenstein);
-        return ResponseEntity.ok(mapToDTO(meilenstein));
+        return ResponseEntity.ok(MeilensteinMapper.toDTO(meilenstein));
     }
 
     /**
@@ -179,7 +180,7 @@ public class MeilensteinController {
         meilenstein.setName(newName);
         meilensteinRepository.save(meilenstein);
 
-        return ResponseEntity.ok(mapToDTO(meilenstein));
+        return ResponseEntity.ok(MeilensteinMapper.toDTO(meilenstein));
     }
 
     /**
@@ -211,23 +212,6 @@ public class MeilensteinController {
 
         meilensteinRepository.delete(meilenstein);
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Wandelt ein Meilenstein-Objekt in ein entsprechendes MeilensteinDTO um.
-     *
-     * @param entity Das zu konvertierende Meilenstein-Objekt.
-     * @return Das resultierende MeilensteinDTO.
-     */
-    private MeilensteinDTO mapToDTO(Meilenstein entity) {
-        MeilensteinDTO dto = new MeilensteinDTO();
-        dto.setMeilensteinId(entity.getMeilensteinId());
-        dto.setName(entity.getName());
-        dto.setStatus(entity.getStatus());
-        if (entity.getDiplomarbeit() != null) {
-            dto.setProjektId(entity.getDiplomarbeit().getProjektId());
-        }
-        return dto;
     }
 
     /**

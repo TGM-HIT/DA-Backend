@@ -6,6 +6,7 @@ import at.ac.tgm.diplomarbeit.diplomdb.entity.Diplomarbeit;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Dokument;
 import at.ac.tgm.diplomarbeit.diplomdb.exception.ResourceNotFoundException;
 import at.ac.tgm.ad.service.UserService;
+import at.ac.tgm.diplomarbeit.diplomdb.mapper.DokumentMapper;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DokumentRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DiplomarbeitRepository;
 import org.slf4j.Logger;
@@ -87,7 +88,7 @@ public class DokumentController {
             @RequestParam("typ") String typ,
             @RequestParam("datum") String datum,
             @RequestParam("diplomarbeitId") Long diplomarbeitId,
-            @RequestParam("erstellerSamAccountName") String erstellerSamAccountName) {
+            @RequestParam String erstellerSamAccountName) {
 
         LOGGER.info("Dokument-Upload: titel={}, diplomarbeitId={}", titel, diplomarbeitId);
         if (!userExistsInLdap(erstellerSamAccountName)) {
@@ -121,7 +122,7 @@ public class DokumentController {
             dokument.setBewertungsKommentar(null);
 
             Dokument savedDokument = dokumentRepository.save(dokument);
-            DokumentDTO dokumentDTO = mapToDTO(savedDokument);
+            DokumentDTO dokumentDTO = DokumentMapper.toDTO(savedDokument);
 
             AUDIT_LOGGER.info("Dokument hochgeladen: dokumentId={}, diplomarbeitId={}, user={}",
                     savedDokument.getDokumentId(), diplomarbeitId, erstellerSamAccountName);
@@ -229,7 +230,7 @@ public class DokumentController {
         }
 
         List<DokumentDTO> dokumentDTOs = dokumente.stream()
-                .map(this::mapToDTO)
+                .map(DokumentMapper::toDTO)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(dokumentDTOs);
@@ -250,7 +251,7 @@ public class DokumentController {
         LOGGER.debug("GET /documents/{}", id);
         Dokument dokument = dokumentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Dokument nicht gefunden mit ID " + id));
-        return ResponseEntity.ok(mapToDTO(dokument));
+        return ResponseEntity.ok(DokumentMapper.toDTO(dokument));
     }
 
     /**
@@ -299,7 +300,7 @@ public class DokumentController {
 
         Dokument updatedDokument = dokumentRepository.save(existingDokument);
         LOGGER.info("Dokument aktualisiert: dokumentId={}", id);
-        return ResponseEntity.ok(mapToDTO(updatedDokument));
+        return ResponseEntity.ok(DokumentMapper.toDTO(updatedDokument));
     }
 
     /**
@@ -340,7 +341,7 @@ public class DokumentController {
 
         Dokument saved = dokumentRepository.save(dokument);
         AUDIT_LOGGER.info("Dokument bewertet: dokumentId={}, user={}, value={}", id, currentUserSam, value);
-        return ResponseEntity.ok(mapToDTO(saved));
+        return ResponseEntity.ok(DokumentMapper.toDTO(saved));
     }
 
     /**
@@ -371,35 +372,6 @@ public class DokumentController {
         dokumentRepository.delete(dokument);
         AUDIT_LOGGER.info("Dokument gelöscht: dokumentId={}", id);
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Wandelt ein Dokument-Objekt in ein DokumentDTO um.
-     *
-     * @param dokument Das zu konvertierende Dokument.
-     * @return Das resultierende DokumentDTO.
-     */
-    private DokumentDTO mapToDTO(Dokument dokument) {
-        DokumentDTO dto = new DokumentDTO();
-        dto.setDokumentId(dokument.getDokumentId());
-        dto.setTitel(dokument.getTitel());
-        dto.setBeschreibung(dokument.getBeschreibung());
-        dto.setTyp(dokument.getTyp());
-        dto.setHochladungsdatum(dokument.getHochladungsdatum());
-        dto.setDatum(dokument.getDatum());
-        dto.setDateiname(dokument.getDateiname());
-
-        if (dokument.getDiplomarbeit() != null) {
-            dto.setDiplomarbeitId(dokument.getDiplomarbeit().getProjektId());
-            dto.setDiplomarbeitTitel(dokument.getDiplomarbeit().getTitel());
-        }
-
-        dto.setErstellerSamAccountName(dokument.getErstellerSamAccountName());
-        dto.setBewertungProzent(dokument.getBewertungProzent());
-        dto.setBewertetDurchSamAccountName(dokument.getBewertetDurchSamAccountName());
-        dto.setBewertungsKommentar(dokument.getBewertungsKommentar());
-
-        return dto;
     }
 
     /**

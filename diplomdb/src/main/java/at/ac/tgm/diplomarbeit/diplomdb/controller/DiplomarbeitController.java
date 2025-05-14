@@ -7,6 +7,7 @@ import at.ac.tgm.diplomarbeit.diplomdb.entity.Diplomarbeit;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Dokument;
 import at.ac.tgm.diplomarbeit.diplomdb.exception.ResourceNotFoundException;
 import at.ac.tgm.ad.service.UserService;
+import at.ac.tgm.diplomarbeit.diplomdb.mapper.DiplomarbeitMapper;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.BetreuerRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DiplomarbeitRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DokumentRepository;
@@ -63,7 +64,7 @@ public class DiplomarbeitController {
 
     /**
      * Erstellt ein neues Projekt (Diplomarbeit) inklusive Lastenheft-Datei.
-     *
+     * <p>
      * HTTP-Methode: POST
      * URL: /api/projects/create-with-lastenheft
      */
@@ -149,7 +150,7 @@ public class DiplomarbeitController {
 
         dokumentRepository.save(dok);
 
-        DiplomarbeitResponseDTO responseDTO = mapToResponseDTO(savedDiplom);
+        DiplomarbeitResponseDTO responseDTO = DiplomarbeitMapper.toResponseDTO(savedDiplom);
         AUDIT_LOGGER.info("Neues Projekt angelegt: ID={}, Titel={}, erstellt von User={}", savedDiplom.getProjektId(), titel, currentUser);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
@@ -157,7 +158,7 @@ public class DiplomarbeitController {
 
     /**
      * Ermöglicht einem Lehrer, sich selbst als Betreuer eines Projekts anhand der Projekt-ID zuzuweisen.
-     *
+     * <p>
      * HTTP-Methode: PUT
      * URL: /api/projects/assign-teacher-by-id/self
      */
@@ -194,12 +195,12 @@ public class DiplomarbeitController {
         projekt.setBetreuerSamAccountName(currentUser);
         Diplomarbeit saved = diplomarbeitRepository.save(projekt);
         AUDIT_LOGGER.info("Projekt mit ID '{}' wurde dem Lehrer '{}' zur Selbstzuweisung zugewiesen.", projectId, currentUser);
-        return ResponseEntity.ok(mapToResponseDTO(saved));
+        return ResponseEntity.ok(DiplomarbeitMapper.toResponseDTO(saved));
     }
 
     /**
      * Ermöglicht einem Administrator, einem Projekt anhand der Projekt-ID einen spezifischen Lehrer zuzuweisen.
-     *
+     * <p>
      * HTTP-Methode: PUT
      * URL: /api/projects/assign-teacher-by-id/admin
      */
@@ -237,12 +238,12 @@ public class DiplomarbeitController {
         projekt.setBetreuerSamAccountName(teacherSamAccountName);
         Diplomarbeit saved = diplomarbeitRepository.save(projekt);
         AUDIT_LOGGER.info("Projekt mit ID '{}' wurde durch einen Administrator dem Lehrer '{}' zugewiesen.", projectId, teacherSamAccountName);
-        return ResponseEntity.ok(mapToResponseDTO(saved));
+        return ResponseEntity.ok(DiplomarbeitMapper.toResponseDTO(saved));
     }
 
     /**
      * Führt eine Überprüfung (Review) eines Projekts durch, um den Status auf ANGENOMMEN oder ABGELEHNT zu setzen.
-     *
+     * <p>
      * HTTP-Methode: PUT
      * URL: /api/projects/{id}/review
      */
@@ -269,12 +270,12 @@ public class DiplomarbeitController {
 
         Diplomarbeit updated = diplomarbeitRepository.save(projekt);
         AUDIT_LOGGER.info("Projekt-Review durchgeführt: ID={}, neuer Status={}", id, projekt.getStatus());
-        return ResponseEntity.ok(mapToResponseDTO(updated));
+        return ResponseEntity.ok(DiplomarbeitMapper.toResponseDTO(updated));
     }
 
     /**
      * Erstellt ein neues Projekt ohne direkte Lehrerzuweisung.
-     *
+     * <p>
      * HTTP-Methode: POST
      * URL: /api/projects
      */
@@ -302,10 +303,10 @@ public class DiplomarbeitController {
         if (diplomarbeitDTO.getTitel() == null || diplomarbeitDTO.getTitel().trim().isEmpty()) {
             throw new IllegalArgumentException("Titel darf nicht leer sein!");
         }
-        if(diplomarbeitDTO.getStartdatum() == null) {
+        if (diplomarbeitDTO.getStartdatum() == null) {
             throw new IllegalArgumentException("Startdatum darf nicht null sein!");
         }
-        if(diplomarbeitDTO.getStartdatum().isBefore(LocalDate.now().minusYears(1))) {
+        if (diplomarbeitDTO.getStartdatum().isBefore(LocalDate.now().minusYears(1))) {
             throw new IllegalArgumentException("Startdatum darf nicht mehr als ein Jahr in der Vergangenheit liegen!");
         }
         String status = (diplomarbeitDTO.getStatus() == null || diplomarbeitDTO.getStatus().trim().isEmpty())
@@ -349,12 +350,12 @@ public class DiplomarbeitController {
 
         Diplomarbeit savedDiplomarbeit = diplomarbeitRepository.save(diplomarbeit);
         AUDIT_LOGGER.info("Projekt erstellt: ID={}, Titel={}", savedDiplomarbeit.getProjektId(), diplomarbeitDTO.getTitel());
-        return ResponseEntity.status(201).body(mapToResponseDTO(savedDiplomarbeit));
+        return ResponseEntity.status(201).body(DiplomarbeitMapper.toResponseDTO(savedDiplomarbeit));
     }
 
     /**
      * Ruft alle Projekte ab, optional gefiltert nach Suchbegriff, Datumsbereich, Status und sortiert.
-     *
+     * <p>
      * HTTP-Methode: GET
      * URL: /api/projects
      */
@@ -415,7 +416,7 @@ public class DiplomarbeitController {
         }
 
         List<at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitResponseDTO> responseDTOs = diplomarbeiten.stream()
-                .map(this::mapToResponseDTO)
+                .map(DiplomarbeitMapper::toResponseDTO)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(responseDTOs);
@@ -423,7 +424,7 @@ public class DiplomarbeitController {
 
     /**
      * Ruft ein einzelnes Projekt anhand seiner ID ab.
-     *
+     * <p>
      * HTTP-Methode: GET
      * URL: /api/projects/{id}
      */
@@ -433,18 +434,18 @@ public class DiplomarbeitController {
         LOGGER.debug("GET /projects/{}", id);
         Diplomarbeit diplomarbeit = diplomarbeitRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Diplomarbeit nicht gefunden mit ID " + id));
-        return ResponseEntity.ok(mapToResponseDTO(diplomarbeit));
+        return ResponseEntity.ok(DiplomarbeitMapper.toResponseDTO(diplomarbeit));
     }
 
     /**
      * Aktualisiert die Daten eines bestehenden Projekts.
-     *
+     * <p>
      * HTTP-Methode: PUT
      * URL: /api/projects/{id}
-     *
+     * <p>
      * Hier erfolgt auch die Anpassung der zugewiesenen Projekte-Kapazität:
      * - Wenn der Betreuer geändert wird, wird der alte Lehrer (sofern vorhanden) entsprechend dekrementiert
-     *   und der neue Lehrer wird inkrementiert (nach Prüfung der Kapazität).
+     * und der neue Lehrer wird inkrementiert (nach Prüfung der Kapazität).
      * - Wird kein neuer Betreuer gesetzt, so wird ggf. der alte Eintrag entfernt und dessen Zählwert reduziert.
      */
     @Secured({Roles.TEACHER, Roles.ADMIN})
@@ -512,12 +513,12 @@ public class DiplomarbeitController {
 
         Diplomarbeit updatedDiplomarbeit = diplomarbeitRepository.save(existingDiplomarbeit);
         AUDIT_LOGGER.info("Projekt aktualisiert: ID={}", id);
-        return ResponseEntity.ok(mapToResponseDTO(updatedDiplomarbeit));
+        return ResponseEntity.ok(DiplomarbeitMapper.toResponseDTO(updatedDiplomarbeit));
     }
 
     /**
      * Löscht ein Projekt und passt gegebenenfalls die Kapazität des zugewiesenen Lehrers an.
-     *
+     * <p>
      * HTTP-Methode: DELETE
      * URL: /api/projects/{id}
      */
@@ -547,20 +548,4 @@ public class DiplomarbeitController {
         return userService.findBysAMAccountName(sAMAccountName).isPresent();
     }
 
-    /**
-     * Wandelt ein Diplomarbeit-Objekt in ein entsprechendes Response-Datentransferobjekt um.
-     */
-    private DiplomarbeitResponseDTO mapToResponseDTO(Diplomarbeit diplomarbeit) {
-        DiplomarbeitResponseDTO dto = new DiplomarbeitResponseDTO();
-        dto.setProjektId(diplomarbeit.getProjektId());
-        dto.setTitel(diplomarbeit.getTitel());
-        dto.setBeschreibung(diplomarbeit.getBeschreibung());
-        dto.setStatus(diplomarbeit.getStatus());
-        dto.setStartdatum(diplomarbeit.getStartdatum());
-        dto.setEnddatum(diplomarbeit.getEnddatum());
-        dto.setBetreuerSamAccountName(diplomarbeit.getBetreuerSamAccountName());
-        dto.setMitarbeiterSamAccountNames(diplomarbeit.getMitarbeiterSamAccountNames());
-        dto.setAblehnungsgrund(diplomarbeit.getAblehnungsgrund());
-        return dto;
-    }
 }

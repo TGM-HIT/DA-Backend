@@ -6,6 +6,7 @@ import at.ac.tgm.diplomarbeit.diplomdb.dto.UserDTO;
 import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.entry.GroupEntry;
 import at.ac.tgm.ad.service.UserService;
+import at.ac.tgm.diplomarbeit.diplomdb.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class UserController {
 
     /**
      * Testet, ob ein LDAP-Benutzer mit dem angegebenen sAMAccountName existiert.
-     *
+     * <p>
      * HTTP-Methode: GET
      * URL: /api/test-ldap-user/{samAccountName}
      *
@@ -60,7 +61,7 @@ public class UserController {
 
     /**
      * Ruft Details zu einem Benutzer anhand des sAMAccountName ab.
-     *
+     * <p>
      * HTTP-Methode: GET
      * URL: /api/users/{samAccountName}
      *
@@ -75,13 +76,13 @@ public class UserController {
         if (userOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        UserDTO userDTO = mapToUserDTO(userOpt.get());
+        UserDTO userDTO = UserMapper.toDTO(userOpt.get());
         return ResponseEntity.ok(userDTO);
     }
 
     /**
      * Ruft die Gruppen eines Benutzers anhand seines sAMAccountName ab.
-     *
+     * <p>
      * HTTP-Methode: GET
      * URL: /api/users/{samAccountName}/groups
      *
@@ -98,14 +99,14 @@ public class UserController {
         }
         UserEntry user = userOpt.get();
         Set<GroupDTO> groupDTOs = user.getGroups().stream()
-                .map(this::mapToGroupDTO)
+                .map(UserMapper::toDTO)
                 .collect(Collectors.toSet());
         return ResponseEntity.ok(groupDTOs);
     }
 
     /**
      * Sucht einen Benutzer anhand der Mail-Adresse.
-     *
+     * <p>
      * HTTP-Methode: GET
      * URL: /api/users/searchByMail
      *
@@ -124,13 +125,13 @@ public class UserController {
         if (userWithGroups.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        UserDTO userDTO = mapToUserDTO(userWithGroups.get());
+        UserDTO userDTO = UserMapper.toDTO(userWithGroups.get());
         return ResponseEntity.ok(userDTO);
     }
 
     /**
      * Sucht einen Benutzer anhand des Common Name (CN).
-     *
+     * <p>
      * HTTP-Methode: GET
      * URL: /api/users/searchByCN
      *
@@ -145,42 +146,8 @@ public class UserController {
         if (userOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        UserDTO userDTO = mapToUserDTO(userOpt.get());
+        UserDTO userDTO = UserMapper.toDTO(userOpt.get());
         return ResponseEntity.ok(userDTO);
     }
 
-    /**
-     * Wandelt ein UserEntry in ein UserDTO um.
-     *
-     * @param user Das UserEntry-Objekt.
-     * @return Das resultierende UserDTO mit den entsprechenden Benutzerinformationen.
-     */
-    private UserDTO mapToUserDTO(UserEntry user) {
-        UserDTO dto = new UserDTO();
-        dto.setSAMAccountName(user.getSAMAccountName());
-        dto.setCn(user.getCn());
-        dto.setSn(user.getSn());
-        dto.setDisplayName(user.getDisplayName());
-        dto.setMail(user.getMail());
-        if (user.getGroups() != null && !user.getGroups().isEmpty()) {
-            Set<GroupDTO> groupDTOs = user.getGroups().stream()
-                    .map(this::mapToGroupDTO)
-                    .collect(Collectors.toSet());
-            dto.setGroups(groupDTOs);
-        }
-        return dto;
-    }
-
-    /**
-     * Wandelt ein GroupEntry in ein GroupDTO um.
-     *
-     * @param group Das GroupEntry-Objekt.
-     * @return Das resultierende GroupDTO mit den entsprechenden Gruppendaten.
-     */
-    private GroupDTO mapToGroupDTO(at.ac.tgm.ad.entry.GroupEntry group) {
-        GroupDTO dto = new GroupDTO();
-        dto.setCn(group.getCn());
-        dto.setDisplayName(group.getDisplayName());
-        return dto;
-    }
 }
