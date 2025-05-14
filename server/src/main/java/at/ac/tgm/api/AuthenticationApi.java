@@ -33,4 +33,8 @@ public interface AuthenticationApi {
     
     @GetMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session);
+
+    @GetMapping({"", "/"})
+    public ResponseEntity<Authentication> getAuthCurrentUser();
 }
+

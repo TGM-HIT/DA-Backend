@@ -5,39 +5,44 @@
     <title>Dokumente Test</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
+        header { background: #333; color: #fff; padding: 10px; }
+        header nav a { color: #fff; margin-right: 15px; text-decoration: none; }
+        header nav a:hover { text-decoration: underline; }
         label, button { display: block; margin: 8px 0; }
         input, textarea { width: 300px; }
         .response { border: 1px solid #ccc; padding: 10px; background: #f9f9f9; white-space: pre-wrap; margin-top: 10px; }
     </style>
+    <script>
+        let csrfToken = null;
+        let csrfHeaderName = null;
+        async function getCsrfToken() {
+            if (!csrfToken) {
+                const response = await fetch('/auth/csrf-token', { method: 'GET', credentials: 'include' });
+                if (!response.ok) throw new Error('CSRF-Token konnte nicht abgerufen werden.');
+                const data = await response.json();
+                csrfToken = data.token;
+                csrfHeaderName = data.headerName;
+                console.log('CSRF-Token geladen:', csrfToken, 'Header:', csrfHeaderName);
+            }
+        }
+    </script>
 </head>
 <body>
-<!-- Gemeinsamer Header -->
-<header style="background: #333; color: #fff; padding: 10px;">
+<header>
     <nav>
-        <a href="/index.html" style="color: #fff; margin-right: 15px;">Home</a>
-        <a href="/login_test.html" style="color: #fff; margin-right: 15px;">Login Test</a>
-        <a href="/betreuer_test.html" style="color: #fff; margin-right: 15px;">Betreuer Test</a>
-        <a href="/projects_test.html" style="color: #fff; margin-right: 15px;">Projekte Test</a>
-        <a href="/documents_test.html" style="color: #fff; margin-right: 15px;">Dokumente Test</a>
-        <a href="/milestones_test.html" style="color: #fff; margin-right: 15px;">Meilensteine Test</a>
-        <a href="/project_applications_test.html" style="color: #fff; margin-right: 15px;">Bewerbungen Test</a>
-        <a href="/schueler_test.html" style="color: #fff; margin-right: 15px;">Schüler Test</a>
-        <a href="/user_test.html" style="color: #fff;">User Test</a>
+        <a href="/index.html">Home</a>
+        <a href="/login.html">Login</a>
+        <a href="/betreuer_test.html">Betreuer Test</a>
+        <a href="/projects_test.html">Projekte Test</a>
+        <a href="/documents_test.html">Dokumente Test</a>
+        <a href="/milestones_test.html">Meilensteine Test</a>
+        <a href="/project_applications_test.html">Bewerbungen Test</a>
+        <a href="/schueler_test.html">Schüler Test</a>
+        <a href="/user_test.html">User Test</a>
     </nav>
-    <div id="headerLoginSection">
-        <label style="color: #fff;">Username:
-            <input type="text" id="headerUsername">
-        </label>
-        <label style="color: #fff;">Password:
-            <input type="password" id="headerPassword">
-        </label>
-        <button id="headerLoginBtn">Login</button>
-    </div>
 </header>
 <hr>
-
 <h1>Dokumente Test</h1>
-
 <h2>Dokument Upload</h2>
 <label>Titel:
     <input type="text" id="docTitle">
@@ -91,39 +96,9 @@
 
 <h3>Response:</h3>
 <pre class="response" id="responseArea"></pre>
-
 <script>
-    let csrfToken = null;
-    async function getCsrf() {
-        if (!csrfToken) {
-            const res = await fetch('/api/csrf-token', { method: 'GET', credentials: 'include' });
-            const data = await res.json();
-            csrfToken = data.csrfToken;
-        }
-    }
-    // Header Login (falls noch nicht erfolgt)
-    document.getElementById('headerLoginBtn').addEventListener('click', async () => {
-        const username = document.getElementById('headerUsername').value;
-        const password = document.getElementById('headerPassword').value;
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-            credentials: 'include'
-        });
-        const data = await res.json();
-        alert("Login Response: " + JSON.stringify(data, null, 2));
-        const csrfRes = await fetch('/api/csrf-token', { method: 'GET', credentials: 'include' });
-        const csrfData = await csrfRes.json();
-        csrfToken = csrfData.csrfToken;
-        alert("CSRF Token: " + csrfToken);
-        if(data.status === 'success'){
-            document.getElementById('headerLoginSection').style.display = 'none';
-        }
-    });
-
     document.getElementById('uploadDocBtn').addEventListener('click', async () => {
-        await getCsrf();
+        await getCsrfToken();
         const title = document.getElementById('docTitle').value;
         const desc = document.getElementById('docDesc').value;
         const type = document.getElementById('docType').value;
@@ -136,7 +111,6 @@
             return;
         }
         const file = fileInput.files[0];
-
         const formData = new FormData();
         formData.append("titel", title);
         formData.append("beschreibung", desc);
@@ -145,30 +119,27 @@
         formData.append("diplomarbeitId", diplomId);
         formData.append("erstellerSamAccountName", ersteller);
         formData.append("file", file);
-
         const res = await fetch('/api/documents/upload', {
             method: 'POST',
             credentials: 'include',
-            headers: { 'X-CSRF-TOKEN': csrfToken },
+            headers: { [csrfHeaderName]: csrfToken },
             body: formData
         });
         const data = await res.json();
         document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
     });
-
     document.getElementById('getDocsBtn').addEventListener('click', async () => {
-        await getCsrf();
+        await getCsrfToken();
         const res = await fetch('/api/documents', {
             method: 'GET',
             credentials: 'include',
-            headers: { 'X-CSRF-TOKEN': csrfToken }
+            headers: { [csrfHeaderName]: csrfToken }
         });
         const data = await res.json();
         document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
     });
-
     document.getElementById('rateDocBtn').addEventListener('click', async () => {
-        await getCsrf();
+        await getCsrfToken();
         const docId = document.getElementById('rateDocId').value;
         const value = document.getElementById('rateValue').value;
         const comment = document.getElementById('rateComment').value;
@@ -179,28 +150,26 @@
         const res = await fetch(url, {
             method: 'PUT',
             credentials: 'include',
-            headers: { 'X-CSRF-TOKEN': csrfToken }
+            headers: { [csrfHeaderName]: csrfToken }
         });
         const data = await res.json();
         document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
     });
-
     document.getElementById('downloadDocBtn').addEventListener('click', async () => {
-        await getCsrf();
+        await getCsrfToken();
         const docId = document.getElementById('downloadDocId').value;
         const url = `/api/documents/download/${encodeURIComponent(docId)}`;
         window.open(url, '_blank');
-        document.getElementById('responseArea').textContent = "Download gestartet (prüfe deinen Browser).";
+        document.getElementById('responseArea').textContent = "Download gestartet (prüfe Deinen Browser).";
     });
-
     document.getElementById('deleteDocBtn').addEventListener('click', async () => {
-        await getCsrf();
+        await getCsrfToken();
         const docId = document.getElementById('deleteDocId').value;
         const url = `/api/documents/${encodeURIComponent(docId)}`;
         const res = await fetch(url, {
             method: 'DELETE',
             credentials: 'include',
-            headers: { 'X-CSRF-TOKEN': csrfToken }
+            headers: { [csrfHeaderName]: csrfToken }
         });
         if(res.status === 204){
             document.getElementById('responseArea').textContent = "Dokument gelöscht.";

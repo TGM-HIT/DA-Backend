@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -86,7 +87,7 @@ public class AuthenticationController implements AuthenticationApi {
             return authenticationManager.authenticate(authenticationToken);
         }
     }
-    
+
     @Override
     public CsrfToken csrfToken(HttpServletRequest request) {
         return (CsrfToken) request.getAttribute(CsrfToken.class.getName());
@@ -97,5 +98,15 @@ public class AuthenticationController implements AuthenticationApi {
         session.invalidate();
         logger.info("Session invalidated, User logged out successfully");
         return ResponseEntity.ok("User logged out successfully");
+    }
+
+    @Override
+    public ResponseEntity<Authentication> getAuthCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        } else {
+            return ResponseEntity.ok(auth);
+        }
     }
 }

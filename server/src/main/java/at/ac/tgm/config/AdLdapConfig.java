@@ -22,6 +22,7 @@ import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 
 import javax.naming.Name;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -69,45 +70,5 @@ public class AdLdapConfig {
     @Bean
     public AuthenticationManager authenticationManager(ActiveDirectoryLdapAuthenticationProvider adProvider) {
         return new ProviderManager(Collections.singletonList(adProvider));
-    }
-    
-    @Bean
-    public ObjectMapper registerObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule("MyObjectSerializer");
-        module.addSerializer(Name.class, new NameJsonSerializer());
-        module.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
-        mapper.registerModule(module);
-        return mapper;
-    }
-    
-    static class NameJsonSerializer extends StdSerializer<Name> {
-        public NameJsonSerializer() {
-            this(null);
-        }
-        
-        public NameJsonSerializer(Class<Name> t) {
-            super(t);
-        }
-        
-        @Override
-        public void serialize(Name value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-            jgen.writeString(value.toString());
-        }
-    }
-    
-    static class LocalDateTimeJsonSerializer extends StdSerializer<LocalDateTime> {
-        public LocalDateTimeJsonSerializer() {
-            this(null);
-        }
-        
-        public LocalDateTimeJsonSerializer(Class<LocalDateTime> t) {
-            super(t);
-        }
-        
-        @Override
-        public void serialize(LocalDateTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-            jgen.writeString(value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        }
     }
 }
