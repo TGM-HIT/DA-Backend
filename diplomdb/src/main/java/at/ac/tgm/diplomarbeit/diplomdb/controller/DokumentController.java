@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
  * - DELETE /api/documents/{id}: Löschen eines Dokuments und der zugehörigen Datei.
  */
 @RestController
-@RequestMapping("api/documents")
+@RequestMapping("/diplomdb/api/documents")
 public class DokumentController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DokumentController.class);

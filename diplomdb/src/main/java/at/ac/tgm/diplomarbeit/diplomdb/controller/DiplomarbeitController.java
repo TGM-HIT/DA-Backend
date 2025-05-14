@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * Dokumenten (Lastenheft) und der Lehrerzuweisung angeboten.
  */
 @RestController
-@RequestMapping("api/projects")
+@RequestMapping("/diplomdb/api/projects")
 public class DiplomarbeitController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DiplomarbeitController.class);
