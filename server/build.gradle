@@ -16,3 +16,6 @@ dependencies {
 
 bootJar.enabled = true
 bootWar.enabled = true
+bootJar {
+    mainClass = 'at.ac.tgm.Application'
+}

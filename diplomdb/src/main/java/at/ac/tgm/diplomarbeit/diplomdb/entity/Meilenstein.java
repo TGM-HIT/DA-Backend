@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import static at.ac.tgm.Consts.DIPLOMDB_TABLE_PREFIX;
+
 /**
  * Entität zur Darstellung eines Meilensteins innerhalb eines Projekts.
  * Ein Meilenstein repräsentiert einen wichtigen Schritt oder eine Phase im Projektverlauf.
  */
 @Entity
-@Table(name = "meilenstein")
+@Table(name = DIPLOMDB_TABLE_PREFIX + "meilenstein")
 @Getter
 @Setter
 @NoArgsConstructor

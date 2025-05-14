@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 
+import static at.ac.tgm.Consts.DIPLOMDB_TABLE_PREFIX;
+
 @Entity
-@Table(name = "dokument")
+@Table(name = DIPLOMDB_TABLE_PREFIX + "dokument")
 @Getter
 @Setter
 @ToString

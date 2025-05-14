@@ -19,8 +19,8 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI diplomarbeitOpenAPI() {
         return new OpenAPI()
-                .info(new Info().title("Diplomarbeit API")
-                        .description("Dokumentation der Diplomarbeit REST API")
+                .info(new Info().title("API Dokumentation")
+                        .description("Dokumentation der REST API")
                         .version("v1.0")); // TODO: Version überprüfen build gradle
 
     }
