@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Bootstickverwaltung</title>
+</head>
+<body>
+<h1>Login</h1>
+<form id="loginForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required/><br/><br/>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required/><br/><br/>
+    <button type="submit">Login</button>
+</form>
+<div id="message" style="color:red;"></div>
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, simulate: false })
+            });
+            if(response.ok) {
+                document.getElementById('message').style.color = 'green';
+                document.getElementById('message').innerText = "Login successful!";
+                // Weiterleitung z.B. zur USB-API:
+                window.location.href = '/api/usb';
+            } else {
+                const errorText = await response.text();
+                document.getElementById('message').innerText = "Login failed: " + errorText;
+            }
+        } catch (error) {
+            document.getElementById('message').innerText = "Error: " + error;
+        }
+    });
+</script>
+</body>
+</html>

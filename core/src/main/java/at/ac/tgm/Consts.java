@@ -5,4 +5,6 @@ public class Consts {
     public static final String BEISPIEL_TABLE_PREFIX = "BEISPIEL_";
     public static final String EIS_PATH_PREFIX = "/eis";
     public static final String EIS_TABLE_PREFIX = "EIS_";
+    public static final String BSVW_PATH_PREFIX = "/bsvw";
+    public static final String BSVW_TABLE_PREFIX = "BSVW_";
 }

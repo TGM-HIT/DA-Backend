@@ -1,0 +1,4 @@
+dependencies {
+    // Einbindung des core-Moduls, in dem Roles liegt
+    implementation project(':core')
+}
