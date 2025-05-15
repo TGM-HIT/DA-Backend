@@ -8,10 +8,10 @@ import at.ac.tgm.dto.LoginRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,9 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@Slf4j
 public class AuthenticationController implements AuthenticationApi {
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
-    
     @Autowired
     private AuthenticationManager authenticationManager;
     
@@ -50,7 +49,7 @@ public class AuthenticationController implements AuthenticationApi {
     private UserService userService;
     
     @Override
-    public ResponseEntity<Authentication> authenticateUser(LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Authentication> login(LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
         UserEntry user = (loginRequest.getUsername().contains("@")
                 ? userService.findByMail(loginRequest.getUsername())
                 : userService.findBysAMAccountName(loginRequest.getUsername()))
@@ -62,7 +61,7 @@ public class AuthenticationController implements AuthenticationApi {
         context.setAuthentication(authentication);
         securityContextRepository.saveContext(context, request, response);
         
-        logger.info("Login of " + user.getDisplayName());
+        log.info("Login of {}", user.getDisplayName());
         
         return ResponseEntity.ok(authentication);
     }
@@ -94,8 +93,29 @@ public class AuthenticationController implements AuthenticationApi {
     
     @Override
     public ResponseEntity<String> logout(HttpSession session) {
-        session.invalidate();
-        logger.info("Session invalidated, User logged out successfully");
-        return ResponseEntity.ok("User logged out successfully");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            session.invalidate();
+            log.info("Session invalidated, User logged out successfully");
+            return ResponseEntity.ok("User logged out successfully");
+        } else {
+            return ResponseEntity.ok("User already logged-out or was never logged-in");
+        }
+    }
+    
+    @Override
+    public ResponseEntity<Authentication> getAuthCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+        } else {
+            return ResponseEntity.ok(auth);
+        }
+    }
+    
+    @Override
+    public ResponseEntity<Boolean> isLoggedIn() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(auth != null);
     }
 }

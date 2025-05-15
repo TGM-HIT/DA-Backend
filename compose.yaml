@@ -1,0 +1,46 @@
+name: da-backend
+services:
+  application:
+    container_name: SpringBoot
+    build:
+      dockerfile: ./Dockerfile
+    image: ${DOCKERHUB_USERNAME:-mpointner}/${DOCKERHUB_IMAGE:-da-backend}:${DOCKERHUB_TAG:-latest}
+    ports:
+      - ${APPLICATION_PORT:-8080}:8080
+    environment:
+      - AD_USER=${AD_USER}
+      - AD_PASSWORD=${AD_PASSWORD}
+      - APPLICATION_PORT=8080 # No need to change the default port and expose it within a container
+      - APPLICATION_ADMINS=${APPLICATION_ADMINS:-}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE:-da}
+      - MARIADB_PORT=3306
+    depends_on:
+      database:
+        condition: service_started
+    networks:
+      - DA-Backend
+    links:
+      - database
+
+  database:
+    container_name: MariaDB
+    image: mariadb:latest
+    restart: always
+    ports:
+      - ${MARIADB_PORT:-3306}:3306
+    environment:
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE:-da}
+      - MARIADB_PORT=3306 # No need to change the default port and expose it within a container
+    volumes:
+      - database:/var/lib/mysql
+    networks:
+      - DA-Backend
+
+networks:
+  DA-Backend:
+    driver: bridge
+
+volumes:
+  database:
