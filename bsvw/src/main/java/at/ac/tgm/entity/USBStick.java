@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "usb_stick")
+@Table(name = Consts.BSVW_TABLE_PREFIX + "usb_stick")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,7 +18,7 @@ public class USBStick {
     private String inventarnummer;
 
     @ManyToOne
-    @JoinColumn(name = Consts.BSVW_TABLE_PREFIX + "group_id")
+    @JoinColumn(name = "group_id")
     @JsonBackReference
     private StickGroup group;
 
