@@ -5,6 +5,7 @@ import at.ac.tgm.dto.StickGroupDTO;
 import at.ac.tgm.dto.USBStickDTO;
 import at.ac.tgm.service.StickGroupService;
 import at.ac.tgm.service.USBStickService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -28,12 +29,14 @@ public class USBStickController {
 
     @Secured(Roles.TEACHER)
     @GetMapping
+    @Operation(summary = "Get all USB sticks")
     public ResponseEntity<List<USBStickDTO>> getAllUSBSticks() {
         return ResponseEntity.ok(usbStickService.findAll());
     }
 
     @Secured(Roles.TEACHER)
     @GetMapping("/{inventarnummer}")
+    @Operation(summary = "Get USB stick by ID")
     public ResponseEntity<USBStickDTO> getUSBStickById(@PathVariable String inventarnummer) {
         Optional<USBStickDTO> stickOpt = usbStickService.findById(inventarnummer);
         return stickOpt.map(ResponseEntity::ok)
@@ -42,6 +45,7 @@ public class USBStickController {
 
     @Secured(Roles.TEACHER)
     @PostMapping
+    @Operation(summary = "Create a new USB stick")
     public ResponseEntity<USBStickDTO> addUSBStick(@RequestBody USBStickDTO newStick) {
         USBStickDTO saved = usbStickService.save(newStick);
         return ResponseEntity.ok(saved);
@@ -49,6 +53,7 @@ public class USBStickController {
 
     @Secured(Roles.TEACHER)
     @PutMapping("/{inventarnummer}")
+    @Operation(summary = "Update an existing USB stick")
     public ResponseEntity<USBStickDTO> updateUSBStick(@PathVariable String inventarnummer,
                                                       @RequestBody USBStickDTO updatedStick) {
         Optional<USBStickDTO> updatedOpt = usbStickService.update(inventarnummer, updatedStick);
@@ -58,6 +63,7 @@ public class USBStickController {
 
     @Secured(Roles.TEACHER)
     @DeleteMapping("/{inventarnummer}")
+    @Operation(summary = "Delete a USB stick")
     public ResponseEntity<Void> deleteUSBStick(@PathVariable String inventarnummer) {
         usbStickService.deleteById(inventarnummer);
         return ResponseEntity.noContent().build();
@@ -67,12 +73,14 @@ public class USBStickController {
 
     @Secured(Roles.TEACHER)
     @GetMapping("/groups")
+    @Operation(summary = "Get all stick groups")
     public ResponseEntity<List<StickGroupDTO>> getAllGroups() {
         return ResponseEntity.ok(stickGroupService.findAll());
     }
 
     @Secured(Roles.TEACHER)
     @GetMapping("/groups/{groupId}")
+    @Operation(summary = "Get stick group by ID")
     public ResponseEntity<StickGroupDTO> getGroupById(@PathVariable String groupId) {
         Optional<StickGroupDTO> groupOpt = stickGroupService.findById(groupId);
         return groupOpt.map(ResponseEntity::ok)
@@ -81,6 +89,7 @@ public class USBStickController {
 
     @Secured(Roles.TEACHER)
     @PostMapping("/groups")
+    @Operation(summary = "Create a new stick group")
     public ResponseEntity<StickGroupDTO> createGroup(@RequestBody StickGroupDTO newGroup) {
         StickGroupDTO saved = stickGroupService.save(newGroup);
         return ResponseEntity.ok(saved);
@@ -88,6 +97,7 @@ public class USBStickController {
 
     @Secured(Roles.TEACHER)
     @PutMapping("/groups/{groupId}")
+    @Operation(summary = "Update an existing stick group")
     public ResponseEntity<StickGroupDTO> updateGroup(@PathVariable String groupId,
                                                      @RequestBody StickGroupDTO updatedGroup) {
         Optional<StickGroupDTO> existing = stickGroupService.findById(groupId);
@@ -101,6 +111,7 @@ public class USBStickController {
 
     @Secured(Roles.TEACHER)
     @DeleteMapping("/groups/{groupId}")
+    @Operation(summary = "Delete a stick group")
     public ResponseEntity<Void> deleteGroup(@PathVariable String groupId) {
         stickGroupService.deleteById(groupId);
         return ResponseEntity.noContent().build();
