@@ -1,10 +1,11 @@
 package at.ac.tgm.entity;
 
+import at.ac.tgm.Consts;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "reservation")
+@Table(name = Consts.BSVW_TABLE_PREFIX + "reservation")
 @Getter
 @Setter
 @NoArgsConstructor

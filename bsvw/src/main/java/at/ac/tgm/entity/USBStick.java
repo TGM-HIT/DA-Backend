@@ -1,5 +1,6 @@
 package at.ac.tgm.entity;
 
+import at.ac.tgm.Consts;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class USBStick {
     private String inventarnummer;
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = Consts.BSVW_TABLE_PREFIX + "group_id")
     @JsonBackReference
     private StickGroup group;
 

@@ -1,5 +1,6 @@
 package at.ac.tgm.entity;
 
+import at.ac.tgm.Consts;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "stick_groups")
+@Table(name = Consts.BSVW_TABLE_PREFIX + "stick_groups")
 @Getter
 @Setter
 @NoArgsConstructor
