@@ -7,6 +7,10 @@ import at.ac.tgm.diplomarbeit.diplomdb.entity.Meilenstein;
 import at.ac.tgm.diplomarbeit.diplomdb.exception.ResourceNotFoundException;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DiplomarbeitRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.MeilensteinRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +57,21 @@ public class MeilensteinController {
      * @return ResponseEntity mit dem erstellten Meilenstein-Datentransferobjekt.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary     = "Erstellt einen neuen Meilenstein für ein bestimmtes Projekt.",
+            parameters  = {
+                    @Parameter(
+                            name        = "projektId",
+                            in          = ParameterIn.PATH,
+                            description = "ID des Projekts",
+                            required    = true
+                    )
+            },
+            responses   = {
+                    @ApiResponse(responseCode = "201", description = "Meilenstein erfolgreich erstellt"),
+                    @ApiResponse(responseCode = "404", description = "Projekt nicht gefunden")
+            }
+    )
     @PostMapping("/{projektId}/milestones")
     public ResponseEntity<MeilensteinDTO> createMeilenstein(
             @PathVariable Long projektId,
@@ -80,6 +99,21 @@ public class MeilensteinController {
      * @return ResponseEntity mit einer Liste von Meilenstein-Datentransferobjekten.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Ruft alle Meilensteine eines bestimmten Projekts ab.",
+            parameters = {
+                    @Parameter(
+                            name        = "projektId",
+                            in          = ParameterIn.PATH,
+                            description = "ID des Projekts",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Liste der Meilenstein-DTOs"),
+                    @ApiResponse(responseCode = "404", description = "Projekt nicht gefunden")
+            }
+    )
     @GetMapping("/{projektId}/milestones")
     public ResponseEntity<List<MeilensteinDTO>> getMilestonesByProject(@PathVariable Long projektId) {
         Diplomarbeit projekt = diplomarbeitRepository.findById(projektId)
@@ -110,6 +144,34 @@ public class MeilensteinController {
      * @return ResponseEntity mit dem aktualisierten Meilenstein-Datentransferobjekt.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Aktualisiert den Status eines Meilensteins.",
+            parameters = {
+                    @Parameter(
+                            name        = "projektId",
+                            in          = ParameterIn.PATH,
+                            description = "ID des Projekts",
+                            required    = true
+                    ),
+                    @Parameter(
+                            name        = "milestoneId",
+                            in          = ParameterIn.PATH,
+                            description = "ID des Meilensteins",
+                            required    = true
+                    ),
+                    @Parameter(
+                            name        = "newStatus",
+                            in          = ParameterIn.QUERY,
+                            description = "Neuer Status (OFFEN, IN_BEARBEITUNG oder ERFUELLT)",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Meilenstein erfolgreich aktualisiert"),
+                    @ApiResponse(responseCode = "400", description = "Ungültiger Status oder Meilenstein gehört nicht zum Projekt"),
+                    @ApiResponse(responseCode = "404", description = "Projekt oder Meilenstein nicht gefunden")
+            }
+    )
     @PutMapping("/{projektId}/milestones/{milestoneId}/status")
     public ResponseEntity<MeilensteinDTO> updateMilestoneStatus(
             @PathVariable Long projektId,
@@ -159,6 +221,34 @@ public class MeilensteinController {
      * @return ResponseEntity mit dem aktualisierten Meilenstein-Datentransferobjekt.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Ändert den Namen eines bestehenden Meilensteins.",
+            parameters = {
+                    @Parameter(
+                            name        = "projektId",
+                            in          = ParameterIn.PATH,
+                            description = "ID des Projekts",
+                            required    = true
+                    ),
+                    @Parameter(
+                            name        = "milestoneId",
+                            in          = ParameterIn.PATH,
+                            description = "ID des Meilensteins",
+                            required    = true
+                    ),
+                    @Parameter(
+                            name        = "newName",
+                            in          = ParameterIn.QUERY,
+                            description = "Neuer Name für den Meilenstein",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Meilenstein-Name erfolgreich aktualisiert"),
+                    @ApiResponse(responseCode = "400", description = "Meilenstein gehört nicht zum Projekt"),
+                    @ApiResponse(responseCode = "404", description = "Projekt oder Meilenstein nicht gefunden")
+            }
+    )
     @PutMapping("/{projektId}/milestones/{milestoneId}/name")
     public ResponseEntity<MeilensteinDTO> updateMilestoneName(
             @PathVariable Long projektId,
@@ -193,6 +283,27 @@ public class MeilensteinController {
      * @return ResponseEntity ohne Inhalt, wenn der Löschvorgang erfolgreich war.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Löscht einen Meilenstein aus einem Projekt.",
+            parameters = {
+                    @Parameter(
+                            name        = "projektId",
+                            in          = ParameterIn.PATH,
+                            description = "ID des Projekts",
+                            required    = true
+                    ),
+                    @Parameter(
+                            name        = "milestoneId",
+                            in          = ParameterIn.PATH,
+                            description = "ID des zu löschenden Meilensteins",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "204", description = "Meilenstein erfolgreich gelöscht"),
+                    @ApiResponse(responseCode = "404", description = "Projekt oder Meilenstein nicht gefunden")
+            }
+    )
     @DeleteMapping("/{projektId}/milestones/{milestoneId}")
     public ResponseEntity<Void> deleteMilestone(
             @PathVariable Long projektId,

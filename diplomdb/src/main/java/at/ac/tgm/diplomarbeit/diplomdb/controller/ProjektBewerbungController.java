@@ -4,6 +4,10 @@ import at.ac.tgm.ad.Roles;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.ProjektBewerbung;
 import at.ac.tgm.diplomarbeit.diplomdb.service.ProjektBewerbungService;
 import at.ac.tgm.diplomarbeit.diplomdb.service.ProjektBewerbungService.UserBewerbungOverviewDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +54,15 @@ public class ProjektBewerbungController {
      * @return ResponseEntity mit dem erstellten Bewerbung-Objekt.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary     = "Erstellt eine neue Bewerbung für ein Projekt.",
+            description = "Bei Studenten wird der sAMAccountName auf den aktuell angemeldeten Benutzer gesetzt. Lehrer und Administratoren können im Request einen beliebigen sAMAccountName angeben.",
+            responses   = {
+                    @ApiResponse(responseCode = "201", description = "Bewerbung erfolgreich erstellt"),
+                    @ApiResponse(responseCode = "400", description = "Ungültige Eingabedaten"),
+                    @ApiResponse(responseCode = "500", description = "Interner Serverfehler")
+            }
+    )
     @PostMapping
     public ResponseEntity<ProjektBewerbung> createApplication(@RequestBody ProjektBewerbung bewerbung) {
         LOGGER.info("Erstelle Bewerbung: projektId={}, user(angefragt)={}, prioritaet={}",
@@ -87,6 +100,38 @@ public class ProjektBewerbungController {
      * @return ResponseEntity mit einer Liste von Bewerbungen.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Ruft Bewerbungen ab, optional gefiltert nach Benutzer, Projekt-ID, Projektname und sortiert.",
+            parameters = {
+                    @Parameter(
+                            name        = "user",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionaler Filter nach Benutzer (sAMAccountName)",
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "projektId",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionaler Filter nach Projekt-ID",
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "projektName",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionaler Filter nach Projektname",
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "sortBy",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionales Sortierkriterium",
+                            required    = false
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Liste der gefundenen Bewerbungen")
+            }
+    )
     @GetMapping
     public ResponseEntity<List<ProjektBewerbung>> getApplications(
             @RequestParam(required = false) String user,
@@ -110,6 +155,12 @@ public class ProjektBewerbungController {
      * @return ResponseEntity mit einer Liste von UserBewerbungOverviewDTO, gruppiert nach Benutzer.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary   = "Gibt eine gruppierte Übersicht aller Bewerbungen pro Benutzer zurück.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Liste von UserBewerbungOverviewDTO, gruppiert nach Benutzer")
+            }
+    )
     @GetMapping("/overview")
     public ResponseEntity<List<ProjektBewerbungService.UserBewerbungOverviewDTO>> getApplicationsOverview() {
         LOGGER.debug("GET /project-applications/overview");
@@ -128,6 +179,21 @@ public class ProjektBewerbungController {
      * @return ResponseEntity ohne Inhalt, wenn die Löschung erfolgreich war.
      */
     @Secured(Roles.ADMIN)
+    @Operation(
+            summary    = "Löscht eine Bewerbung.",
+            parameters = {
+                    @Parameter(
+                            name        = "id",
+                            in          = ParameterIn.PATH,
+                            description = "ID der zu löschenden Bewerbung",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "204", description = "Bewerbung erfolgreich gelöscht"),
+                    @ApiResponse(responseCode = "404", description = "Bewerbung nicht gefunden")
+            }
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteApplication(@PathVariable Long id) {
         LOGGER.warn("Lösche Bewerbung: id={}", id);

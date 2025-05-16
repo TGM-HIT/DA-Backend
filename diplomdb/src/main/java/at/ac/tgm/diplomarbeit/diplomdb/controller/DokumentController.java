@@ -8,6 +8,11 @@ import at.ac.tgm.diplomarbeit.diplomdb.exception.ResourceNotFoundException;
 import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DokumentRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DiplomarbeitRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +84,23 @@ public class DokumentController {
      * @return ResponseEntity mit dem erstellten Dokument-Datentransferobjekt.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary     = "Erlaubt den Upload eines Dokuments.",
+            description = "Erwartet Multipart-Form-Daten mit Datei und Metadaten zum Dokument.",
+            parameters  = {
+                    @Parameter(name = "file",                     in = ParameterIn.QUERY,  description = "Die hochzuladende Datei",                         required = true),
+                    @Parameter(name = "titel",                    in = ParameterIn.QUERY,  description = "Der Titel des Dokuments",                           required = true),
+                    @Parameter(name = "beschreibung",              in = ParameterIn.QUERY,  description = "Eine Beschreibung des Dokuments",                   required = true),
+                    @Parameter(name = "typ",                      in = ParameterIn.QUERY,  description = "Der Typ des Dokuments (z.B. Lastenheft, Design)",    required = true),
+                    @Parameter(name = "datum",                    in = ParameterIn.QUERY,  description = "Das Datum des Dokuments im Format YYYY-MM-DD",      required = true),
+                    @Parameter(name = "diplomarbeitId",           in = ParameterIn.QUERY,  description = "Die ID der zugehörigen Diplomarbeit",               required = true),
+                    @Parameter(name = "erstellerSamAccountName",  in = ParameterIn.QUERY,  description = "Der sAMAccountName des Erstellers",                 required = true)
+            },
+            responses   = {
+                    @ApiResponse(responseCode = "201", description = "Dokument erfolgreich hochgeladen"),
+                    @ApiResponse(responseCode = "500", description = "Interner Serverfehler")
+            }
+    )
     @PostMapping("/upload")
     public ResponseEntity<DokumentDTO> uploadDocument(
             @RequestParam("file") MultipartFile file,
@@ -143,6 +165,22 @@ public class DokumentController {
      * @return ResponseEntity mit dem herunterzuladenden Resource-Objekt.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Ermöglicht den Download eines Dokuments anhand seiner ID.",
+            parameters = {
+                    @Parameter(
+                            name        = "id",
+                            in          = ParameterIn.PATH,
+                            description = "Die eindeutige ID des Dokuments",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Dokument erfolgreich heruntergeladen"),
+                    @ApiResponse(responseCode = "404", description = "Dokument oder Datei nicht gefunden"),
+                    @ApiResponse(responseCode = "500", description = "Interner Serverfehler")
+            }
+    )
     @GetMapping("/download/{id}")
     public ResponseEntity<Resource> downloadDocument(@PathVariable Long id) {
         LOGGER.debug("Download Dokument: {}", id);
@@ -183,6 +221,55 @@ public class DokumentController {
      * @return ResponseEntity mit einer Liste von Dokument-Datentransferobjekten.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Ruft alle Dokumente ab, optional gefiltert nach Suchbegriff, Typ und Datum sowie sortiert.",
+            parameters = {
+                    @Parameter(
+                            name        = "search",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionaler Suchbegriff",
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "typ",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionaler Dokumenttyp",
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "vonDatum",
+                            in          = ParameterIn.QUERY,
+                            description = "Startdatum für den Datumsfilter (YYYY-MM-DD)",
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "bisDatum",
+                            in          = ParameterIn.QUERY,
+                            description = "Enddatum für den Datumsfilter (YYYY-MM-DD)",
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "sortField",
+                            in          = ParameterIn.QUERY,
+                            description = "Feld zur Sortierung; Standard ist \"dokumentId\"",
+                            required    = false,
+                            schema      = @Schema(type = "string", defaultValue = "dokumentId")
+                    ),
+                    @Parameter(
+                            name        = "sortDirection",
+                            in          = ParameterIn.QUERY,
+                            description = "Sortierrichtung (\"asc\" oder \"desc\"); Standard ist \"asc\"",
+                            required    = false,
+                            schema      = @Schema(type = "string", defaultValue = "asc")
+                    )
+            },
+            responses  = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description  = "Liste der Dokumente entsprechend der Filter- und Sortierkriterien"
+                    )
+            }
+    )
     @GetMapping
     public ResponseEntity<List<DokumentDTO>> getAllDocuments(
             @RequestParam(required = false) String search,
@@ -245,6 +332,21 @@ public class DokumentController {
      * @return ResponseEntity mit dem Dokument-Datentransferobjekt.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Ruft ein spezifisches Dokument anhand seiner ID ab.",
+            parameters = {
+                    @Parameter(
+                            name        = "id",
+                            in          = ParameterIn.PATH,
+                            description = "Die eindeutige ID des Dokuments",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Dokument erfolgreich zurückgegeben"),
+                    @ApiResponse(responseCode = "404", description = "Dokument nicht gefunden")
+            }
+    )
     @GetMapping("/{id}")
     public ResponseEntity<DokumentDTO> getDocumentById(@PathVariable Long id) {
         LOGGER.debug("GET /documents/{}", id);
@@ -264,6 +366,22 @@ public class DokumentController {
      * @return ResponseEntity mit dem aktualisierten Dokument-Datentransferobjekt.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary     = "Aktualisiert die Daten eines bestehenden Dokuments.",
+            parameters  = {
+                    @Parameter(
+                            name        = "id",
+                            in          = ParameterIn.PATH,
+                            description = "ID des Dokuments",
+                            required    = true
+                    )
+            },
+            responses   = {
+                    @ApiResponse(responseCode = "200", description = "Dokument erfolgreich aktualisiert"),
+                    @ApiResponse(responseCode = "400", description = "Ungültige Eingabedaten"),
+                    @ApiResponse(responseCode = "404", description = "Dokument nicht gefunden")
+            }
+    )
     @PutMapping("/{id}")
     public ResponseEntity<DokumentDTO> updateDocument(@PathVariable Long id, @RequestBody DokumentDTO dokumentDTO) {
         LOGGER.info("Update Dokument: {}", id);
@@ -314,6 +432,35 @@ public class DokumentController {
      * @return ResponseEntity mit dem aktualisierten Dokument-Datentransferobjekt.
      */
     @Secured({Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Aktualisiert die Bewertung eines Dokuments.",
+            parameters = {
+                    @Parameter(
+                            name        = "id",
+                            in          = ParameterIn.PATH,
+                            description = "ID des Dokuments",
+                            required    = true
+                    ),
+                    @Parameter(
+                            name        = "value",
+                            in          = ParameterIn.QUERY,
+                            description = "Bewertungsscore (0–100)",
+                            required    = true,
+                            schema      = @Schema(type = "integer")
+                    ),
+                    @Parameter(
+                            name        = "comment",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionaler Kommentar zur Bewertung",
+                            required    = false
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Dokument-Bewertung erfolgreich aktualisiert"),
+                    @ApiResponse(responseCode = "400", description = "Ungültige Bewertung oder Eingabedaten"),
+                    @ApiResponse(responseCode = "404", description = "Dokument nicht gefunden")
+            }
+    )
     @PutMapping("/{id}/rating")
     public ResponseEntity<DokumentDTO> updateDocumentRating(
             @PathVariable Long id,
@@ -353,6 +500,21 @@ public class DokumentController {
      * @return ResponseEntity ohne Inhalt, wenn das Löschen erfolgreich war.
      */
     @Secured(Roles.ADMIN)
+    @Operation(
+            summary    = "Löscht ein Dokument und entfernt die zugehörige Datei vom Server.",
+            parameters = {
+                    @Parameter(
+                            name        = "id",
+                            in          = ParameterIn.PATH,
+                            description = "ID des zu löschenden Dokuments",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "204", description = "Dokument erfolgreich gelöscht"),
+                    @ApiResponse(responseCode = "404", description = "Dokument nicht gefunden")
+            }
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDocument(@PathVariable Long id) {
         LOGGER.warn("Lösche Dokument: {}", id);

@@ -3,6 +3,11 @@ package at.ac.tgm.diplomarbeit.diplomdb.controller;
 import at.ac.tgm.ad.Roles;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Betreuer;
 import at.ac.tgm.diplomarbeit.diplomdb.service.BetreuerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +53,13 @@ public class BetreuerController {
      * Aktualisiert die Betreuerliste aus dem LDAP-Verzeichnis.
      * Nur Benutzer mit der Rolle ADMIN haben Zugriff.
      *
-     * HTTP-Methode: POST
-     * URL: /api/betreuer/refresh
-     *
      * @return ResponseEntity mit einer Bestätigungsmeldung, dass die Betreuerliste erfolgreich aktualisiert wurde.
      */
     @Secured(Roles.ADMIN)
+    @Operation(summary = "Aktualisiert die Betreuerliste aus dem LDAP-Verzeichnis", description = "Nur Benutzer mit der Rolle ADMIN haben Zugriff."
+            , responses = {@ApiResponse(
+            responseCode = "200", description = "ResponseEntity mit einer Bestätigungsmeldung, dass die Betreuerliste erfolgreich aktualisiert wurde."
+    )})
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshBetreuerList() {
         LOGGER.info("Refreshing Betreuer list from LDAP...");
@@ -63,7 +69,6 @@ public class BetreuerController {
     }
 
     /**
-     * Ruft eine Liste von Betreuern ab. Es können optionale Parameter zur Filterung und Sortierung angegeben werden.
      *
      * HTTP-Methode: GET
      * URL: /api/betreuer
@@ -75,6 +80,42 @@ public class BetreuerController {
      * @return ResponseEntity mit der Liste der Betreuer, die den angegebenen Kriterien entsprechen.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary = "Ruft eine Liste von Betreuern ab.",
+            description = "Es können optionale Parameter zur Filterung und Sortierung angegeben werden.",
+            parameters = {
+                    @Parameter(
+                            name = "search",
+                            in = ParameterIn.QUERY,
+                            description = "Optionaler Suchbegriff zur Filterung der Betreuer",
+                            required = false
+                    ),
+                    @Parameter(
+                            name = "sortField",
+                            in = ParameterIn.QUERY,
+                            description = "Das Feld, nach dem sortiert wird; Standard ist \"id\"",
+                            schema = @Schema(type = "string", defaultValue = "id")
+                    ),
+                    @Parameter(
+                            name = "sortDirection",
+                            in = ParameterIn.QUERY,
+                            description = "Die Sortierrichtung (\"asc\" oder \"desc\"); Standard ist \"asc\"",
+                            schema = @Schema(type = "string", defaultValue = "asc")
+                    ),
+                    @Parameter(
+                            name = "status",
+                            in = ParameterIn.QUERY,
+                            description = "Optionaler Filter für den Status",
+                            required = false
+                    )
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Liste der Betreuer entsprechend der Filter- und Sortierkriterien"
+                    )
+            }
+    )
     @GetMapping
     public ResponseEntity<List<Betreuer>> getBetreuer(
             @RequestParam(required = false) String search,
@@ -100,6 +141,32 @@ public class BetreuerController {
      * @return ResponseEntity mit dem aktualisierten Betreuer-Objekt.
      */
     @Secured({Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary     = "Aktualisiert den Status eines spezifischen Betreuers anhand des sAMAccountName.",
+            description = "Nur Benutzer mit den Rollen TEACHER und ADMIN dürfen diesen Endpunkt aufrufen.",
+            parameters  = {
+                    @Parameter(
+                            name        = "samAccountName",
+                            in          = ParameterIn.PATH,
+                            description = "Der sAMAccountName des Betreuers, dessen Status geändert werden soll.",
+                            required    = true,
+                            schema      = @Schema(type = "string")
+                    ),
+                    @Parameter(
+                            name        = "newStatus",
+                            in          = ParameterIn.QUERY,
+                            description = "Der neue Status, der gesetzt werden soll.",
+                            required    = true,
+                            schema      = @Schema(type = "string")
+                    )
+            },
+            responses   = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description  = "ResponseEntity mit dem aktualisierten Betreuer-Objekt."
+                    )
+            }
+    )
     @PutMapping("/sam/{samAccountName}/status")
     public ResponseEntity<Betreuer> setBetreuerStatusBySam(
             @PathVariable String samAccountName,
@@ -122,6 +189,25 @@ public class BetreuerController {
      * @return ResponseEntity mit dem aktualisierten Betreuer-Objekt.
      */
     @Secured(Roles.TEACHER)
+    @Operation(
+            summary     = "Aktualisiert die eigene Kapazität eines Lehrers.",
+            description = "Dieser Endpunkt ist ausschließlich für Benutzer mit der Rolle TEACHER zugänglich.",
+            parameters  = {
+                    @Parameter(
+                            name        = "maxProjekte",
+                            in          = ParameterIn.QUERY,
+                            description = "Die neue maximale Anzahl von Projekten, die der Lehrer betreuen kann.",
+                            required    = true,
+                            schema      = @Schema(type = "integer")
+                    )
+            },
+            responses   = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description  = "ResponseEntity mit dem aktualisierten Betreuer-Objekt."
+                    )
+            }
+    )
     @PutMapping("/capacity/self")
     public ResponseEntity<Betreuer> updateOwnCapacity(
             @RequestParam int maxProjekte
@@ -145,6 +231,32 @@ public class BetreuerController {
      * @return ResponseEntity mit dem aktualisierten Betreuer-Objekt.
      */
     @Secured(Roles.ADMIN)
+    @Operation(
+            summary     = "Aktualisiert die Kapazität eines spezifischen Betreuers.",
+            description = "Dieser Endpunkt ist ausschließlich für Administratoren vorgesehen.",
+            parameters  = {
+                    @Parameter(
+                            name        = "samAccountName",
+                            in          = ParameterIn.PATH,
+                            description = "Der sAMAccountName des Betreuers, dessen Kapazität geändert werden soll.",
+                            required    = true,
+                            schema      = @Schema(type = "string")
+                    ),
+                    @Parameter(
+                            name        = "maxProjekte",
+                            in          = ParameterIn.QUERY,
+                            description = "Die neue maximale Anzahl von Projekten, die der Betreuer betreuen darf.",
+                            required    = true,
+                            schema      = @Schema(type = "integer")
+                    )
+            },
+            responses   = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description  = "ResponseEntity mit dem aktualisierten Betreuer-Objekt."
+                    )
+            }
+    )
     @PutMapping("/sam/{samAccountName}/capacity")
     public ResponseEntity<Betreuer> updateTeacherCapacity(
             @PathVariable String samAccountName,
@@ -171,6 +283,51 @@ public class BetreuerController {
      * @return ResponseEntity, die die exportierten Daten als Byte-Array enthält und entsprechende HTTP-Header gesetzt hat.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary     = "Exportiert die Betreuerliste in einem der unterstützten Formate: CSV, Excel oder PDF.",
+            description = "Es können optionale Such-, Sortier- und Statusfilter als Parameter übergeben werden.",
+            parameters  = {
+                    @Parameter(
+                            name        = "format",
+                            in          = ParameterIn.QUERY,
+                            description = "Das gewünschte Exportformat (\"csv\", \"excel\" oder \"pdf\").",
+                            required    = true,
+                            schema      = @Schema(type = "string", allowableValues = {"csv","excel","pdf"})
+                    ),
+                    @Parameter(
+                            name        = "search",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionaler Suchbegriff zur Filterung.",
+                            required    = false,
+                            schema      = @Schema(type = "string")
+                    ),
+                    @Parameter(
+                            name        = "sortField",
+                            in          = ParameterIn.QUERY,
+                            description = "Das Feld, nach dem sortiert wird; Standard ist \"id\".",
+                            schema      = @Schema(type = "string", defaultValue = "id")
+                    ),
+                    @Parameter(
+                            name        = "sortDirection",
+                            in          = ParameterIn.QUERY,
+                            description = "Die Sortierrichtung (\"asc\" oder \"desc\"); Standard ist \"asc\".",
+                            schema      = @Schema(type = "string", defaultValue = "asc", allowableValues = {"asc","desc"})
+                    ),
+                    @Parameter(
+                            name        = "status",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionaler Filter für den Status.",
+                            required    = false,
+                            schema      = @Schema(type = "string")
+                    )
+            },
+            responses   = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description  = "ResponseEntity, die die exportierten Daten als Byte-Array enthält und entsprechende HTTP-Header gesetzt hat."
+                    )
+            }
+    )
     @GetMapping("/export")
     public ResponseEntity<byte[]> exportBetreuerList(
             @RequestParam String format,

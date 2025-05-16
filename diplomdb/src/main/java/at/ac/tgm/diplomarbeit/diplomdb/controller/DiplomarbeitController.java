@@ -12,6 +12,13 @@ import at.ac.tgm.diplomarbeit.diplomdb.repository.DiplomarbeitRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DokumentRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.MeilensteinRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.service.BetreuerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.SchemaProperty;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +75,16 @@ public class DiplomarbeitController {
      * URL: /api/projects/create-with-lastenheft
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary     = "Erstellt ein neues Projekt (Diplomarbeit) inklusive Lastenheft-Datei.",
+            description = "Erwartet Projektdaten und Lastenheft-Datei als Multipart-Form-Daten.",
+            responses   = {
+                    @ApiResponse(responseCode = "201", description = "Projekt erfolgreich erstellt"),
+                    @ApiResponse(responseCode = "400", description = "Ungültige Eingabedaten"),
+                    @ApiResponse(responseCode = "500", description = "Interner Serverfehler")
+            }
+    )
+
     @PostMapping("/create-with-lastenheft")
     public ResponseEntity<DiplomarbeitResponseDTO> createProjectWithLastenheft(
             @RequestParam("titel") String titel,
@@ -162,6 +179,23 @@ public class DiplomarbeitController {
      * URL: /api/projects/assign-teacher-by-id/self
      */
     @Secured({Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Ermöglicht einem Lehrer, sich selbst als Betreuer eines Projekts anhand der Projekt-ID zuzuweisen.",
+            parameters = {
+                    @Parameter(
+                            name        = "projectId",
+                            in          = ParameterIn.QUERY,
+                            description = "ID des Projekts",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description  = "Betreuer erfolgreich zugewiesen"
+                    )
+            }
+    )
     @PutMapping("/assign-teacher-by-id/self")
     public ResponseEntity<DiplomarbeitResponseDTO> assignSelfTeacherToProjectById(
             @RequestParam Long projectId
@@ -204,6 +238,23 @@ public class DiplomarbeitController {
      * URL: /api/projects/assign-teacher-by-id/admin
      */
     @Secured(Roles.ADMIN)
+    @Operation(
+            summary    = "Ermöglicht einem Administrator, einem Projekt anhand der Projekt-ID einen spezifischen Lehrer zuzuweisen.",
+            parameters = {
+                    @Parameter(
+                            name        = "projectId",
+                            in          = ParameterIn.QUERY,
+                            description = "ID des Projekts",
+                            required    = true
+                    ),
+                    @Parameter(
+                            name        = "teacherSamAccountName",
+                            in          = ParameterIn.QUERY,
+                            description = "sAMAccountName des Lehrers",
+                            required    = true
+                    )
+            }
+    )
     @PutMapping("/assign-teacher-by-id/admin")
     public ResponseEntity<DiplomarbeitResponseDTO> assignTeacherToProjectByIdAdmin(
             @RequestParam Long projectId,
@@ -247,6 +298,36 @@ public class DiplomarbeitController {
      * URL: /api/projects/{id}/review
      */
     @Secured({Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Führt eine Überprüfung eines Projekts durch und setzt den Status auf ANGENOMMEN oder ABGELEHNT.",
+            parameters = {
+                    @Parameter(
+                            name        = "id",
+                            in          = ParameterIn.PATH,
+                            description = "ID des zu überprüfenden Projekts",
+                            required    = true
+                    ),
+                    @Parameter(
+                            name        = "decision",
+                            in          = ParameterIn.QUERY,
+                            description = "Entscheidung für das Review (\"ACCEPTED\" oder \"REJECTED\")",
+                            required    = true
+                    ),
+                    @Parameter(
+                            name        = "reason",
+                            in          = ParameterIn.QUERY,
+                            description = "Begründung bei Ablehnung",
+                            required    = false
+                    )
+            },
+            responses  = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description  = "ResponseEntity mit dem aktualisierten Projekt-DTO nach Review"
+                    )
+            }
+    )
+
     @PutMapping("/{id}/review")
     public ResponseEntity<DiplomarbeitResponseDTO> reviewProject(
             @PathVariable Long id,
@@ -279,6 +360,14 @@ public class DiplomarbeitController {
      * URL: /api/projects
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary   = "Erstellt ein neues Projekt ohne direkte Lehrerzuweisung.",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Projekt erfolgreich erstellt"),
+                    @ApiResponse(responseCode = "400", description = "Ungültige Eingabedaten"),
+                    @ApiResponse(responseCode = "500", description = "Interner Serverfehler")
+            }
+    )
     @PostMapping
     public ResponseEntity<DiplomarbeitResponseDTO> createProject(@RequestBody at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitDTO diplomarbeitDTO) {
         LOGGER.info("Erstelle Projekt: {}", diplomarbeitDTO.getTitel());
@@ -359,6 +448,56 @@ public class DiplomarbeitController {
      * URL: /api/projects
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary     = "Ruft alle Projekte ab, optional gefiltert nach Suchbegriff, Datumsbereich, Status und sortiert.",
+            description = "Ermöglicht das Abrufen aller Projekte mit optionalen Query-Parametern zur Filterung und Sortierung.",
+            parameters  = {
+                    @Parameter(
+                            name        = "search",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionaler Suchbegriff zur Filterung nach Titel, Beschreibung, Betreuer oder Mitgliedern",
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "vonDatum",
+                            in          = ParameterIn.QUERY,
+                            description = "Startdatum für den Datumsbereich-Filter (YYYY-MM-DD)",
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "bisDatum",
+                            in          = ParameterIn.QUERY,
+                            description = "Enddatum für den Datumsbereich-Filter (YYYY-MM-DD)",
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "sortField",
+                            in          = ParameterIn.QUERY,
+                            description = "Feld, nach dem sortiert wird; Standard ist \"projektId\"",
+                            schema      = @Schema(type = "string", defaultValue = "projektId"),
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "sortDirection",
+                            in          = ParameterIn.QUERY,
+                            description = "Sortierrichtung (\"asc\" oder \"desc\"); Standard ist \"asc\"",
+                            schema      = @Schema(type = "string", defaultValue = "asc"),
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "status",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionaler Status-Filter",
+                            required    = false
+                    )
+            },
+            responses   = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description  = "Liste der Projekte entsprechend der Filter- und Sortierkriterien"
+                    )
+            }
+    )
     @GetMapping
     public ResponseEntity<List<at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitResponseDTO>> getAllProjects(
             @RequestParam(required = false) String search,
@@ -428,6 +567,22 @@ public class DiplomarbeitController {
      * URL: /api/projects/{id}
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Ruft ein einzelnes Projekt anhand seiner ID ab.",
+            parameters = {
+                    @Parameter(
+                            name        = "id",
+                            in          = ParameterIn.PATH,
+                            description = "ID des Projekts",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Projekt erfolgreich zurückgegeben"),
+                    @ApiResponse(responseCode = "404", description = "Projekt nicht gefunden")
+            }
+    )
+
     @GetMapping("/{id}")
     public ResponseEntity<at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitResponseDTO> getProjectById(@PathVariable Long id) {
         LOGGER.debug("GET /projects/{}", id);
@@ -448,6 +603,22 @@ public class DiplomarbeitController {
      * - Wird kein neuer Betreuer gesetzt, so wird ggf. der alte Eintrag entfernt und dessen Zählwert reduziert.
      */
     @Secured({Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Aktualisiert die Daten eines bestehenden Projekts.",
+            parameters = {
+                    @Parameter(
+                            name        = "id",
+                            in          = ParameterIn.PATH,
+                            description = "ID des Projekts",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Projekt erfolgreich aktualisiert"),
+                    @ApiResponse(responseCode = "400", description = "Ungültige Eingabedaten"),
+                    @ApiResponse(responseCode = "404", description = "Projekt nicht gefunden")
+            }
+    )
     @PutMapping("/{id}")
     public ResponseEntity<at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitResponseDTO> updateProject(@PathVariable Long id, @RequestBody at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitDTO diplomarbeitDTO) {
         LOGGER.info("Aktualisiere Projekt: {}", id);
@@ -522,6 +693,21 @@ public class DiplomarbeitController {
      * URL: /api/projects/{id}
      */
     @Secured(Roles.ADMIN)
+    @Operation(
+            summary    = "Löscht ein Projekt und passt gegebenenfalls die Kapazität des zugewiesenen Lehrers an.",
+            parameters = {
+                    @Parameter(
+                            name        = "id",
+                            in          = ParameterIn.PATH,
+                            description = "ID des zu löschenden Projekts",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "204", description = "Projekt erfolgreich gelöscht"),
+                    @ApiResponse(responseCode = "404", description = "Projekt nicht gefunden")
+            }
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         LOGGER.warn("Lösche Projekt: {}", id);

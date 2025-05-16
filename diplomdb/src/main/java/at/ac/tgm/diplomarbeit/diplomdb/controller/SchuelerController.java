@@ -9,6 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
@@ -42,6 +47,23 @@ public class SchuelerController {
      * @return ResponseEntity mit einer Bestätigungsmeldung oder einer Fehlermeldung bei ungültigem Jahrgang.
      */
     @Secured(Roles.ADMIN)
+    @Operation(
+            summary     = "Aktualisiert die Schülerliste für den angegebenen Jahrgang durch Neuimport aus LDAP.",
+            description = "Löscht alle bestehenden Einträge und importiert neue Schülerdaten aus dem LDAP-Verzeichnis (Clean Slate).",
+            parameters  = {
+                    @Parameter(
+                            name        = "year",
+                            in          = ParameterIn.QUERY,
+                            description = "Der Jahrgang, für den die Schülerdaten importiert werden sollen (\"4\" oder \"5\").",
+                            required    = true,
+                            schema      = @Schema(type = "string", allowableValues = {"4","5"})
+                    )
+            },
+            responses   = {
+                    @ApiResponse(responseCode = "200", description = "Schuelerliste erfolgreich aktualisiert"),
+                    @ApiResponse(responseCode = "400", description = "Ungültiger Parameter year, nur '4' oder '5' erlaubt")
+            }
+    )
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshSchuelerList(@RequestParam String year) {
         if (!("4".equals(year) || "5".equals(year))) {
@@ -63,6 +85,34 @@ public class SchuelerController {
      * @return ResponseEntity mit einer Liste der Schüler, die den angegebenen Filter- und Sortierkriterien entsprechen.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Ruft die Schülerliste ab, optional gefiltert nach Suchbegriff und sortiert.",
+            parameters = {
+                    @Parameter(
+                            name        = "search",
+                            in          = ParameterIn.QUERY,
+                            description = "Optionaler Suchbegriff zur Filterung der Schüler",
+                            required    = false
+                    ),
+                    @Parameter(
+                            name        = "sortField",
+                            in          = ParameterIn.QUERY,
+                            description = "Feld, nach dem sortiert wird (z.B. nachname, vorname, samAccountName); Standard ist \"nachname\"",
+                            required    = false,
+                            schema      = @Schema(type = "string", defaultValue = "nachname")
+                    ),
+                    @Parameter(
+                            name        = "sortDirection",
+                            in          = ParameterIn.QUERY,
+                            description = "Sortierrichtung (\"asc\" oder \"desc\"); Standard ist \"asc\"",
+                            required    = false,
+                            schema      = @Schema(type = "string", defaultValue = "asc")
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Liste der Schüler entsprechend der Filter- und Sortierkriterien")
+            }
+    )
     @GetMapping
     public ResponseEntity<List<Schueler>> getSchueler(
             @RequestParam(required = false) String search,

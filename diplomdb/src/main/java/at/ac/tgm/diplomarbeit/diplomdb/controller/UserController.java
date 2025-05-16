@@ -12,6 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Optional;
 import java.util.Set;
@@ -50,6 +55,21 @@ public class UserController {
      * @return ResponseEntity mit einer Bestätigung, ob der Benutzer gefunden wurde.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Testet, ob ein LDAP-Benutzer mit dem angegebenen sAMAccountName existiert.",
+            parameters = {
+                    @Parameter(
+                            name        = "samAccountName",
+                            in          = ParameterIn.PATH,
+                            description = "sAMAccountName des zu testenden Benutzers",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "User gefunden"),
+                    @ApiResponse(responseCode = "404", description = "User nicht gefunden")
+            }
+    )
     @GetMapping("/test-ldap-user/{samAccountName}")
     public ResponseEntity<String> testLdapUser(@PathVariable String samAccountName) {
         LOGGER.debug("Test LDAP user: {}", samAccountName);
@@ -68,6 +88,21 @@ public class UserController {
      * @return ResponseEntity mit dem UserDTO, das die Benutzerinformationen enthält.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Ruft Details zu einem Benutzer anhand des sAMAccountName ab.",
+            parameters = {
+                    @Parameter(
+                            name        = "samAccountName",
+                            in          = ParameterIn.PATH,
+                            description = "sAMAccountName des Benutzers",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Benutzerdaten erfolgreich zurückgegeben"),
+                    @ApiResponse(responseCode = "404", description = "Benutzer nicht gefunden")
+            }
+    )
     @GetMapping("/users/{samAccountName}")
     public ResponseEntity<UserDTO> getUserDetails(@PathVariable String samAccountName) {
         LOGGER.debug("GET /users/{}", samAccountName);
@@ -89,6 +124,21 @@ public class UserController {
      * @return ResponseEntity mit einem Set von GroupDTO, das die Gruppeninformationen enthält.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Ruft die Gruppen eines Benutzers anhand seines sAMAccountName ab.",
+            parameters = {
+                    @Parameter(
+                            name        = "samAccountName",
+                            in          = ParameterIn.PATH,
+                            description = "sAMAccountName des Benutzers",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Gruppen des Benutzers erfolgreich zurückgegeben"),
+                    @ApiResponse(responseCode = "404", description = "Benutzer nicht gefunden")
+            }
+    )
     @GetMapping("/users/{samAccountName}/groups")
     public ResponseEntity<Set<GroupDTO>> getUserGroups(@PathVariable String samAccountName) {
         LOGGER.debug("GET /users/{}/groups", samAccountName);
@@ -113,6 +163,21 @@ public class UserController {
      * @return ResponseEntity mit dem UserDTO, falls ein Benutzer gefunden wird.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Sucht einen Benutzer anhand der Mail-Adresse.",
+            parameters = {
+                    @Parameter(
+                            name        = "mail",
+                            in          = ParameterIn.QUERY,
+                            description = "Die Mail-Adresse, nach der gesucht werden soll",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Benutzer erfolgreich gefunden"),
+                    @ApiResponse(responseCode = "404", description = "Benutzer nicht gefunden")
+            }
+    )
     @GetMapping("/users/searchByMail")
     public ResponseEntity<UserDTO> searchUserByMail(@RequestParam String mail) {
         LOGGER.debug("GET /users/searchByMail?mail={}", mail);
@@ -138,6 +203,21 @@ public class UserController {
      * @return ResponseEntity mit dem UserDTO, falls ein Benutzer gefunden wird.
      */
     @Secured({Roles.STUDENT, Roles.TEACHER, Roles.ADMIN})
+    @Operation(
+            summary    = "Sucht einen Benutzer anhand des Common Name (CN).",
+            parameters = {
+                    @Parameter(
+                            name        = "cn",
+                            in          = ParameterIn.QUERY,
+                            description = "Der Common Name, nach dem gesucht werden soll",
+                            required    = true
+                    )
+            },
+            responses  = {
+                    @ApiResponse(responseCode = "200", description = "Benutzer erfolgreich gefunden"),
+                    @ApiResponse(responseCode = "404", description = "Benutzer nicht gefunden")
+            }
+    )
     @GetMapping("/users/searchByCN")
     public ResponseEntity<UserDTO> searchUserByCN(@RequestParam String cn) {
         LOGGER.debug("GET /users/searchByCN?cn={}", cn);
