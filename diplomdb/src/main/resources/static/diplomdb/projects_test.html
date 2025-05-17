@@ -118,7 +118,7 @@
         formData.append("endDatum", end);
         members.forEach(member => formData.append("mitglieder", member));
         formData.append("lastenheft", file);
-        const res = await fetch('/api/projects/create-with-lastenheft', {
+        const res = await fetch('/diplomdb/api/projects/create-with-lastenheft', {
             method: 'POST',
             credentials: 'include',
             headers: { [csrfHeaderName]: csrfToken },
@@ -129,7 +129,7 @@
     });
     document.getElementById('getProjBtn').addEventListener('click', async () => {
         await getCsrfToken();
-        const res = await fetch('/api/projects', {
+        const res = await fetch('/diplomdb/api/projects', {
             method: 'GET',
             credentials: 'include',
             headers: { [csrfHeaderName]: csrfToken }

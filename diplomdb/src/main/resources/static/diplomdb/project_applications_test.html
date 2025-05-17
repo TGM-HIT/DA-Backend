@@ -84,7 +84,7 @@
         const priority = parseInt(document.getElementById('appPriority').value, 10);
         const team = document.getElementById('appTeam').value.split(',').map(s => s.trim()).filter(s => s);
         const payload = { projektId: projId, samAccountName: sam, prioritaet: priority, teamMitglieder: team };
-        const res = await fetch('/api/project-applications', {
+        const res = await fetch('/diplomdb/api/project-applications', {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -98,7 +98,7 @@
     });
     document.getElementById('getAppsBtn').addEventListener('click', async () => {
         await getCsrfToken();
-        const res = await fetch('/api/project-applications', {
+        const res = await fetch('/diplomdb/api/project-applications', {
             method: 'GET',
             credentials: 'include',
             headers: { [csrfHeaderName]: csrfToken }
@@ -108,7 +108,7 @@
     });
     document.getElementById('getAppsOverviewBtn').addEventListener('click', async () => {
         await getCsrfToken();
-        const res = await fetch('/api/project-applications/overview', {
+        const res = await fetch('/diplomdb/api/project-applications/overview', {
             method: 'GET',
             credentials: 'include',
             headers: { [csrfHeaderName]: csrfToken }

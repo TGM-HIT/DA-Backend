@@ -65,7 +65,7 @@
 <label>Datei auswählen:
     <input type="file" id="docFile">
 </label>
-<button id="uploadDocBtn">Dokument hochladen (POST /api/documents/upload)</button>
+<button id="uploadDocBtn">Dokument hochladen (POST /diplomdb/api/documents/upload)</button>
 
 <h2>Alle Dokumente abrufen</h2>
 <button id="getDocsBtn">GET /api/documents</button>
@@ -119,7 +119,7 @@
         formData.append("diplomarbeitId", diplomId);
         formData.append("erstellerSamAccountName", ersteller);
         formData.append("file", file);
-        const res = await fetch('/api/documents/upload', {
+        const res = await fetch('/diplomdb/api/documents/upload', {
             method: 'POST',
             credentials: 'include',
             headers: { [csrfHeaderName]: csrfToken },
@@ -130,7 +130,7 @@
     });
     document.getElementById('getDocsBtn').addEventListener('click', async () => {
         await getCsrfToken();
-        const res = await fetch('/api/documents', {
+        const res = await fetch('/diplomdb/api/documents', {
             method: 'GET',
             credentials: 'include',
             headers: { [csrfHeaderName]: csrfToken }

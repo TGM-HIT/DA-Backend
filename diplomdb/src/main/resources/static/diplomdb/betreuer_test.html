@@ -67,7 +67,7 @@
 <script>
     // Alle Fetch-Aufrufe verwenden credentials: 'include'
     document.getElementById('refreshBtn').addEventListener('click', async () => {
-        const res = await fetch('/api/betreuer/refresh', {
+        const res = await fetch('/diplomdb/api/betreuer/refresh', {
             method: 'POST',
             credentials: 'include'
         });
@@ -76,7 +76,7 @@
     });
 
     document.getElementById('getListBtn').addEventListener('click', async () => {
-        const res = await fetch('/api/betreuer', {
+        const res = await fetch('/diplomdb/api/betreuer', {
             method: 'GET',
             credentials: 'include'
         });
