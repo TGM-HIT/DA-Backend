@@ -45,15 +45,6 @@ public class UserService {
         return user;
     }
     
-    public Optional<UserEntry> findByMail(String email) {
-        Optional<UserEntry> user = userRepository.findByMail(email);
-        return user;
-    }
-    public Optional<UserEntry> findBysAMAccountName(String sAMAccountName) {
-        Optional<UserEntry> user = userRepository.findBysAMAccountName(sAMAccountName);
-        return user;
-    }
-    
     public List<String> listUserCNs(String entryBase) {
         return ldapTemplate.list(entryBase);
     }
@@ -70,6 +61,15 @@ public class UserService {
         lehrer.setGroups(groups);
     }
 
+    public Optional<UserEntry> findByMail(String email) {
+        Optional<UserEntry> user = userRepository.findByMail(email);
+        return user;
+    }
+    public Optional<UserEntry> findBysAMAccountName(String sAMAccountName) {
+        Optional<UserEntry> user = userRepository.findBysAMAccountName(sAMAccountName);
+        return user;
+    }
+    
     /**
      * Neue öffentliche Methode, um einen Benutzer inkl. Gruppen zu laden.
      */

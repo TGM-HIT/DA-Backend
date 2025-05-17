@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -28,7 +28,7 @@ import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
     
     @Bean
@@ -63,6 +63,7 @@ public class SecurityConfig {
     ) throws Exception {
         return http
                 .csrf((csrf) -> {
+                    csrf.ignoringRequestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/auth/login");
                     csrf.csrfTokenRepository(cookieCsrfTokenRepository);
                     csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler);
                     csrf.configure(http); // Wichtig, damit das neue Einstellungen übernommen werden
@@ -118,7 +119,7 @@ public class SecurityConfig {
                         .allowedHeaders("*")
                         .allowedMethods("*")
                         .allowCredentials(true)
-                        .allowedOriginPatterns("http://localhost:[*]", "https://projekte.tgm.ac.at")
+                        .allowedOriginPatterns("http://localhost", "http://localhost:[*]", "https://projekte.tgm.ac.at")
                         .exposedHeaders("Access-Control-Allow-Origin");
             }
         };
@@ -127,11 +128,11 @@ public class SecurityConfig {
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return new AccessDeniedHandler() {
-            private static final Logger logger = LoggerFactory.getLogger(AccessDeniedHandler.class);
+            private static final Logger log = LoggerFactory.getLogger(AccessDeniedHandler.class);
             
             @Override
             public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-                logger.info("CustomAccessDeniedHandler", accessDeniedException.getMessage());
+                log.info("CustomAccessDeniedHandler {}", accessDeniedException.getMessage());
                 // Both header are important, else Axios Network error
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -145,11 +146,11 @@ public class SecurityConfig {
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return new AuthenticationEntryPoint() {
-            private static final Logger logger = LoggerFactory.getLogger(AuthenticationEntryPoint.class);
+            private static final Logger log = LoggerFactory.getLogger(AuthenticationEntryPoint.class);
             
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-                logger.info("CustomAuthenticationEntryPoint", authException.getMessage());
+                log.info("CustomAuthenticationEntryPoint {}", authException.getMessage());
                 // Both header are important, else Axios Network error
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");

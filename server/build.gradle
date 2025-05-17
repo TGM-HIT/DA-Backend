@@ -1,21 +1,12 @@
-plugins {
-    id 'war'
-}
-
 dependencies {
     implementation project(':core')
+    implementation project(':eis')
     implementation project(':beispiel')
     implementation project(':diplomdb')
     
-    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+    // LDAP
     implementation 'org.springframework.ldap:spring-ldap-core'
     implementation 'org.springframework.security:spring-security-ldap'
     implementation 'org.springframework.boot:spring-boot-starter-data-ldap'
     implementation 'com.unboundid:unboundid-ldapsdk'
-}
-
-bootJar.enabled = true
-bootWar.enabled = true
-bootJar {
-    mainClass = 'at.ac.tgm.Application'
 }

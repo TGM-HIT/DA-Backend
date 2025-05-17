@@ -26,46 +26,46 @@ public class JacksonConfig {
         mapper.registerModule(module);
         return mapper;
     }
-
+    
     static class NameJsonSerializer extends StdSerializer<Name> {
         public NameJsonSerializer() {
             this(null);
         }
-
+        
         public NameJsonSerializer(Class<Name> t) {
             super(t);
         }
-
+        
         @Override
         public void serialize(Name value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
             jgen.writeString(value.toString());
         }
     }
-
+    
     static class LocalDateTimeJsonSerializer extends StdSerializer<LocalDateTime> {
         public LocalDateTimeJsonSerializer() {
             this(null);
         }
-
+        
         public LocalDateTimeJsonSerializer(Class<LocalDateTime> t) {
             super(t);
         }
-
+        
         @Override
         public void serialize(LocalDateTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
             jgen.writeString(value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         }
     }
-
+    
     static class LocalDateJsonSerializer extends StdSerializer<LocalDate> {
         public LocalDateJsonSerializer() {
             this(null);
         }
-
+        
         public LocalDateJsonSerializer(Class<LocalDate> t) {
             super(t);
         }
-
+        
         @Override
         public void serialize(LocalDate value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
             jgen.writeString(value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
