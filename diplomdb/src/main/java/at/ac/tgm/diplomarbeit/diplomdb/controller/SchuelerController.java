@@ -3,19 +3,19 @@ package at.ac.tgm.diplomarbeit.diplomdb.controller;
 import at.ac.tgm.ad.Roles;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Schueler;
 import at.ac.tgm.diplomarbeit.diplomdb.service.SchuelerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
+
+import static at.ac.tgm.Consts.DIPLOMDB_PATH_PREFIX;
 
 /**
  * Controller zur Verwaltung der Schülerdaten.
@@ -30,7 +30,7 @@ import java.util.List;
  * - GET /api/schueler: Ruft die Schülerliste ab, optional gefiltert nach einem Suchbegriff und sortiert nach einem angegebenen Feld.
  */
 @RestController
-@RequestMapping("/diplomdb/api/schueler")
+@RequestMapping(DIPLOMDB_PATH_PREFIX + "/api/schueler")
 public class SchuelerController {
 
     @Autowired

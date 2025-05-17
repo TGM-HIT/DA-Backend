@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static at.ac.tgm.Consts.DIPLOMDB_PATH_PREFIX;
+
 /**
  * Controller zur Verwaltung der Betreuer.
  *
@@ -40,7 +42,7 @@ import java.util.List;
  *   und Sortierparameter übergeben werden.
  */
 @RestController
-@RequestMapping("/diplomdb/api/betreuer")
+@RequestMapping(DIPLOMDB_PATH_PREFIX + "/api/betreuer")
 public class BetreuerController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BetreuerController.class);

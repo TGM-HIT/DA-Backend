@@ -76,28 +76,9 @@ public class SecurityConfig {
                                         "/",
                                         "/auth/**", // Login-Controller
                                         "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/swagger-config", // OpenAPI Documentation
-                                                // Öffentliche Endpunkte: Fehlerseiten, H2-Konsole und API-Dokumentation
-                                                "/error",
-                                                "/h2-console/**",
-                                                "/swagger-ui/**",
-                                                "/swagger-ui.html",
-                                                "/v3/api-docs/**",
-                                                // Statische Testseiten erlauben
-                                                "/index.html",
-                                                "/login_test.html",
-                                                "/betreuer_test.html",
-                                                "/projects_test.html",
-                                                "/documents_test.html",
-                                                "/milestones_test.html",
-                                                "/project_applications_test.html",
-                                                "/schueler_test.html",
-                                                "/user_test.html",
-                                                "/login.html",
-                                                "/api_test.html",
-                                                // API-Endpunkte für Login, Logout und CSRF-Token abrufen erlauben
-                                                "/api/login",
-                                                "/api/logout",
-                                                "/api/csrf-token"
+                                        "/error", // Fehlerseiten
+                                        "/h2-console/**", // H2-Konsole
+                                        "/diplomdb/**.html" // Statische Testseiten erlauben
                                         // Alle weiteren Anfragen erfordern Authentifizierung
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS).permitAll() // Für Preflight bei unterschiedlichen Ports

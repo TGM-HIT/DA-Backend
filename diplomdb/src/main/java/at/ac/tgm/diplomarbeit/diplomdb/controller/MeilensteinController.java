@@ -12,8 +12,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -21,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static at.ac.tgm.Consts.DIPLOMDB_PATH_PREFIX;
 
 /**
  * Controller zur Verwaltung von Meilensteinen in Projekten.
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * - DELETE /api/projects/{projektId}/milestones/{milestoneId}: Löschen eines Meilensteins.
  */
 @RestController
-@RequestMapping("/diplomdb/api/projects")
+@RequestMapping(DIPLOMDB_PATH_PREFIX + "/api/projects")
 public class MeilensteinController {
 
     @Autowired

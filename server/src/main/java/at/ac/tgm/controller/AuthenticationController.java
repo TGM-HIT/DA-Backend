@@ -118,14 +118,4 @@ public class AuthenticationController implements AuthenticationApi {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(auth != null);
     }
-
-    @Override
-    public ResponseEntity<Authentication> getAuthCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        } else {
-            return ResponseEntity.ok(auth);
-        }
-    }
 }

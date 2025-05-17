@@ -1,12 +1,12 @@
 package at.ac.tgm.diplomarbeit.diplomdb.controller;
 
 import at.ac.tgm.ad.Roles;
+import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.diplomarbeit.diplomdb.dto.DiplomarbeitResponseDTO;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Betreuer;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Diplomarbeit;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Dokument;
 import at.ac.tgm.diplomarbeit.diplomdb.exception.ResourceNotFoundException;
-import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.diplomarbeit.diplomdb.mapper.DiplomarbeitMapper;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.BetreuerRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DiplomarbeitRepository;
@@ -16,25 +16,31 @@ import at.ac.tgm.diplomarbeit.diplomdb.service.BetreuerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static at.ac.tgm.Consts.DIPLOMDB_PATH_PREFIX;
 
 /**
  * Controller zur Verwaltung von Diplomarbeitsprojekten.
@@ -44,7 +50,7 @@ import java.util.stream.Collectors;
  * Dokumenten (Lastenheft) und der Lehrerzuweisung angeboten.
  */
 @RestController
-@RequestMapping("/diplomdb/api/projects")
+@RequestMapping(DIPLOMDB_PATH_PREFIX + "/api/projects")
 public class DiplomarbeitController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DiplomarbeitController.class);

@@ -3,7 +3,6 @@ package at.ac.tgm.diplomarbeit.diplomdb.controller;
 import at.ac.tgm.ad.Roles;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.ProjektBewerbung;
 import at.ac.tgm.diplomarbeit.diplomdb.service.ProjektBewerbungService;
-import at.ac.tgm.diplomarbeit.diplomdb.service.ProjektBewerbungService.UserBewerbungOverviewDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -19,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static at.ac.tgm.Consts.DIPLOMDB_PATH_PREFIX;
+
 /**
  * Controller zur Verwaltung von Projekt-Bewerbungen.
  *
@@ -33,7 +34,7 @@ import java.util.List;
  * - DELETE /api/project-applications/{id}: Löschen einer Bewerbung – nur für Administratoren.
  */
 @RestController
-@RequestMapping("/diplomdb/api/project-applications")
+@RequestMapping(DIPLOMDB_PATH_PREFIX + "/api/project-applications")
 public class ProjektBewerbungController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjektBewerbungController.class);

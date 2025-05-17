@@ -1,14 +1,14 @@
 package at.ac.tgm.diplomarbeit.diplomdb.controller;
 
 import at.ac.tgm.ad.Roles;
+import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.diplomarbeit.diplomdb.dto.DokumentDTO;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Diplomarbeit;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Dokument;
 import at.ac.tgm.diplomarbeit.diplomdb.exception.ResourceNotFoundException;
-import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.diplomarbeit.diplomdb.mapper.DokumentMapper;
-import at.ac.tgm.diplomarbeit.diplomdb.repository.DokumentRepository;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.DiplomarbeitRepository;
+import at.ac.tgm.diplomarbeit.diplomdb.repository.DokumentRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -17,22 +17,27 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.PathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.stream.Collectors;
+
+import static at.ac.tgm.Consts.DIPLOMDB_PATH_PREFIX;
 
 /**
  * Controller zur Verwaltung von Dokumenten.
@@ -52,7 +57,7 @@ import java.util.stream.Collectors;
  * - DELETE /api/documents/{id}: Löschen eines Dokuments und der zugehörigen Datei.
  */
 @RestController
-@RequestMapping("/diplomdb/api/documents")
+@RequestMapping(DIPLOMDB_PATH_PREFIX + "/api/documents")
 public class DokumentController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DokumentController.class);

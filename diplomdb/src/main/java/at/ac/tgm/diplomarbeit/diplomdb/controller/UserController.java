@@ -1,27 +1,27 @@
 package at.ac.tgm.diplomarbeit.diplomdb.controller;
 
 import at.ac.tgm.ad.Roles;
+import at.ac.tgm.ad.entry.UserEntry;
+import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.diplomarbeit.diplomdb.dto.GroupDTO;
 import at.ac.tgm.diplomarbeit.diplomdb.dto.UserDTO;
-import at.ac.tgm.ad.entry.UserEntry;
-import at.ac.tgm.ad.entry.GroupEntry;
-import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.diplomarbeit.diplomdb.mapper.UserMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static at.ac.tgm.Consts.DIPLOMDB_PATH_PREFIX;
 
 /**
  * Controller zur Verwaltung von Benutzer- und LDAP-Abfragen.
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * - GET /api/users/searchByCN: Sucht einen Benutzer anhand des Common Name (CN).
  */
 @RestController
-@RequestMapping("/diplomdb/api")
+@RequestMapping(DIPLOMDB_PATH_PREFIX + "/api")
 public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
