@@ -1,8 +1,10 @@
 package at.ac.tgm.controller;
 
 import at.ac.tgm.ad.Roles;
+import at.ac.tgm.dto.ReservationDTO;
 import at.ac.tgm.dto.StickGroupDTO;
 import at.ac.tgm.dto.USBStickDTO;
+import at.ac.tgm.service.ReservationService;
 import at.ac.tgm.service.StickGroupService;
 import at.ac.tgm.service.USBStickService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,10 +21,14 @@ public class USBStickController {
 
     private final USBStickService usbStickService;
     private final StickGroupService stickGroupService;
+    private final ReservationService reservationService;
 
-    public USBStickController(USBStickService usbStickService, StickGroupService stickGroupService) {
+    public USBStickController(USBStickService usbStickService,
+                              StickGroupService stickGroupService,
+                              ReservationService reservationService) {
         this.usbStickService = usbStickService;
         this.stickGroupService = stickGroupService;
+        this.reservationService = reservationService;
     }
 
     // --- USBStick Endpoints ---
@@ -114,6 +120,31 @@ public class USBStickController {
     @Operation(summary = "Delete a stick group")
     public ResponseEntity<Void> deleteGroup(@PathVariable String groupId) {
         stickGroupService.deleteById(groupId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // --- Reservation Endpoints ---
+
+    @Secured(Roles.TEACHER)
+    @GetMapping("/reservations")
+    @Operation(summary = "Get all reservations")
+    public ResponseEntity<List<ReservationDTO>> getAllReservations() {
+        return ResponseEntity.ok(reservationService.findAll());
+    }
+
+    @Secured(Roles.TEACHER)
+    @PostMapping("/reservations")
+    @Operation(summary = "Create a reservation for a stick group")
+    public ResponseEntity<ReservationDTO> createReservation(@RequestBody ReservationDTO reservationDTO) {
+        ReservationDTO saved = reservationService.save(reservationDTO);
+        return ResponseEntity.ok(saved);
+    }
+
+    @Secured(Roles.TEACHER)
+    @DeleteMapping("/reservations/{id}")
+    @Operation(summary = "Delete a reservation")
+    public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
+        reservationService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

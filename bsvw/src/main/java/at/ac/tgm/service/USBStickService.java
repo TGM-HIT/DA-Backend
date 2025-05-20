@@ -4,6 +4,7 @@ import at.ac.tgm.dto.USBStickDTO;
 import at.ac.tgm.entity.USBStick;
 import at.ac.tgm.mapper.USBStickMapper;
 import at.ac.tgm.repository.USBStickRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,9 @@ public class USBStickService {
     }
 
     public void deleteById(String inventarnummer) {
+        if (!repository.existsById(inventarnummer)) {
+            throw new EntityNotFoundException("USB-Stick mit ID " + inventarnummer + " existiert nicht.");
+        }
         repository.deleteById(inventarnummer);
     }
 

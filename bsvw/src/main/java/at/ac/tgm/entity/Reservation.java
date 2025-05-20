@@ -22,4 +22,5 @@ public class Reservation {
     private StickGroup group;
 
     private String reservedBy;
+    private String reservationDate;
 }
