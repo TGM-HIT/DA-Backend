@@ -62,4 +62,5 @@ replay_pid*
 
 .env
 .DS_Store
-
+datenbank.mv.db
+datenbank.trace.db
