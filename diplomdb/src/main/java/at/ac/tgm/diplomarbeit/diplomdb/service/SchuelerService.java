@@ -1,21 +1,13 @@
 package at.ac.tgm.diplomarbeit.diplomdb.service;
 
-import at.ac.tgm.diplomarbeit.diplomdb.entity.Schueler;
 import at.ac.tgm.ad.service.UserService;
+import at.ac.tgm.diplomarbeit.diplomdb.entity.Schueler;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.SchuelerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ldap.control.PagedResultsCookie;
-import org.springframework.ldap.control.PagedResultsDirContextProcessor;
-import org.springframework.ldap.core.AttributesMapper;
-import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.stereotype.Service;
-import javax.naming.Name;
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.SearchControls;
-import java.util.ArrayList;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,9 +31,6 @@ public class SchuelerService {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private LdapTemplate ldapTemplate;
-
     /**
      * Aktualisiert die Schülerliste für einen bestimmten Jahrgang (4 oder 5) aus dem LDAP.
      * Dabei werden zunächst alle vorhandenen Schülerdaten gelöscht (Clean Slate) und anschließend
@@ -59,7 +48,7 @@ public class SchuelerService {
         String filter = createHITSchuelerGroupFilter(year);
 
         // 3) Sammle alle sAMAccountNames, die dem Filter entsprechen, mithilfe der Paging-Methode
-        List<String> allSAMs = collectAllSAMAccountNamesPaged(filter);
+        List<String> allSAMs = userService.collectAllSAMAccountNamesPaged(filter);
 
         // 4) Für jeden sAMAccountName: Hole die LDAP-Daten und speichere einen neuen Schülereintrag
         int count = 0;
@@ -110,53 +99,6 @@ public class SchuelerService {
         }
         return "(objectClass=none)";
     }
-
-    /**
-     * Sammelt alle sAMAccountNames aus dem LDAP, die dem angegebenen Filter entsprechen, mithilfe der Paging-Methode.
-     *
-     * @param filter Der LDAP-Filter, der angewendet werden soll.
-     * @return Eine Liste der gesammelten sAMAccountNames.
-     */
-    private List<String> collectAllSAMAccountNamesPaged(String filter) {
-        List<String> result = new ArrayList<>();
-        String baseDn = "";
-        SearchControls controls = new SearchControls();
-        controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        controls.setReturningAttributes(new String[]{"sAMAccountName"});
-
-        int pageSize = 200;
-        PagedResultsCookie cookie = null;
-
-        do {
-            PagedResultsDirContextProcessor pager = new PagedResultsDirContextProcessor(pageSize, cookie);
-            List<String> pageSAMs = ldapTemplate.search(
-                    baseDn,
-                    filter,
-                    controls,
-                    (AttributesMapper<String>) this::extractSamAccountName,
-                    pager
-            );
-            result.addAll(pageSAMs);
-            cookie = pager.getCookie();
-        } while (cookie != null && cookie.getCookie() != null);
-
-        return result;
-    }
-
-    /**
-     * Extrahiert den sAMAccountName aus den LDAP-Attributen.
-     *
-     * @param attrs Die LDAP-Attribute.
-     * @return Der extrahierte sAMAccountName oder null, falls das Attribut nicht vorhanden ist.
-     * @throws NamingException Falls ein Fehler beim Zugriff auf die Attribute auftritt.
-     */
-    private String extractSamAccountName(Attributes attrs) throws NamingException {
-        if (attrs.get("sAMAccountName") != null) {
-            return attrs.get("sAMAccountName").get().toString();
-        }
-        return null;
-    }
-
     /**
      * Sucht die Schüler in der Datenbank anhand eines optionalen Suchbegriffs und sortiert sie
      * anhand des angegebenen Sortierfeldes und der Sortierrichtung.

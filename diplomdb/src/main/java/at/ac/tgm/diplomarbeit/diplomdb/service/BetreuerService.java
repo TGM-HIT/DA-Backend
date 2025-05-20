@@ -1,37 +1,31 @@
 package at.ac.tgm.diplomarbeit.diplomdb.service;
 
+import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.diplomarbeit.diplomdb.entity.Betreuer;
 import at.ac.tgm.diplomarbeit.diplomdb.exception.ResourceNotFoundException;
-import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.diplomarbeit.diplomdb.repository.BetreuerRepository;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ldap.core.AttributesMapper;
-import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.control.PagedResultsCookie;
-import org.springframework.ldap.control.PagedResultsDirContextProcessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.SearchControls;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,9 +38,6 @@ public class BetreuerService {
 
     @Autowired
     private BetreuerRepository betreuerRepository;
-
-    @Autowired
-    private LdapTemplate ldapTemplate;
 
     /**
      * Exportiert die Betreuerliste als CSV-Datei.
@@ -244,7 +235,7 @@ public class BetreuerService {
      */
     public void refreshBetreuerListFromLDAP() {
         LOGGER.info("Aktualisiere Betreuerliste aus LDAP ...");
-        List<String> allSAMs = collectAllSAMAccountNamesPaged();
+        List<String> allSAMs = userService.collectAllSAMAccountNamesPaged();
         for (String sam : allSAMs) {
             // Auto-add teacher if not existing
             Betreuer b = betreuerRepository.findBySamAccountNameIgnoreCase(sam)
@@ -261,40 +252,6 @@ public class BetreuerService {
             });
         }
         LOGGER.info("Betreuer-Refresh abgeschlossen. Anzahl der aktualisierten Einträge: {}", allSAMs.size());
-    }
-
-    private List<String> collectAllSAMAccountNamesPaged() {
-        List<String> result = new ArrayList<>();
-        String baseDn = "";
-        String filter = "(objectClass=user)";
-        SearchControls controls = new SearchControls();
-        controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        controls.setReturningAttributes(new String[]{"sAMAccountName"});
-
-        int pageSize = 200;
-        PagedResultsCookie cookie = null;
-
-        do {
-            PagedResultsDirContextProcessor pager = new PagedResultsDirContextProcessor(pageSize, cookie);
-            List<String> pageSAMs = ldapTemplate.search(
-                    baseDn,
-                    filter,
-                    controls,
-                    (AttributesMapper<String>) this::extractSamAccountName,
-                    pager
-            );
-            result.addAll(pageSAMs);
-            cookie = pager.getCookie();
-        } while (cookie != null && cookie.getCookie() != null);
-
-        return result;
-    }
-
-    private String extractSamAccountName(Attributes attrs) throws NamingException {
-        if (attrs.get("sAMAccountName") != null) {
-            return attrs.get("sAMAccountName").get().toString();
-        }
-        return null;
     }
 
     /**

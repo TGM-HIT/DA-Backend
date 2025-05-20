@@ -6,6 +6,8 @@ import at.ac.tgm.ad.repository.GroupRepository;
 import at.ac.tgm.ad.repository.UserRepository;
 import at.ac.tgm.ad.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ldap.control.PagedResultsCookie;
+import org.springframework.ldap.control.PagedResultsDirContextProcessor;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.odm.annotations.Entry;
@@ -13,11 +15,11 @@ import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.stereotype.Service;
 
 import javax.naming.Name;
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.SearchControls;
 import javax.naming.ldap.LdapName;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,5 +81,60 @@ public class UserService {
             loadGroupMembers(userOpt.get());
         }
         return userOpt;
+    }
+    
+    /**
+     * Sammelt alle sAMAccountNames von Usern aus dem LDAP, mithilfe der Paging-Methode.
+     *
+     * @return Eine Liste der gesammelten sAMAccountNames.
+     */
+    public List<String> collectAllSAMAccountNamesPaged() {
+        return collectAllSAMAccountNamesPaged("(objectClass=user)");
+    }
+    
+    /**
+     * Sammelt alle sAMAccountNames aus dem LDAP, die dem angegebenen Filter entsprechen, mithilfe der Paging-Methode.
+     *
+     * @param filter Der LDAP-Filter, der angewendet werden soll.
+     * @return Eine Liste der gesammelten sAMAccountNames.
+     */
+    public List<String> collectAllSAMAccountNamesPaged(String filter) {
+        List<String> result = new ArrayList<>();
+        String baseDn = "";
+        SearchControls controls = new SearchControls();
+        controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        controls.setReturningAttributes(new String[]{"sAMAccountName"});
+        
+        int pageSize = 200;
+        PagedResultsCookie cookie = null;
+        
+        do {
+            PagedResultsDirContextProcessor pager = new PagedResultsDirContextProcessor(pageSize, cookie);
+            List<String> pageSAMs = ldapTemplate.search(
+                    baseDn,
+                    filter,
+                    controls,
+                    this::extractSamAccountName,
+                    pager
+            );
+            result.addAll(pageSAMs);
+            cookie = pager.getCookie();
+        } while (cookie != null && cookie.getCookie() != null);
+        
+        return result;
+    }
+    
+    /**
+     * Extrahiert den sAMAccountName aus den LDAP-Attributen.
+     *
+     * @param attrs Die LDAP-Attribute.
+     * @return Der extrahierte sAMAccountName oder null, falls das Attribut nicht vorhanden ist.
+     * @throws NamingException Falls ein Fehler beim Zugriff auf die Attribute auftritt.
+     */
+    private String extractSamAccountName(Attributes attrs) throws NamingException {
+        if (attrs.get("sAMAccountName") != null) {
+            return attrs.get("sAMAccountName").get().toString();
+        }
+        return null;
     }
 }

@@ -3,9 +3,6 @@
 dependencies {
     implementation 'org.apache.poi:poi-ooxml:5.2.4'
     implementation 'org.apache.pdfbox:pdfbox:2.0.27'
-    implementation 'org.springframework.boot:spring-boot-starter-data-ldap'
-    implementation 'org.springframework.ldap:spring-ldap-core'
-    implementation 'org.springframework.security:spring-security-ldap'
     implementation project(':core')
 
 
