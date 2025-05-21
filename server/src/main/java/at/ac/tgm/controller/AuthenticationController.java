@@ -85,7 +85,7 @@ public class AuthenticationController implements AuthenticationApi {
             return authenticationManager.authenticate(authenticationToken);
         }
     }
-    
+
     @Override
     public CsrfToken csrfToken(HttpServletRequest request) {
         return (CsrfToken) request.getAttribute(CsrfToken.class.getName());

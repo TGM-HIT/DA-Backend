@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>User Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        header { background: #333; color: #fff; padding: 10px; }
+        header nav a { color: #fff; margin-right: 15px; text-decoration: none; }
+        header nav a:hover { text-decoration: underline; }
+        label, button { display: block; margin: 8px 0; }
+        input { width: 300px; }
+        .response { border: 1px solid #ccc; padding: 10px; background: #f9f9f9; white-space: pre-wrap; margin-top: 10px; }
+    </style>
+    <script>
+        let csrfToken = null;
+        let csrfHeaderName = null;
+        async function getCsrfToken() {
+            if (!csrfToken) {
+                const response = await fetch('/auth/csrf-token', { credentials: 'include' });
+                if (!response.ok) throw new Error('CSRF-Token konnte nicht abgerufen werden.');
+                const data = await response.json();
+                csrfToken = data.token;
+                csrfHeaderName = data.headerName;
+                console.log('CSRF-Token geladen:', csrfToken, 'Header:', csrfHeaderName);
+            }
+        }
+    </script>
+</head>
+<body>
+<header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+        <a href="betreuer_test.html">Betreuer Test</a>
+        <a href="projects_test.html">Projekte Test</a>
+        <a href="documents_test.html">Dokumente Test</a>
+        <a href="milestones_test.html">Meilensteine Test</a>
+        <a href="project_applications_test.html">Bewerbungen Test</a>
+        <a href="schueler_test.html">Schüler Test</a>
+        <a href="user_test.html">User Test</a>
+    </nav>
+</header>
+<hr>
+<h1>User Test</h1>
+<h2>Test LDAP User</h2>
+<label>sAMAccountName:
+    <input type="text" id="ldapUserSam">
+</label>
+<button id="testLdapUserBtn">Testen (GET /api/test-ldap-user/{samAccountName})</button>
+
+<h2>User Details abrufen</h2>
+<label>sAMAccountName:
+    <input type="text" id="userDetailsSam">
+</label>
+<button id="getUserDetailsBtn">Abrufen (GET /api/users/{samAccountName})</button>
+
+<h2>User Groups abrufen</h2>
+<label>sAMAccountName:
+    <input type="text" id="userGroupsSam">
+</label>
+<button id="getUserGroupsBtn">Abrufen (GET /api/users/{samAccountName}/groups)</button>
+
+<h2>User search by Mail</h2>
+<label>Mail:
+    <input type="text" id="userMail">
+</label>
+<button id="searchUserMailBtn">Suchen (GET /api/users/searchByMail?mail=...)</button>
+
+<h2>User search by CN</h2>
+<label>CN:
+    <input type="text" id="userCn">
+</label>
+<button id="searchUserCnBtn">Suchen (GET /api/users/searchByCN?cn=...)</button>
+
+<h3>Response:</h3>
+<pre class="response" id="responseArea"></pre>
+<script>
+    document.getElementById('testLdapUserBtn').addEventListener('click', async () => {
+        await getCsrfToken();
+        const sam = document.getElementById('ldapUserSam').value;
+        const url = `/api/test-ldap-user/${encodeURIComponent(sam)}`;
+        const res = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { [csrfHeaderName]: csrfToken }
+        });
+        const text = await res.text();
+        document.getElementById('responseArea').textContent = text;
+    });
+    document.getElementById('getUserDetailsBtn').addEventListener('click', async () => {
+        await getCsrfToken();
+        const sam = document.getElementById('userDetailsSam').value;
+        const url = `/api/users/${encodeURIComponent(sam)}`;
+        const res = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { [csrfHeaderName]: csrfToken }
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
+    });
+    document.getElementById('getUserGroupsBtn').addEventListener('click', async () => {
+        await getCsrfToken();
+        const sam = document.getElementById('userGroupsSam').value;
+        const url = `/api/users/${encodeURIComponent(sam)}/groups`;
+        const res = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { [csrfHeaderName]: csrfToken }
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
+    });
+    document.getElementById('searchUserMailBtn').addEventListener('click', async () => {
+        await getCsrfToken();
+        const mail = document.getElementById('userMail').value;
+        const url = `/api/users/searchByMail?mail=${encodeURIComponent(mail)}`;
+        const res = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { [csrfHeaderName]: csrfToken }
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
+    });
+    document.getElementById('searchUserCnBtn').addEventListener('click', async () => {
+        await getCsrfToken();
+        const cn = document.getElementById('userCn').value;
+        const url = `/api/users/searchByCN?cn=${encodeURIComponent(cn)}`;
+        const res = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { [csrfHeaderName]: csrfToken }
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
+    });
+</script>
+</body>
+</html>

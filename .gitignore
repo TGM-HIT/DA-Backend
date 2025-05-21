@@ -61,6 +61,11 @@ hs_err_pid*
 replay_pid*
 
 .env
+# DiplomDB uploads ohne Docker
+uploads/
+# Docker data
+data/
+# Mac
 .DS_Store
-datenbank.mv.db
-datenbank.trace.db
+# H2
+*.db

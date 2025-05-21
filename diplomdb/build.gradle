@@ -1,0 +1,15 @@
+
+
+dependencies {
+    implementation 'org.apache.poi:poi-ooxml:5.2.4'
+    implementation 'org.apache.pdfbox:pdfbox:2.0.27'
+    implementation project(':core')
+
+
+
+    //implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1' //für JUnit Tests
+    compileOnly 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+    testCompileOnly 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+
+    testImplementation 'org.springframework.security:spring-security-test'
+}
