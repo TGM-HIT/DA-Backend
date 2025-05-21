@@ -3,8 +3,8 @@ package at.ac.tgm.service;
 import at.ac.tgm.dto.ReservationDTO;
 import at.ac.tgm.dto.StickGroupDTO;
 import at.ac.tgm.entity.Reservation;
-import at.ac.tgm.entity.StickGroup;
 import at.ac.tgm.mapper.ReservationMapper;
+import at.ac.tgm.mapper.StickGroupMapper;
 import at.ac.tgm.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +22,9 @@ public class ReservationService {
 
     @Autowired
     private StickGroupService stickGroupService;
+    
+    @Autowired
+    private StickGroupMapper stickGroupMapper;
 
     public List<ReservationDTO> findAll() {
         return repository.findAll().stream().map(mapper::toDTO).toList();
@@ -33,7 +36,7 @@ public class ReservationService {
                 .orElseThrow(() -> new RuntimeException("Gruppe nicht gefunden"));
 
         Reservation reservation = mapper.toEntity(dto);
-        reservation.setGroup(group);
+        reservation.setGroup(stickGroupMapper.toEntity(group));
         return mapper.toDTO(repository.save(reservation));
     }
 
