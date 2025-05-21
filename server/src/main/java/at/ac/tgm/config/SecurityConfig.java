@@ -1,6 +1,5 @@
 package at.ac.tgm.config;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -100,7 +99,7 @@ public class SecurityConfig {
                         .allowedHeaders("*")
                         .allowedMethods("*")
                         .allowCredentials(true)
-                        .allowedOriginPatterns("http://localhost", "http://localhost:[*]", "https://projekte.tgm.ac.at")
+                        .allowedOriginPatterns("http://localhost", "http://localhost:[*]", "https://projekte.tgm.ac.at", "https://[*].projekte.tgm.ac.at")
                         .exposedHeaders("Access-Control-Allow-Origin");
             }
         };
@@ -112,13 +111,14 @@ public class SecurityConfig {
             private static final Logger log = LoggerFactory.getLogger(AccessDeniedHandler.class);
             
             @Override
-            public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+            public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
                 log.info("CustomAccessDeniedHandler {}", accessDeniedException.getMessage());
                 // Both header are important, else Axios Network error
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
                 response.setHeader("Access-Control-Allow-Headers", "*");
-                response.setContentType("text/plain");
+                // TODO Fix this, causes "No converter for [class java.util.LinkedHashMap] with preset Content-Type 'text/plain'"
+                //response.setContentType(MediaType.TEXT_PLAIN_VALUE);
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "You don't have the necessary role to access this resource");
             }
         };
@@ -130,16 +130,16 @@ public class SecurityConfig {
             private static final Logger log = LoggerFactory.getLogger(AuthenticationEntryPoint.class);
             
             @Override
-            public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+            public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
                 log.info("CustomAuthenticationEntryPoint {}", authException.getMessage());
                 // Both header are important, else Axios Network error
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
                 response.setHeader("Access-Control-Allow-Headers", "*");
-                response.setContentType("text/plain");
+                // TODO Fix this, causes "No converter for [class java.util.LinkedHashMap] with preset Content-Type 'text/plain'"
+                //response.setContentType(MediaType.TEXT_PLAIN_VALUE);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "You must be logged-in to access this resource");
             }
         };
     }
-    
 }
