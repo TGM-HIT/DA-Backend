@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Meilensteine Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        header { background: #333; color: #fff; padding: 10px; }
+        header nav a { color: #fff; margin-right: 15px; text-decoration: none; }
+        header nav a:hover { text-decoration: underline; }
+        label, button { display: block; margin: 8px 0; }
+        input, select, textarea { width: 300px; }
+        .response { border: 1px solid #ccc; padding: 10px; background: #f9f9f9; white-space: pre-wrap; margin-top: 10px; }
+    </style>
+    <script>
+        let csrfToken = null;
+        let csrfHeaderName = null;
+        async function getCsrfToken() {
+            if (!csrfToken) {
+                const response = await fetch('/auth/csrf-token', { credentials: 'include' });
+                if (!response.ok) throw new Error('CSRF-Token konnte nicht abgerufen werden.');
+                const data = await response.json();
+                csrfToken = data.token;
+                csrfHeaderName = data.headerName;
+                console.log('CSRF-Token geladen:', csrfToken, 'Header:', csrfHeaderName);
+            }
+        }
+    </script>
+</head>
+<body>
+<header>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+        <a href="betreuer_test.html">Betreuer Test</a>
+        <a href="projects_test.html">Projekte Test</a>
+        <a href="documents_test.html">Dokumente Test</a>
+        <a href="milestones_test.html">Meilensteine Test</a>
+        <a href="project_applications_test.html">Bewerbungen Test</a>
+        <a href="schueler_test.html">Schüler Test</a>
+        <a href="user_test.html">User Test</a>
+    </nav>
+</header>
+<hr>
+<h1>Meilensteine Test</h1>
+<!-- Meilenstein erstellen -->
+<h2>Meilenstein erstellen</h2>
+<label>Projekt-ID:
+    <input type="text" id="msProjId">
+</label>
+<label>Meilenstein Name:
+    <input type="text" id="msName">
+</label>
+<button id="createMsBtn">Erstellen (POST /api/projects/{projektId}/milestones)</button>
+
+<!-- Meilensteine abrufen -->
+<h2>Meilensteine abrufen</h2>
+<label>Projekt-ID:
+    <input type="text" id="listProjId">
+</label>
+<button id="listMsBtn">Abrufen (GET /api/projects/{projektId}/milestones)</button>
+
+<!-- Meilenstein Status ändern -->
+<h2>Meilenstein Status ändern</h2>
+<label>Projekt-ID:
+    <input type="text" id="statusProjId">
+</label>
+<label>Meilenstein-ID:
+    <input type="text" id="statusMsId">
+</label>
+<label>Neuer Status:
+    <select id="newMsStatus">
+        <option value="OFFEN">OFFEN</option>
+        <option value="IN_BEARBEITUNG">IN_BEARBEITUNG</option>
+        <option value="ERFUELLT">ERFUELLT</option>
+    </select>
+</label>
+<button id="updateStatusBtn">Status ändern (PUT /api/projects/{projektId}/milestones/{milestoneId}/status)</button>
+
+<!-- Meilenstein Namen ändern -->
+<h2>Meilenstein Namen ändern</h2>
+<label>Projekt-ID:
+    <input type="text" id="nameProjId">
+</label>
+<label>Meilenstein-ID:
+    <input type="text" id="nameMsId">
+</label>
+<label>Neuer Name:
+    <input type="text" id="newMsName">
+</label>
+<button id="updateNameBtn">Namen ändern (PUT /api/projects/{projektId}/milestones/{milestoneId}/name)</button>
+
+<!-- Meilenstein löschen -->
+<h2>Meilenstein löschen</h2>
+<label>Projekt-ID:
+    <input type="text" id="delProjId">
+</label>
+<label>Meilenstein-ID:
+    <input type="text" id="delMsId">
+</label>
+<button id="deleteMsBtn">Löschen (DELETE /api/projects/{projektId}/milestones/{milestoneId})</button>
+
+<h3>Response:</h3>
+<pre class="response" id="responseArea"></pre>
+<script>
+    document.getElementById('createMsBtn').addEventListener('click', async () => {
+        await getCsrfToken();
+        const projId = document.getElementById('msProjId').value;
+        const name = document.getElementById('msName').value;
+        const url = `/api/projects/${encodeURIComponent(projId)}/milestones`;
+        const res = await fetch(url, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeaderName]: csrfToken
+            },
+            body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
+    });
+    document.getElementById('listMsBtn').addEventListener('click', async () => {
+        await getCsrfToken();
+        const projId = document.getElementById('listProjId').value;
+        const url = `/api/projects/${encodeURIComponent(projId)}/milestones`;
+        const res = await fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { [csrfHeaderName]: csrfToken }
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
+    });
+    document.getElementById('updateStatusBtn').addEventListener('click', async () => {
+        await getCsrfToken();
+        const projId = document.getElementById('statusProjId').value;
+        const msId = document.getElementById('statusMsId').value;
+        const newStatus = document.getElementById('newMsStatus').value;
+        const url = `/api/projects/${encodeURIComponent(projId)}/milestones/${encodeURIComponent(msId)}/status?newStatus=${encodeURIComponent(newStatus)}`;
+        const res = await fetch(url, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: { [csrfHeaderName]: csrfToken }
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
+    });
+    document.getElementById('updateNameBtn').addEventListener('click', async () => {
+        await getCsrfToken();
+        const projId = document.getElementById('nameProjId').value;
+        const msId = document.getElementById('nameMsId').value;
+        const newName = document.getElementById('newMsName').value;
+        const url = `/api/projects/${encodeURIComponent(projId)}/milestones/${encodeURIComponent(msId)}/name?newName=${encodeURIComponent(newName)}`;
+        const res = await fetch(url, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: { [csrfHeaderName]: csrfToken }
+        });
+        const data = await res.json();
+        document.getElementById('responseArea').textContent = JSON.stringify(data, null, 2);
+    });
+    document.getElementById('deleteMsBtn').addEventListener('click', async () => {
+        await getCsrfToken();
+        const projId = document.getElementById('delProjId').value;
+        const msId = document.getElementById('delMsId').value;
+        const url = `/api/projects/${encodeURIComponent(projId)}/milestones/${encodeURIComponent(msId)}`;
+        const res = await fetch(url, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: { [csrfHeaderName]: csrfToken }
+        });
+        if (res.status === 204) {
+            document.getElementById('responseArea').textContent = "Meilenstein gelöscht.";
+        } else {
+            const text = await res.text();
+            document.getElementById('responseArea').textContent = `Fehler: ${res.status}\n${text}`;
+        }
+    });
+</script>
+</body>
+</html>

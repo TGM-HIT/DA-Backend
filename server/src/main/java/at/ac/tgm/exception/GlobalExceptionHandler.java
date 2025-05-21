@@ -50,6 +50,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handler(IllegalStateException e) {
+        log.info("IllegalStateException", e.getMessage());
+        String body = e.getMessage();
+        return new ResponseEntity<>(body, headers, HttpStatus.IM_USED);
+    }
+    
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<String> handler(NoSuchElementException e) {
         log.info("NoSuchElementException {}", e.getMessage());

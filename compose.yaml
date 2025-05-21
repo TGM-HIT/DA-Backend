@@ -18,6 +18,8 @@ services:
     depends_on:
       database:
         condition: service_started
+    volumes:
+      - ./data/application:/data
     networks:
       - DA-Backend
     links:
@@ -34,13 +36,10 @@ services:
       - MARIADB_DATABASE=${MARIADB_DATABASE:-da}
       - MARIADB_PORT=3306 # No need to change the default port and expose it within a container
     volumes:
-      - database:/var/lib/mysql
+      - ./data/mariadb:/var/lib/mysql
     networks:
       - DA-Backend
 
 networks:
   DA-Backend:
     driver: bridge
-
-volumes:
-  database:

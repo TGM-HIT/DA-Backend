@@ -61,3 +61,7 @@ hs_err_pid*
 replay_pid*
 
 .env
+# DiplomDB uploads ohne Docker
+uploads/
+# Docker data
+data/
