@@ -1,15 +1,22 @@
 package at.ac.tgm.config;
 
-import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.customizers.OperationCustomizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Configuration
 public class SwaggerConfig {
+    @Value("${server.port}")
+    private String localPort;
+    
     private static final String INFO_ANY_ENDPOINT = " (Can happen on any endpoint)";
     
     /**
@@ -19,13 +26,17 @@ public class SwaggerConfig {
      */
     @Bean
     public OpenAPI diplomarbeitOpenAPI() {
+        List<Server> servers = new ArrayList<>();
+        servers.add(new Server().url("https://da-backend.projekte.tgm.ac.at").description("Projekteserver"));
+        servers.add(new Server().url("http://localhost:" + localPort).description("Local Development Server"));
         return new OpenAPI()
                 .info(new Info().title("API Dokumentation")
                         .description("Dokumentation der REST API")
-                        .version("v1.0")); // TODO: Version überprüfen build gradle
-
+                        .version("v3.1.0"))
+                .servers(servers);
+        
     }
-
+    
     @Bean
     public OperationCustomizer operationCustomizer() {
         // add error type to each operation
