@@ -1,8 +1,9 @@
 dependencies {
     implementation project(':core')
-    implementation project(':eis')
     implementation project(':beispiel')
+    implementation project(':eis')
     implementation project(':diplomdb')
+    implementation project(':bsvw')
     
     // LDAP
     implementation 'org.springframework.ldap:spring-ldap-core'

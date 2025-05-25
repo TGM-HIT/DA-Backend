@@ -77,7 +77,9 @@ public class SecurityConfig {
                                         "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/swagger-config", // OpenAPI Documentation
                                         "/error", // Fehlerseiten
                                         "/h2-console/**", // H2-Konsole
-                                        "/diplomdb/**.html" // Statische Testseiten erlauben
+                                        "/diplomdb/**.html", // Statische Testseiten erlauben
+                                        "/logs", "/logs/**", // Temporär für leichteres Debugging
+                                        "/**.ico" // Icons erlauben
                                         // Alle weiteren Anfragen erfordern Authentifizierung
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS).permitAll() // Für Preflight bei unterschiedlichen Ports
@@ -99,7 +101,7 @@ public class SecurityConfig {
                         .allowedHeaders("*")
                         .allowedMethods("*")
                         .allowCredentials(true)
-                        .allowedOriginPatterns("http://localhost", "http://localhost:[*]", "https://projekte.tgm.ac.at", "https://[*].projekte.tgm.ac.at")
+                        .allowedOriginPatterns("http://localhost", "http://localhost:[*]", "https://projekte.tgm.ac.at", "https://*.projekte.tgm.ac.at")
                         .exposedHeaders("Access-Control-Allow-Origin");
             }
         };
