@@ -114,7 +114,7 @@ public class SecurityConfig {
             
             @Override
             public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
-                log.error("CustomAccessDeniedHandler {}", accessDeniedException.getMessage());
+                log.info("CustomAccessDeniedHandler {}", accessDeniedException.getMessage());
                 // Both header are important, else Axios Network error
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -133,7 +133,7 @@ public class SecurityConfig {
             
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
-                log.error("CustomAuthenticationEntryPoint {}", authException.getMessage());
+                log.info("CustomAuthenticationEntryPoint {}", authException.getMessage());
                 // Both header are important, else Axios Network error
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
