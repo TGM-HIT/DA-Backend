@@ -77,7 +77,9 @@ public class SecurityConfig {
                                         "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/swagger-config", // OpenAPI Documentation
                                         "/error", // Fehlerseiten
                                         "/h2-console/**", // H2-Konsole
-                                        "/diplomdb/**.html" // Statische Testseiten erlauben
+                                        "/diplomdb/**.html", // Statische Testseiten erlauben
+                                        "/logs", "/logs/**", // Temporär für leichteres Debugging
+                                        "/**.ico" // Icons erlauben
                                         // Alle weiteren Anfragen erfordern Authentifizierung
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS).permitAll() // Für Preflight bei unterschiedlichen Ports
@@ -99,7 +101,7 @@ public class SecurityConfig {
                         .allowedHeaders("*")
                         .allowedMethods("*")
                         .allowCredentials(true)
-                        .allowedOriginPatterns("http://localhost", "http://localhost:[*]", "https://projekte.tgm.ac.at", "https://[*].projekte.tgm.ac.at")
+                        .allowedOriginPatterns("http://localhost", "http://localhost:[*]", "https://projekte.tgm.ac.at", "https://*.projekte.tgm.ac.at")
                         .exposedHeaders("Access-Control-Allow-Origin");
             }
         };
@@ -112,7 +114,7 @@ public class SecurityConfig {
             
             @Override
             public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
-                log.info("CustomAccessDeniedHandler {}", accessDeniedException.getMessage());
+                log.error("CustomAccessDeniedHandler {}", accessDeniedException.getMessage());
                 // Both header are important, else Axios Network error
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -131,7 +133,7 @@ public class SecurityConfig {
             
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
-                log.info("CustomAuthenticationEntryPoint {}", authException.getMessage());
+                log.error("CustomAuthenticationEntryPoint {}", authException.getMessage());
                 // Both header are important, else Axios Network error
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
