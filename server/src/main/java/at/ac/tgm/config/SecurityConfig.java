@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -119,9 +120,10 @@ public class SecurityConfig {
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
                 response.setHeader("Access-Control-Allow-Headers", "*");
-                // TODO Fix this, causes "No converter for [class java.util.LinkedHashMap] with preset Content-Type 'text/plain'"
-                //response.setContentType(MediaType.TEXT_PLAIN_VALUE);
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "You don't have the necessary role to access this resource");
+                response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+                // Don't use sendError here, else No converter for [class java.util.LinkedHashMap] with preset Content-Type 'text/plain' error
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("You don't have the necessary role to access this resource");
             }
         };
     }
@@ -138,9 +140,10 @@ public class SecurityConfig {
                 response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
                 response.setHeader("Access-Control-Allow-Credentials", "true");
                 response.setHeader("Access-Control-Allow-Headers", "*");
-                // TODO Fix this, causes "No converter for [class java.util.LinkedHashMap] with preset Content-Type 'text/plain'"
-                //response.setContentType(MediaType.TEXT_PLAIN_VALUE);
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "You must be logged-in to access this resource");
+                response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+                // Don't use sendError here, else No converter for [class java.util.LinkedHashMap] with preset Content-Type 'text/plain' error
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("You must be logged-in to access this resource");
             }
         };
     }
