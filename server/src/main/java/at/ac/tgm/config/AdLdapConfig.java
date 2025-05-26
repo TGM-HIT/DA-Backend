@@ -18,7 +18,7 @@ import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import java.util.*;
 
 @Configuration
-@EnableLdapRepositories(basePackages = "at.ac.tgm.ad.repository")
+@EnableLdapRepositories
 public class AdLdapConfig {
     @Value("${spring.ldap.urls}")
     private String url;
