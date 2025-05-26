@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -63,7 +64,7 @@ public class SecurityConfig {
     ) throws Exception {
         return http
                 .csrf((csrf) -> {
-                    csrf.ignoringRequestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/auth/login");
+                    csrf.ignoringRequestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/auth/login", "/h2-console/**");
                     csrf.csrfTokenRepository(cookieCsrfTokenRepository);
                     csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler);
                     csrf.configure(http); // Wichtig, damit das neue Einstellungen übernommen werden
@@ -86,6 +87,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.OPTIONS).permitAll() // Für Preflight bei unterschiedlichen Ports
                                 .anyRequest().authenticated()
                 )
+                .headers((headers) -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)) // h2 Console
                 .exceptionHandling(exception -> {
                     exception.accessDeniedHandler(accessDeniedHandler);
                     exception.authenticationEntryPoint(authenticationEntryPoint);

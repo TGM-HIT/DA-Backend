@@ -62,7 +62,7 @@
     </logger>
 
     <!-- === LOGGER für Performance === -->
-    <logger name="at.ac.tgm.diplomarbeit.diplomdb.performance" level="INFO" additivity="false">
+    <logger name="at.ac.tgm.performance" level="INFO" additivity="false">
         <appender-ref ref="PerformanceFileAppender"/>
         <appender-ref ref="ConsoleAppender"/> <!-- optional -->
     </logger>
