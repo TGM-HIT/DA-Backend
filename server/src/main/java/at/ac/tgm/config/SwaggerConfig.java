@@ -25,10 +25,10 @@ public class SwaggerConfig {
      * @return das OpenAPI-Objekt mit den definierten API-Informationen und externen Dokumentationsdetails
      */
     @Bean
-    public OpenAPI diplomarbeitOpenAPI() {
+    public OpenAPI openAPI() {
         List<Server> servers = new ArrayList<>();
-        servers.add(new Server().url("https://da-backend.projekte.tgm.ac.at").description("Projekteserver"));
         servers.add(new Server().url("http://localhost:" + localPort).description("Local Development Server"));
+        servers.add(new Server().url("https://da-backend.projekte.tgm.ac.at").description("Projekteserver"));
         return new OpenAPI()
                 .info(new Info().title("API Dokumentation")
                         .description("Dokumentation der REST API")

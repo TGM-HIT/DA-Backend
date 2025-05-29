@@ -1,11 +1,10 @@
 package at.ac.tgm.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,17 +14,27 @@ import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/logs")
+@Hidden
 public class LogController {
+    @Value("${secret}")
+    private String secret;
+    
     @GetMapping(value = "", produces = MediaType.TEXT_HTML_VALUE)
-    public String getLogs() {
+    public String getLogs(@RequestParam String secret) {
+        if (!secret.equals(this.secret)) {
+            throw new IllegalArgumentException("Wrong secret");
+        }
         return "<html><body><ul>" + Stream.of(new File("logs/").listFiles())
                 .filter(f -> !f.isDirectory())
-                .map(f -> "<li><a href=\"/logs/" + f.getName() + "\">" + f.getName() + "</a></li>")
+                .map(f -> "<li><a href=\"/logs/" + f.getName() + "?secret=" + secret + "\">" + f.getName() + "</a></li>")
                 .collect(Collectors.joining()) + "</ul></body></html>";
     }
     
     @GetMapping(value = "/{name}", produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<String> getLog(@PathVariable String name) {
+    public ResponseEntity<String> getLog(@PathVariable String name, @RequestParam String secret) {
+        if (!secret.equals(this.secret)) {
+            throw new IllegalArgumentException("Wrong secret");
+        }
         if (name.contains("/")) {
             throw new IllegalArgumentException("Not allowed");
         }
