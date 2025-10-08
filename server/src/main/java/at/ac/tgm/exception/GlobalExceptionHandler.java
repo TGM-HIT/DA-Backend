@@ -46,13 +46,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handler(IllegalArgumentException e) {
         log.info("IllegalArgumentException {}", e.getMessage());
         String body = e.getMessage();
-        System.out.println("IllegalArgumentException: " + e.getMessage());
         return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<String> handler(IllegalStateException e) {
-        log.info("IllegalStateException", e.getMessage());
+        log.info("IllegalStateException {}", e.getMessage());
         String body = e.getMessage();
         return new ResponseEntity<>(body, headers, HttpStatus.IM_USED);
     }
