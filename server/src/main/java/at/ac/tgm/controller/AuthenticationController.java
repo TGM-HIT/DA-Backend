@@ -5,11 +5,11 @@ import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.ad.util.Util;
 import at.ac.tgm.api.AuthenticationApi;
 import at.ac.tgm.dto.LoginRequestDto;
+import at.ac.tgm.webuntis.WebUntisSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,20 +33,28 @@ import java.util.List;
 @RestController
 @Slf4j
 public class AuthenticationController implements AuthenticationApi {
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsContextMapper userDetailsContextMapper;
+    private final Environment env;
+    private final SecurityContextRepository securityContextRepository;
+    private final UserService userService;
+    private final WebUntisSession webUntisSession;
     
-    @Autowired
-    private UserDetailsContextMapper userDetailsContextMapper;
-    
-    @Autowired
-    private Environment env;
-    
-    @Autowired
-    private SecurityContextRepository securityContextRepository;
-    
-    @Autowired
-    private UserService userService;
+    public AuthenticationController(
+            AuthenticationManager authenticationManager,
+            UserDetailsContextMapper userDetailsContextMapper,
+            Environment env,
+            SecurityContextRepository securityContextRepository,
+            UserService userService,
+            WebUntisSession webUntisSession
+    ) {
+        this.authenticationManager = authenticationManager;
+        this.userDetailsContextMapper = userDetailsContextMapper;
+        this.env = env;
+        this.securityContextRepository = securityContextRepository;
+        this.userService = userService;
+        this.webUntisSession = webUntisSession;
+    }
     
     @Override
     public ResponseEntity<Authentication> login(LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
@@ -62,6 +70,10 @@ public class AuthenticationController implements AuthenticationApi {
         securityContextRepository.saveContext(context, request, response);
         
         log.info("Login of {}", user.getDisplayName());
+        
+        if (loginRequest.getWebuntis() != null && loginRequest.getWebuntis()) {
+            webUntisSession.login(loginRequest.getUsername(), loginRequest.getPassword());
+        }
         
         return ResponseEntity.ok(authentication);
     }
@@ -85,7 +97,7 @@ public class AuthenticationController implements AuthenticationApi {
             return authenticationManager.authenticate(authenticationToken);
         }
     }
-
+    
     @Override
     public CsrfToken csrfToken(HttpServletRequest request) {
         return (CsrfToken) request.getAttribute(CsrfToken.class.getName());
@@ -95,6 +107,10 @@ public class AuthenticationController implements AuthenticationApi {
     public ResponseEntity<String> logout(HttpSession session) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
+            if (webUntisSession.isLoggedIn()) {
+                webUntisSession.logout();
+                log.info("WebUnits logged out.");
+            }
             session.invalidate();
             log.info("Session invalidated, User logged out successfully");
             return ResponseEntity.ok("User logged out successfully");
