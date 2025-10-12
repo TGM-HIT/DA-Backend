@@ -107,6 +107,10 @@ public class AuthenticationController implements AuthenticationApi {
     public ResponseEntity<String> logout(HttpSession session) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
+            if (webUntisSession.isLoggedIn()) {
+                webUntisSession.logout();
+                log.info("WebUnits logged out.");
+            }
             session.invalidate();
             log.info("Session invalidated, User logged out successfully");
             return ResponseEntity.ok("User logged out successfully");

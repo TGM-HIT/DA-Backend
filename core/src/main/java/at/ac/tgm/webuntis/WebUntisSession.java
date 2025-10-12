@@ -34,6 +34,10 @@ public class WebUntisSession {
         }
     }
     
+    public boolean isLoggedIn() {
+        return session != null;
+    }
+    
     public void logout() {
         if (session != null) {
             try {
