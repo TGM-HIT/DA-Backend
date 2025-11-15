@@ -1,19 +1,21 @@
 package at.ac.tgm.controller;
 
 import at.ac.tgm.Consts;
+import at.ac.tgm.ad.Roles;
+import at.ac.tgm.ad.entry.UserEntry;
+import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.dto.AmpelDto;
 import at.ac.tgm.dto.AmpelRequestDto;
 import at.ac.tgm.dto.ErrorResponseDto;
 import at.ac.tgm.dto.TeacherKVAmpelDto;
-import at.ac.tgm.ad.Roles;
-import at.ac.tgm.ad.entry.UserEntry;
-import at.ac.tgm.ad.service.UserService;
-import at.ac.tgm.model.*;
+import at.ac.tgm.model.Ampel;
+import at.ac.tgm.model.Hitclass;
+import at.ac.tgm.model.Student;
+import at.ac.tgm.model.Teacher;
 import at.ac.tgm.repository.AmpelRepository;
 import at.ac.tgm.repository.HitclassRepository;
 import at.ac.tgm.repository.TeacherRepository;
 import at.ac.tgm.service.TeacherAmpelService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -53,7 +55,7 @@ public class TeacherAmpelController {
         UserEntry userEntry = userEntryOptional.get();
         String ldapName = userEntry.getName();
 
-        Optional<Teacher> teacherOptional = teacherRepository.findByName(ldapName);
+        Optional<Teacher> teacherOptional = teacherRepository.findByNameIgnoreCase(ldapName);
         if (teacherOptional.isEmpty()) {
             return ResponseEntity.status(404).body(new ErrorResponseDto("Lehrer in der Datenbank nicht gefunden.", 404));
         }
@@ -116,7 +118,7 @@ public class TeacherAmpelController {
         UserEntry userEntry = userEntryOptional.get();
         String ldapName = userEntry.getName();
 
-        Optional<Teacher> teacherOptional = teacherRepository.findByName(ldapName);
+        Optional<Teacher> teacherOptional = teacherRepository.findByNameIgnoreCase(ldapName);
         Teacher teacher = teacherOptional.get();
 
         // 2) Alle Klassen, die diesen Teacher als Klassenvorstand haben

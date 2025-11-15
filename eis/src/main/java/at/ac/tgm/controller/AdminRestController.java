@@ -1,8 +1,8 @@
 package at.ac.tgm.controller;
 
 import at.ac.tgm.Consts;
-import at.ac.tgm.dto.*;
 import at.ac.tgm.ad.Roles;
+import at.ac.tgm.dto.*;
 import at.ac.tgm.model.Hitclass;
 import at.ac.tgm.model.Lesson;
 import at.ac.tgm.model.Student;
@@ -243,7 +243,7 @@ public class AdminRestController {
         if (dto.getName() == null || dto.getName().isEmpty()) {
             return ResponseEntity.badRequest().body("Name is required");
         }
-        boolean alreadyExists = teacherRepository.existsByName(dto.getName());
+        boolean alreadyExists = teacherRepository.existsByNameIgnoreCase(dto.getName());
         if (alreadyExists) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)

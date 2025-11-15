@@ -1,11 +1,14 @@
 package at.ac.tgm.service;
 
-import at.ac.tgm.dto.AmpelDto;
-import at.ac.tgm.dto.AmpelRequestDto;
 import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.service.UserService;
+import at.ac.tgm.dto.AmpelDto;
+import at.ac.tgm.dto.AmpelRequestDto;
 import at.ac.tgm.model.*;
-import at.ac.tgm.repository.*;
+import at.ac.tgm.repository.AmpelRepository;
+import at.ac.tgm.repository.LessonRepository;
+import at.ac.tgm.repository.StudentRepository;
+import at.ac.tgm.repository.TeacherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -116,7 +119,7 @@ public class TeacherAmpelService {
             return Optional.empty();
         }
         String ldapName = userEntryOptional.get().getName();
-        return teacherRepository.findByName(ldapName);
+        return teacherRepository.findByNameIgnoreCase(ldapName);
     }
     private AmpelDto mapEmptyToDto(Lesson lesson, Student student, Teacher teacher) {
         return AmpelDto.builder()

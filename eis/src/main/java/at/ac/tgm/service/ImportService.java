@@ -143,7 +143,7 @@ public class ImportService {
 
                 // Teacher holen oder anlegen
                 String finalLehrerName = lehrerName;
-                Teacher teacher = teacherRepository.findByName(lehrerName)
+                Teacher teacher = teacherRepository.findByNameIgnoreCase(lehrerName)
                         .orElseGet(() -> {
                             Teacher newTeacher = Teacher.builder()
                                     .name(finalLehrerName)

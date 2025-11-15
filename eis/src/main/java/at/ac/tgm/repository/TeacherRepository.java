@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface TeacherRepository extends JpaRepository<Teacher, Long> {
-    Optional<Teacher> findByName(String name);
-    boolean existsByName(String name);
+    Optional<Teacher> findByNameIgnoreCase(String name);
+    boolean existsByNameIgnoreCase(String name);
 }
