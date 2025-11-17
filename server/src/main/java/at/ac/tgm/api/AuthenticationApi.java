@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +33,7 @@ public interface AuthenticationApi {
             }))
     ResponseEntity<Authentication> login(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response);
     
-    @GetMapping("/csrf-token")
+    /*@GetMapping("/csrf-token")
     @Operation(summary = "The CSRF-Token is returned on any call as cookie but if you want to get it explicitly in the body, you can do so with this endpoint",
             responses = {
                     @ApiResponse(responseCode = "200", content = @Content(examples = {
@@ -46,7 +45,7 @@ public interface AuthenticationApi {
                                     }
                                     """)}, schema = @Schema(implementation = CsrfToken.class), mediaType = MediaType.APPLICATION_JSON_VALUE))}
     )
-    CsrfToken csrfToken(HttpServletRequest request);
+    CsrfToken csrfToken(HttpServletRequest request);*/
     
     @PostMapping("/logout")
     @Operation(summary = "Logout the current logged-in user", description = "Does logout the current logged-in user by invalidating the current session.",

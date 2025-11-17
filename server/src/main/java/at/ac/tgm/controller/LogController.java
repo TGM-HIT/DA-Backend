@@ -2,12 +2,14 @@ package at.ac.tgm.controller;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,6 +17,7 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping("/logs")
 @Hidden
+@Configuration
 public class LogController {
     @Value("${secret}")
     private String secret;
@@ -26,6 +29,7 @@ public class LogController {
         }
         return "<html><body><ul>" + Stream.of(new File("logs/").listFiles())
                 .filter(f -> !f.isDirectory())
+                .sorted(Comparator.comparing(File::getName))
                 .map(f -> "<li><a href=\"/logs/" + f.getName() + "?secret=" + secret + "\">" + f.getName() + "</a></li>")
                 .collect(Collectors.joining()) + "</ul></body></html>";
     }

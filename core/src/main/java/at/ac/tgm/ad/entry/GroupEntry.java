@@ -1,7 +1,10 @@
 package at.ac.tgm.ad.entry;
 
 import at.ac.tgm.ad.util.EntryBase;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.ldap.odm.annotations.Attribute;
 import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Id;
@@ -13,7 +16,7 @@ import java.util.Set;
 @Entry(
         base = EntryBase.GROUP,
         objectClasses = { "group", "top" })
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class GroupEntry {
     private @Id Name dn;
     private @Attribute(name = "cn") String cn;
@@ -48,4 +51,11 @@ public class GroupEntry {
     private @Attribute(name = "uSNCreated") String uSNCreated;
     private @Attribute(name = "whenChanged") String whenChanged;
     private @Attribute(name = "whenCreated") String whenCreated;
+    
+    @Override
+    public String toString() {
+        return "GroupEntry{" +
+               "dn=" + dn +
+               '}';
+    }
 }

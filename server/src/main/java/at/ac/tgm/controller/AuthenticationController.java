@@ -25,7 +25,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -86,10 +85,10 @@ public class AuthenticationController implements AuthenticationApi {
         }
     }
 
-    @Override
+    /*@Override
     public CsrfToken csrfToken(HttpServletRequest request) {
         return (CsrfToken) request.getAttribute(CsrfToken.class.getName());
-    }
+    }*/
     
     @Override
     public ResponseEntity<String> logout(HttpSession session) {

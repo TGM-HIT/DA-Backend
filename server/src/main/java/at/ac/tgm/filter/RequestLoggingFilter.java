@@ -40,7 +40,13 @@ public class RequestLoggingFilter implements Filter {
             MDC.put("executionTime", String.valueOf(executionTime));
             MDC.put("status", String.valueOf(status));
             
-            requestLogger.info("{} {}", req.getMethod(), req.getRequestURI());
+            StringBuffer requestURL = req.getRequestURL();
+            String queryString = req.getQueryString();
+            if (queryString != null) {
+                requestURL.append('?').append(queryString);
+            }
+            
+            requestLogger.info("{} {}", req.getMethod(), requestURL.toString());
             
             wrapper.copyBodyToResponse();  // important!
             MDC.clear();
