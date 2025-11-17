@@ -8,13 +8,6 @@
         Und weiterhin Ausgabe auf Konsole.
     -->
 
-    <!-- Pattern for normal logs -->
-    <property name="DEFAULT_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
-
-    <!-- Pattern for request logs -->
-    <property name="REQUEST_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %X{clientIp} %X{executionTime}ms %X{status} %msg%n"/>
-
-
     <!-- === KONSOLE-APPENDER === -->
     <appender name="ConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -34,9 +27,21 @@
         </encoder>
     </appender>
 
+    <!-- === PERFORMANCE-APPENDER === -->
+    <appender name="PerformanceFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/performance.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/performance-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [PERF] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- === ERROR-APPENDER === -->
     <appender name="ErrorFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/console.log</file>
+        <file>logs/error.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>logs/error-%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
@@ -50,29 +55,16 @@
         </filter>
     </appender>
 
-    <!-- ========================================================== -->
-    <!-- File Appender for REQUEST Logs                             -->
-    <!-- ========================================================== -->
-    <appender name="RequestFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/request.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/request-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <pattern>${REQUEST_PATTERN}</pattern>
-        </encoder>
-    </appender>
-
     <!-- === LOGGER für Audit === -->
     <logger name="at.ac.tgm.diplomarbeit.diplomdb.audit" level="INFO" additivity="false">
         <appender-ref ref="AuditFileAppender"/>
         <appender-ref ref="ConsoleAppender"/> <!-- optional -->
     </logger>
 
-    <!-- Logger that writes ONLY request logs -->
-    <logger name="REQUEST_LOGGER" level="INFO" additivity="false">
-        <appender-ref ref="RequestFileAppender"/>
+    <!-- === LOGGER für Performance === -->
+    <logger name="at.ac.tgm.performance" level="INFO" additivity="false">
+        <appender-ref ref="PerformanceFileAppender"/>
+        <appender-ref ref="ConsoleAppender"/> <!-- optional -->
     </logger>
 
     <!-- Standard-Fehler-Logger: Alle ERRORs => error.log -->

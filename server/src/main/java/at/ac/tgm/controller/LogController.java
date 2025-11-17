@@ -41,7 +41,7 @@ public class LogController {
         File file = new File("logs/" + name);
         if (file.exists()) {
             StringBuilder sb = new StringBuilder();
-            sb.append("<html><body><style>white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap;  white-space: -o-pre-wrap; word-wrap: break-word;</style><pre>");
+            sb.append("<html><body><pre>");
             try (Scanner s = new Scanner(file)) {
                 while (s.hasNextLine()) {
                     sb.append(s.nextLine()).append(System.lineSeparator());
