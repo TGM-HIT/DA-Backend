@@ -27,7 +27,7 @@ public class ImportService {
             "BED", "BEd", "Bed", "BSc", "Dr", "Ing", "Bakk.techn",
             "Prof", "MA", "MEd", "rer.nat.", "PhD", "FL", "FOL",
             "BA", "Dipl.-Päd.", "techn.", "Mag.rer.nat.", "Ing.Mag.", "DI(FH)", "Dr.techn.",
-            "Mag.Dr.", "Ing.Dipl.-Päd.", "MMag.Dr.", "Dipl.-Ing.(FH)", "Dipl.-Ing.Dr.", "MAS"
+            "Mag.Dr.", "Ing.Dipl.-Päd.", "MMag.Dr.", "Dipl.-Ing.(FH)", "Dipl.-Ing.Dr.", "MAS", "BSc(WU)", "Mag.phil.", "Ing.DI", "Ing.Dr.", "Mag.(FH)"
     );
 
     @Autowired

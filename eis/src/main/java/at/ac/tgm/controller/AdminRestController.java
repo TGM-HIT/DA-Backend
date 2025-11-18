@@ -308,6 +308,10 @@ public class AdminRestController {
                     .body("Teacher not found with id=" + dto.getId());
         }
         Teacher teacher = optTeacher.get();
+        
+        if (dto.getName() != null && !dto.getName().isEmpty() && !teacher.getName().equals(dto.getName())) {
+            teacher.setName(dto.getName());
+        }
 
         // 3) Neue Lesson-IDs aus DTO
         List<Long> newLessonIds = (dto.getLessonIds() == null)

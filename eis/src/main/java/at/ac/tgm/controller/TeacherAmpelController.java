@@ -54,8 +54,12 @@ public class TeacherAmpelController {
 
         UserEntry userEntry = userEntryOptional.get();
         String ldapName = userEntry.getName();
+        String[] ldapNameParts = ldapName.split(" ");
+        if (ldapNameParts.length < 2) {
+            return ResponseEntity.status(404).body(new ErrorResponseDto("Lehrer hat keinen Vor- und Nachnamen", 404));
+        }
 
-        Optional<Teacher> teacherOptional = teacherRepository.findByNameIgnoreCase(ldapName);
+        Optional<Teacher> teacherOptional = teacherRepository.findByNameContainingIgnoreCaseAndNameContainingIgnoreCase(ldapNameParts[0], ldapNameParts[ldapNameParts.length - 1]);
         if (teacherOptional.isEmpty()) {
             return ResponseEntity.status(404).body(new ErrorResponseDto("Lehrer in der Datenbank nicht gefunden.", 404));
         }

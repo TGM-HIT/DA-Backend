@@ -32,7 +32,7 @@ public class Lesson {
     // und umgekehrt kann ein Lehrer mehrere Unterrichtseinheiten abdecken
     @ManyToMany
     @JoinTable(
-            name = "lesson_teacher",
+            name = "lesson_teacher", // TODO Fix later when not fill with data in production by adding Consts.EIS_TABLE_PREFIX
             joinColumns = @JoinColumn(name = "lesson_id"),
             inverseJoinColumns = @JoinColumn(name = "teacher_id")
     )

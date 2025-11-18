@@ -65,7 +65,7 @@ public class ProjektBewerbung {
      */
     @ElementCollection
     @CollectionTable(
-            name = "projekt_bewerbung_teammitglieder",
+            name = DIPLOMDB_TABLE_PREFIX + "projekt_bewerbung_teammitglieder",
             joinColumns = @JoinColumn(name = "bewerbung_id")
     )
     @Column(name = "team_member_sam")
