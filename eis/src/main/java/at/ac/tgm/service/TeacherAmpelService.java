@@ -130,7 +130,7 @@ public class TeacherAmpelService {
         return AmpelDto.builder()
                 .ampelId(null)                        // null, weil kein Ampel-Datensatz existiert
                 .studentId(student.getId())
-                .studentName(student.getVorname() + " " + student.getNachname())
+                .studentName(student.getNachname() + " " + student.getVorname())
                 .teacherId(teacher.getId())
                 .teacherName(teacher.getName())
                 .subjectKurzbezeichnung(lesson.getSubject().getKurzbezeichnung())

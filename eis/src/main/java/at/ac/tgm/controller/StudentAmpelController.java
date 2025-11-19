@@ -1,15 +1,14 @@
 package at.ac.tgm.controller;
 
 import at.ac.tgm.Consts;
-import at.ac.tgm.dto.AmpelDto;
-import at.ac.tgm.dto.ErrorResponseDto;
 import at.ac.tgm.ad.Roles;
 import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.service.UserService;
+import at.ac.tgm.dto.AmpelDto;
+import at.ac.tgm.dto.ErrorResponseDto;
 import at.ac.tgm.model.*;
 import at.ac.tgm.repository.AmpelRepository;
 import at.ac.tgm.repository.StudentRepository;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -69,7 +68,7 @@ public class StudentAmpelController {
             return AmpelDto.builder()
                     .ampelId(ampel.getId())
                     .studentId(student.getId())
-                    .studentName(student.getVorname() + " " + student.getNachname())
+                    .studentName(student.getNachname() + " " + student.getVorname())
                     .teacherId((teacher != null) ? teacher.getId() : null)
                     .teacherName((teacher != null) ? teacher.getName() : null)
                     .subjectKurzbezeichnung(subject.getKurzbezeichnung())
