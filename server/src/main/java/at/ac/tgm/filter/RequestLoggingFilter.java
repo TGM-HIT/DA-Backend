@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
@@ -39,6 +41,11 @@ public class RequestLoggingFilter implements Filter {
             
             MDC.put("executionTime", String.valueOf(executionTime));
             MDC.put("status", String.valueOf(status));
+            
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated()) {
+                MDC.put("user", auth.getName());
+            }
             
             StringBuffer requestURL = req.getRequestURL();
             String queryString = req.getQueryString();
