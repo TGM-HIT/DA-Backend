@@ -20,13 +20,13 @@ import java.util.Set;
 
 @Service
 public class TeacherAmpelService {
-
+    
     private final TeacherRepository teacherRepository;
     private final LessonRepository lessonRepository;
     private final AmpelRepository ampelRepository;
     private final StudentRepository studentRepository;
     private final UserService userService;
-
+    
     @Autowired
     public TeacherAmpelService(TeacherRepository teacherRepository, LessonRepository lessonRepository, AmpelRepository ampelRepository, StudentRepository studentRepository, UserService userService) {
         this.teacherRepository = teacherRepository;
@@ -35,16 +35,16 @@ public class TeacherAmpelService {
         this.studentRepository = studentRepository;
         this.userService = userService;
     }
-
+    
     public AmpelDto createOrUpdateAmpel(AmpelRequestDto dto) {
         if (dto.getLessonId() == null || dto.getStudentId() == null || dto.getTeacherId() == null) {
             throw new RuntimeException("lessonId, studentId, teacherId must not be null");
         }
-
+        
         Optional<Ampel> existingOpt = ampelRepository.findByLessonIdAndStudentIdAndTeacherId(
                 dto.getLessonId(), dto.getStudentId(), dto.getTeacherId()
         );
-
+        
         Ampel ampel;
         if (existingOpt.isPresent()) {
             ampel = existingOpt.get();
@@ -63,7 +63,7 @@ public class TeacherAmpelService {
                     .orElseThrow(() -> new RuntimeException("Teacher not found"));
             Student student = studentRepository.findById(dto.getStudentId())
                     .orElseThrow(() -> new RuntimeException("Student not found"));
-
+            
             ampel = new Ampel();
             ampel.setLesson(lesson);
             ampel.setTeacher(teacher);
@@ -73,11 +73,11 @@ public class TeacherAmpelService {
             ampel.setUpdatedAt(LocalDateTime.now());
             ampel.setLesson(lesson);
         }
-
+        
         Ampel saved = ampelRepository.save(ampel);
         return mapToDto(saved);
     }
-
+    
     public void deleteAmpel(Long lessonId, Long studentId, Long teacherId) {
         Optional<Ampel> existingOpt = ampelRepository.findByLessonIdAndStudentIdAndTeacherId(
                 lessonId, studentId, teacherId
@@ -86,8 +86,8 @@ public class TeacherAmpelService {
             ampelRepository.delete(existingOpt.get());
         }
     }
-
-
+    
+    
     // Hilfsmethode
     private AmpelDto mapToDto(Ampel ampel) {
         Subject subj = ampel.getLesson().getSubject();
@@ -95,13 +95,13 @@ public class TeacherAmpelService {
         Student s = ampel.getStudent();
         Hitclass c = ampel.getLesson().getHitclass();
         Lesson lesson = ampel.getLesson();
-
+        
         return AmpelDto.builder()
                 .ampelId(ampel.getId())
                 .teacherId(t.getId())
                 .teacherName(t.getName())
                 .studentId(s.getId())
-                .studentName(s.getVorname() + " " + s.getNachname())
+                .studentName(s.getNachname() + " " + s.getVorname())
                 .subjectKurzbezeichnung(subj.getKurzbezeichnung())
                 .subjectLangbezeichnung(subj.getLangbezeichnung())
                 .gegenstandsart(subj.getGegenstandsart())
@@ -112,15 +112,20 @@ public class TeacherAmpelService {
                 .lessonId(lesson.getId())
                 .build();
     }
-
+    
     public Optional<Teacher> getTeacherBySAMAccountName(String sAMAccountName) {
-        Optional<UserEntry> userEntryOptional = userService.findBysAMAccountName(sAMAccountName);
-        if (userEntryOptional.isEmpty()) {
-            return Optional.empty();
-        }
-        String ldapName = userEntryOptional.get().getName();
-        return teacherRepository.findByNameIgnoreCase(ldapName);
+        return userService.findBysAMAccountName(sAMAccountName).map(this::getTeacherByUserEntry).orElseThrow();
     }
+    
+    public Optional<Teacher> getTeacherByUserEntry(UserEntry userEntry) {
+        String cleanedLdapName = userEntry.getName().replaceAll(" [A-Z]\\.", "").trim();
+        String[] parts = cleanedLdapName.split(" ");
+        if (parts.length < 2) {
+            throw new IllegalStateException("Ldap name muss aus zwei mindestens 2 Teilen bestehen: " + cleanedLdapName);
+        }
+        return teacherRepository.findByNameContainingIgnoreCaseAndNameContainingIgnoreCase(parts[0], parts[parts.length - 1]);
+    }
+    
     private AmpelDto mapEmptyToDto(Lesson lesson, Student student, Teacher teacher) {
         return AmpelDto.builder()
                 .ampelId(null)                        // null, weil kein Ampel-Datensatz existiert
@@ -138,16 +143,17 @@ public class TeacherAmpelService {
                 .lessonId(lesson.getId())
                 .build();
     }
+    
     public List<AmpelDto> getAllAmpelForTeacher(Long teacherId) {
         // 1) Teacher laden
         Teacher teacher = teacherRepository.findById(teacherId)
                 .orElseThrow(() -> new RuntimeException("Teacher not found with id=" + teacherId));
-
+        
         // 2) Alle Lessons laden, wo dieser Teacher beteiligt ist
         //    (Je nach Modell: teacher.getLessons() oder via lessonRepository.findAll() und filtern)
         //    Hier mal teacher.getLessons() als Beispiel:
         Set<Lesson> lessons = teacher.getLessons();
-
+        
         // 3) Pro Lesson alle Students => lesson.getHitclass().getStudents()
         //    => Ampel-Eintrag suchen oder leeres DTO
         List<AmpelDto> result = new ArrayList<>();
@@ -173,5 +179,5 @@ public class TeacherAmpelService {
         }
         return result;
     }
-
+    
 }

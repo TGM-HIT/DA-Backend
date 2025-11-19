@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -50,21 +51,10 @@ public class TeacherAmpelController {
     public ResponseEntity<?> getAmpelForTeacher(Authentication authentication) {
         String sAMAccountName = authentication.getName();
 
-        Optional<UserEntry> userEntryOptional = userService.findBysAMAccountName(sAMAccountName);
+        UserEntry userEntry = userService.findBysAMAccountName(sAMAccountName).orElseThrow();
+        
+        Teacher teacher = teacherAmpelService.getTeacherByUserEntry(userEntry).orElseThrow(() -> new NoSuchElementException("Lehrer in der Datenbank nicht gefunden."));
 
-        UserEntry userEntry = userEntryOptional.get();
-        String ldapName = userEntry.getName();
-        String[] ldapNameParts = ldapName.split(" ");
-        if (ldapNameParts.length < 2) {
-            return ResponseEntity.status(404).body(new ErrorResponseDto("Lehrer hat keinen Vor- und Nachnamen", 404));
-        }
-
-        Optional<Teacher> teacherOptional = teacherRepository.findByNameContainingIgnoreCaseAndNameContainingIgnoreCase(ldapNameParts[0], ldapNameParts[ldapNameParts.length - 1]);
-        if (teacherOptional.isEmpty()) {
-            return ResponseEntity.status(404).body(new ErrorResponseDto("Lehrer in der Datenbank nicht gefunden.", 404));
-        }
-
-        Teacher teacher = teacherOptional.get();
         return ResponseEntity.ok(teacherAmpelService.getAllAmpelForTeacher(teacher.getId()));
     }
 
@@ -73,9 +63,7 @@ public class TeacherAmpelController {
     public ResponseEntity<?> createAmpelForTeacher(@RequestBody AmpelRequestDto dto, Authentication authentication) {
         String sAMAccountName = authentication.getName();
 
-        Optional<Teacher> teacherOptional = teacherAmpelService.getTeacherBySAMAccountName(sAMAccountName);
-
-        Teacher teacher = teacherOptional.get();
+        Teacher teacher = teacherAmpelService.getTeacherBySAMAccountName(sAMAccountName).orElseThrow(() -> new NoSuchElementException("Lehrer nicht gefunden"));
 
         dto.setTeacherId(teacher.getId());
 
@@ -118,12 +106,9 @@ public class TeacherAmpelController {
     @GetMapping("/kv/getStudents")
     public ResponseEntity<List<TeacherKVAmpelDto>> getKvStudents(Authentication authentication) {
         String sAMAccountName = authentication.getName();
-        Optional<UserEntry> userEntryOptional = userService.findBysAMAccountName(sAMAccountName);
-        UserEntry userEntry = userEntryOptional.get();
-        String ldapName = userEntry.getName();
-
-        Optional<Teacher> teacherOptional = teacherRepository.findByNameIgnoreCase(ldapName);
-        Teacher teacher = teacherOptional.get();
+        UserEntry userEntry = userService.findBysAMAccountName(sAMAccountName).orElseThrow();
+        
+        Teacher teacher = teacherAmpelService.getTeacherByUserEntry(userEntry).orElseThrow(() -> new NoSuchElementException("Lehrer in der Datenbank nicht gefunden."));
 
         // 2) Alle Klassen, die diesen Teacher als Klassenvorstand haben
         List<Hitclass> kvHitclasses = hitclassRepository.findAllByKlassenvorstand(teacher);
