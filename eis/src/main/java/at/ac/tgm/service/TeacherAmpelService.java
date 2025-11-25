@@ -118,7 +118,7 @@ public class TeacherAmpelService {
     }
     
     public Optional<Teacher> getTeacherByUserEntry(UserEntry userEntry) {
-        String cleanedLdapName = userEntry.getName().replaceAll(" [A-Z]\\.", "").trim();
+        String cleanedLdapName = userEntry.getName().replaceAll(" [A-Z]\\.", "").trim().replace("Smriti SHRIDAR", "Smriti SHRIDHAR");
         String[] parts = cleanedLdapName.split(" ");
         if (parts.length < 2) {
             throw new IllegalStateException("Ldap name muss aus zwei mindestens 2 Teilen bestehen: " + cleanedLdapName);
