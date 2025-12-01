@@ -3,7 +3,10 @@ package at.ac.tgm.config;
 import at.ac.tgm.ad.Roles;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.ldap.repository.config.EnableLdapRepositories;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +21,14 @@ import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import java.util.*;
 
 @Configuration
-@EnableLdapRepositories
+@EnableLdapRepositories(basePackages = "at.ac.tgm.ad.repository")
+@EnableJpaRepositories(
+        basePackages = "at.ac.tgm",
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.REGEX,
+                pattern = "at\\.ac\\.tgm\\.ad\\.repository\\..*"
+        )
+)
 public class AdLdapConfig {
     @Value("${spring.ldap.urls}")
     private String url;

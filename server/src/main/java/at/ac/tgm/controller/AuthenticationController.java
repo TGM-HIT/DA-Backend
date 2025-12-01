@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,7 +23,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,7 +52,7 @@ public class AuthenticationController implements AuthenticationApi {
         UserEntry user = (loginRequest.getUsername().contains("@")
                 ? userService.findByMail(loginRequest.getUsername())
                 : userService.findBysAMAccountName(loginRequest.getUsername()))
-                .orElseThrow(() -> new UsernameNotFoundException("Benutzer nicht gefunden"));
+                .orElseThrow(() -> new BadCredentialsException("Bad credentials"));
         
         Authentication authentication = getAuthentication(loginRequest, user);
         

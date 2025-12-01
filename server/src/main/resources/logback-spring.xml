@@ -12,7 +12,7 @@
     <property name="DEFAULT_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
 
     <!-- Pattern for request logs -->
-    <property name="REQUEST_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %X{clientIp} %X{user} %X{executionTime}ms %X{status} %msg%n"/>
+    <property name="REQUEST_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %X{clientIp} %X{user} %X{status} %X{executionTime}ms %msg%n"/>
 
 
     <!-- === KONSOLE-APPENDER === -->
