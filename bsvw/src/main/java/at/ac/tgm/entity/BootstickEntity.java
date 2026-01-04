@@ -17,13 +17,16 @@ import java.time.LocalDateTime;
 public class BootstickEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long b_id;
+    private Long id;
     
-    private String name;
-
+    private String name; //Klassenbuchstabe "A", "B", "C", "D"
+    private int nummer; //Bootsticknummer z.B. "1" bit "40"
+    //Status des Bootsticks, "VORHANDEN", "AUSGEBORGT, "VERLOREN"
     @Enumerated(EnumType.STRING)
     private Status status;
+    //Zustand des Bootsticks, "IN_ORDNUNG", "FEHLERHAFT", "DEFEKT"
     @Enumerated(EnumType.STRING)
     private Zustand zustand;
+    //Datum der letzten Initialisierung/Veränderung des Bootsticks
     private LocalDateTime letzte_initialisierung;
 }

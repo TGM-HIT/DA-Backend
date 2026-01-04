@@ -14,11 +14,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class DatenstickEntity {
+public class DatenstickEntity { //TODO anzupassen wenn genaue neue Struktur der Datensticks bekannt
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long d_id;
-
+    private Long id;
     private String name;
 
     @Enumerated(EnumType.STRING)
