@@ -22,8 +22,6 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
 
@@ -100,21 +98,6 @@ public class SecurityConfig {
                     exception.authenticationEntryPoint(authenticationEntryPoint);
                 })
                 .build();
-    }
-    
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedHeaders("*")
-                        .allowedMethods("*")
-                        .allowCredentials(true)
-                        .allowedOriginPatterns("http://localhost", "http://localhost:[*]", "https://projekte.tgm.ac.at", "https://*.projekte.tgm.ac.at")
-                        .exposedHeaders("Access-Control-Allow-Origin");
-            }
-        };
     }
     
     @Bean
