@@ -1,3 +1,29 @@
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.4.4"
+    }
+}
+
 dependencies {
     implementation project(':core')
     implementation project(':beispiel')
@@ -10,4 +36,47 @@ dependencies {
     implementation 'org.springframework.security:spring-security-ldap'
     implementation 'org.springframework.boot:spring-boot-starter-data-ldap'
     implementation 'com.unboundid:unboundid-ldapsdk'
+    
+    
+    // Spring Starter
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    
+    // Devtools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    
+    // SpringDoc
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+    
+    // .env Loading
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+    
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    // Mapstruct
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    
+    // Database
+    runtimeOnly 'com.h2database:h2'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.2'
+    
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+bootJar {
+    enabled = true
+    mainClass = 'at.ac.tgm.Application'
 }

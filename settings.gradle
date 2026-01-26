@@ -6,3 +6,9 @@ include 'eis'
 include 'beispiel'
 include 'diplomdb'
 include 'bsvw'
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
