@@ -25,7 +25,7 @@ public class RueckgabeEntity {
     //Klassen, von denen die Sticks zurückgegeben worden sind
     @ElementCollection(targetClass = Schulklasse.class)
     @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "ausleihe_klassen", joinColumns = @JoinColumn(name = "ausleihe_id"))
+    @CollectionTable(name = "rueckgabe_klassen", joinColumns = @JoinColumn(name = "rueckgabe_id"))
     private Set<Schulklasse> klassen = new HashSet<>();
     //Datum, wann die Rückgabe stattgefunden hat
     private LocalDateTime rueckgabedatum;
