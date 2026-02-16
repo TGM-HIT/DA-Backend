@@ -4,17 +4,22 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -29,6 +34,8 @@ import java.io.IOException;
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
+    @Value("${frontend-uri}")
+    private String frontendUri;
     
     @Bean
     public SecurityContextRepository securityContextRepository() {
@@ -64,23 +71,24 @@ public class SecurityConfig {
             CookieCsrfTokenRepository cookieCsrfTokenRepository,
             CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler,
             AccessDeniedHandler accessDeniedHandler,
-            AuthenticationEntryPoint authenticationEntryPoint
+            AuthenticationEntryPoint authenticationEntryPoint,
+            ClientRegistrationRepository clientRegistrationRepository
     ) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
+        http.csrf(AbstractHttpConfigurer::disable);
                 /*.csrf((csrf) -> {
                     csrf.ignoringRequestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/auth/**", "/h2-console/**");
                     csrf.csrfTokenRepository(cookieCsrfTokenRepository);
                     csrf.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler);
                     csrf.configure(http); // Wichtig, damit das neue Einstellungen übernommen werden
                 })*/
-                .securityContext((context) -> context.securityContextRepository(securityContextRepository))
-                .anonymous(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((authorize) ->
+        http.securityContext((context) -> context.securityContextRepository(securityContextRepository));
+        http.anonymous(AbstractHttpConfigurer::disable);
+        http.authorizeHttpRequests((authorize) ->
                         authorize
                                 .requestMatchers(
                                         "/",
                                         "/auth/**", // Login-Controller
+                                        "/oauth2/**", // OAuth2-Pfades
                                         "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/swagger-config", // OpenAPI Documentation
                                         "/error", // Fehlerseiten
                                         "/h2-console/**", // H2-Konsole
@@ -91,13 +99,36 @@ public class SecurityConfig {
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS).permitAll() // Für Preflight bei unterschiedlichen Ports
                                 .anyRequest().authenticated()
-                )
-                .headers((headers) -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)) // h2 Console
-                .exceptionHandling(exception -> {
+                );
+        http.headers((headers) -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)); // h2 Console
+        http.exceptionHandling(exception -> {
                     exception.accessDeniedHandler(accessDeniedHandler);
                     exception.authenticationEntryPoint(authenticationEntryPoint);
-                })
-                .build();
+                });
+        
+        http.oauth2Login(oauth2 -> oauth2
+                //.userInfoEndpoint(userInfo -> userInfo.oidcUserService(oidcUserService))
+                .defaultSuccessUrl(frontendUri, true)
+        );
+        http.oauth2Client(Customizer.withDefaults());
+        
+        http.logout(logout -> {
+            logout.logoutUrl("/auth/logout");
+            logout.logoutSuccessHandler((request, response, authentication) -> {
+                String referer = request.getHeader("Referer");
+                if (authentication instanceof OAuth2AuthenticationToken) {
+                    var logoutHandler = new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
+                    logoutHandler.setPostLogoutRedirectUri(referer+"/login");
+                    logoutHandler.onLogoutSuccess(request, response, authentication);
+                } else {
+                    response.sendRedirect(referer+"/login");
+                }
+            });
+            logout.invalidateHttpSession(true);
+            logout.deleteCookies("JSESSIONID");
+        });
+        
+        return http.build();
     }
     
     @Bean

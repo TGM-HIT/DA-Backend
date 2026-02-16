@@ -1,11 +1,12 @@
 package at.ac.tgm.mapper;
 
 import at.ac.tgm.dto.USBStickDTO;
-import at.ac.tgm.entity.USBStick;
 import at.ac.tgm.entity.StickGroup;
+import at.ac.tgm.entity.USBStick;
 import at.ac.tgm.repository.StickGroupRepository;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,9 +17,11 @@ public abstract class USBStickMapper {
 
     @Autowired
     protected StickGroupRepository groupRepository;
-
+    
+    @Mapping(target = "group", ignore = true)
     public abstract USBStick toEntity(USBStickDTO dto);
-
+    
+    @Mapping(target = "groupId", ignore = true)
     public abstract USBStickDTO toDTO(USBStick entity);
 
     public abstract List<USBStickDTO> toDTO(List<USBStick> entity);

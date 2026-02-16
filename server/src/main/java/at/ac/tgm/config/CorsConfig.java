@@ -17,8 +17,15 @@ public class CorsConfig {
                         .allowedHeaders("*")
                         .allowedMethods("*")
                         .allowCredentials(true)
-                        .allowedOriginPatterns("http://localhost", "http://localhost:[*]", "https://projekte.tgm.ac.at", "https://*.projekte.tgm.ac.at")
-                        .exposedHeaders("Access-Control-Allow-Origin");
+                        .allowedOriginPatterns(
+                                "http://localhost:8080", // When Frontend is served from static/ folder
+                                "http://localhost:8081", // Alternative
+                                "http://localhost:8082", // Alternative
+                                "http://localhost:5173", // Vite dev port
+                                "http://localhost:5174", // Alternative
+                                "http://localhost:5175", // Alternative
+                                "https://*.projekte.tgm.ac.at"
+                        );
             }
             
             @Override

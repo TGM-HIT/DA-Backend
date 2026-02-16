@@ -4,9 +4,9 @@ plugins {
 
 dependencies {
     implementation project(':core')
-    implementation project(':eis')
-    implementation project(':diplomdb')
-    implementation project(':bsvw')
+    //implementation project(':eis')
+    //implementation project(':diplomdb')
+    //implementation project(':bsvw')
     implementation project(':beispiel')
     
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -14,11 +14,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     
     runtimeOnly 'com.h2database:h2'
     implementation 'org.mariadb.jdbc:mariadb-java-client'
+    
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 bootJar {
