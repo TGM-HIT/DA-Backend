@@ -5,9 +5,10 @@ import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.ad.util.Util;
 import at.ac.tgm.api.AuthenticationApi;
 import at.ac.tgm.dto.LoginRequestDto;
+import at.ac.tgm.dto.UserDto;
+import at.ac.tgm.mapper.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -47,8 +48,11 @@ public class AuthenticationController implements AuthenticationApi {
     @Autowired
     private UserService userService;
     
+    @Autowired
+    private UserMapper userMapper;
+    
     @Override
-    public ResponseEntity<Authentication> login(LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<UserDto> login(LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response) {
         UserEntry user = (loginRequest.getUsername().contains("@")
                 ? userService.findByMail(loginRequest.getUsername())
                 : userService.findBysAMAccountName(loginRequest.getUsername()))
@@ -62,7 +66,7 @@ public class AuthenticationController implements AuthenticationApi {
         
         log.info("Login of {}", user.getDisplayName());
         
-        return ResponseEntity.ok(authentication);
+        return ResponseEntity.ok(userMapper.authenticationToUserDto(authentication));
     }
     
     private Authentication getAuthentication(LoginRequestDto loginRequest, UserEntry user) {
@@ -91,24 +95,19 @@ public class AuthenticationController implements AuthenticationApi {
     }*/
     
     @Override
-    public ResponseEntity<String> logout(HttpSession session) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            session.invalidate();
-            log.info("Session invalidated, User logged out successfully");
-            return ResponseEntity.ok("User logged out successfully");
-        } else {
-            return ResponseEntity.ok("User already logged-out or was never logged-in");
-        }
+    public void logout() {
+        // This method is never executed.
+        // Logout is handled by Spring Security filter chain.
+        throw new UnsupportedOperationException("Handled by Spring Security");
     }
     
     @Override
-    public ResponseEntity<Authentication> getAuthCurrentUser() {
+    public ResponseEntity<UserDto> getAuthCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         } else {
-            return ResponseEntity.ok(auth);
+            return ResponseEntity.ok(userMapper.authenticationToUserDto(auth));
         }
     }
     

@@ -10,8 +10,10 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.naming.Name;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 @Configuration
@@ -23,6 +25,7 @@ public class JacksonConfig {
         module.addSerializer(Name.class, new NameJsonSerializer());
         module.addSerializer(LocalDateTime.class, new LocalDateTimeJsonSerializer());
         module.addSerializer(LocalDate.class, new LocalDateJsonSerializer());
+        module.addSerializer(Instant.class, new InstantJsonSerializer());
         mapper.registerModule(module);
         return mapper;
     }
@@ -69,6 +72,19 @@ public class JacksonConfig {
         @Override
         public void serialize(LocalDate value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
             jgen.writeString(value.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        }
+    }
+    
+    static class InstantJsonSerializer extends StdSerializer<Instant> {
+        private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
+        
+        public InstantJsonSerializer() { this(null); }
+        
+        public InstantJsonSerializer(Class<Instant> t) { super(t); }
+        
+        @Override
+        public void serialize(Instant value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+            gen.writeString(FORMATTER.format(value));
         }
     }
 }

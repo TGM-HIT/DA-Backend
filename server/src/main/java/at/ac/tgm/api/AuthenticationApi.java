@@ -1,6 +1,7 @@
 package at.ac.tgm.api;
 
 import at.ac.tgm.dto.LoginRequestDto;
+import at.ac.tgm.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -8,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -31,7 +31,7 @@ public interface AuthenticationApi {
                                             User simulation is just possible if the application is started with active profile "dev" set. To set the profile, go to Run Configurations -> Edit Configurations -> Active Profiles""")
                     }, schema = @Schema(implementation = LoginRequestDto.class), mediaType = MediaType.APPLICATION_JSON_VALUE)
             }))
-    ResponseEntity<Authentication> login(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response);
+    ResponseEntity<UserDto> login(@RequestBody LoginRequestDto loginRequest, HttpServletRequest request, HttpServletResponse response);
     
     /*@GetMapping("/csrf-token")
     @Operation(summary = "The CSRF-Token is returned on any call as cookie but if you want to get it explicitly in the body, you can do so with this endpoint",
@@ -47,16 +47,15 @@ public interface AuthenticationApi {
     )
     CsrfToken csrfToken(HttpServletRequest request);*/
     
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     @Operation(summary = "Logout the current logged-in user", description = "Does logout the current logged-in user by invalidating the current session.",
             responses = {
                     @ApiResponse(responseCode = "200", content = {
                             @Content(examples = {
-                                    @ExampleObject(name = "Log out successful", value = "User logged out successfully"),
-                                    @ExampleObject(name = "Already logged-out", value = "User already logged-out or was never logged-in")
+                                    @ExampleObject(name = "Log out successful", value = "User logged out successfully")
                             }, schema = @Schema(implementation = String.class), mediaType = MediaType.TEXT_PLAIN_VALUE)})
             })
-    ResponseEntity<String> logout(HttpSession session);
+    void logout();
     
     @GetMapping({""})
     @Operation(summary = "Get the current logged-in user",
@@ -122,7 +121,7 @@ public interface AuthenticationApi {
                                     """), schema = @Schema(implementation = Authentication.class), mediaType = MediaType.APPLICATION_JSON_VALUE)}),
                     @ApiResponse(description = "No logged-in", responseCode = "204")
             })
-    ResponseEntity<Authentication> getAuthCurrentUser();
+    ResponseEntity<UserDto> getAuthCurrentUser();
     
     @GetMapping({"/status"})
     @Operation(summary = "Get if user is logged-in",

@@ -6,10 +6,10 @@ import at.ac.tgm.ad.entry.UserEntry;
 import at.ac.tgm.ad.service.UserService;
 import at.ac.tgm.dto.AmpelDto;
 import at.ac.tgm.dto.ErrorResponseDto;
+import at.ac.tgm.mapper.UserMapper;
 import at.ac.tgm.model.*;
 import at.ac.tgm.repository.AmpelRepository;
 import at.ac.tgm.repository.StudentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
@@ -26,19 +26,21 @@ public class StudentAmpelController {
 
     private final AmpelRepository ampelRepository;
     private final StudentRepository studentRepository;
-    @Autowired
     private UserService userService;
+    private UserMapper userMapper;
 
-    public StudentAmpelController(AmpelRepository ampelRepository, StudentRepository studentRepository) {
+    public StudentAmpelController(AmpelRepository ampelRepository, StudentRepository studentRepository, UserService userService, UserMapper userMapper) {
         this.ampelRepository = ampelRepository;
         this.studentRepository = studentRepository;
+        this.userService = userService;
+        this.userMapper = userMapper;
     }
 
 
     @Secured(Roles.STUDENT)
     @GetMapping("/getSchueler")
     public ResponseEntity<?> getAmpelForStudent(Authentication authentication) {
-        String sAMAccountName = authentication.getName();
+        String sAMAccountName = userMapper.getUsername(authentication);
 
         // 1) Prüfen, ob wir überhaupt einen gültigen Login haben
         Optional<UserEntry> userEntryOptional = userService.findBysAMAccountName(sAMAccountName);

@@ -8,6 +8,7 @@ import at.ac.tgm.dto.AmpelDto;
 import at.ac.tgm.dto.AmpelRequestDto;
 import at.ac.tgm.dto.ErrorResponseDto;
 import at.ac.tgm.dto.TeacherKVAmpelDto;
+import at.ac.tgm.mapper.UserMapper;
 import at.ac.tgm.model.Ampel;
 import at.ac.tgm.model.Hitclass;
 import at.ac.tgm.model.Student;
@@ -16,7 +17,6 @@ import at.ac.tgm.repository.AmpelRepository;
 import at.ac.tgm.repository.HitclassRepository;
 import at.ac.tgm.repository.TeacherRepository;
 import at.ac.tgm.service.TeacherAmpelService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
@@ -36,20 +36,22 @@ public class TeacherAmpelController {
     private final TeacherRepository teacherRepository;
     private final HitclassRepository hitclassRepository;
     private final AmpelRepository ampelRepository;
-    @Autowired
     private UserService userService;
+    private UserMapper userMapper;
 
-    public TeacherAmpelController(TeacherAmpelService teacherAmpelService, TeacherRepository teacherRepository, HitclassRepository hitclassRepository, AmpelRepository ampelRepository) {
+    public TeacherAmpelController(TeacherAmpelService teacherAmpelService, TeacherRepository teacherRepository, HitclassRepository hitclassRepository, AmpelRepository ampelRepository, UserService userService, UserMapper userMapper) {
         this.teacherAmpelService = teacherAmpelService;
         this.teacherRepository = teacherRepository;
         this.hitclassRepository = hitclassRepository;
         this.ampelRepository = ampelRepository;
+        this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     @Secured(Roles.TEACHER)
     @GetMapping("/getLehrer")
     public ResponseEntity<?> getAmpelForTeacher(Authentication authentication) {
-        String sAMAccountName = authentication.getName();
+        String sAMAccountName = userMapper.getUsername(authentication);
 
         UserEntry userEntry = userService.findBysAMAccountName(sAMAccountName).orElseThrow();
         
@@ -61,7 +63,7 @@ public class TeacherAmpelController {
     @Secured(Roles.TEACHER)
     @PostMapping
     public ResponseEntity<?> createAmpelForTeacher(@RequestBody AmpelRequestDto dto, Authentication authentication) {
-        String sAMAccountName = authentication.getName();
+        String sAMAccountName = userMapper.getUsername(authentication);
 
         Teacher teacher = teacherAmpelService.getTeacherBySAMAccountName(sAMAccountName).orElseThrow(() -> new NoSuchElementException("Lehrer nicht gefunden"));
 
@@ -83,7 +85,7 @@ public class TeacherAmpelController {
     @Secured(Roles.TEACHER)
     @PutMapping
     public ResponseEntity<?> updateAmpelForTeacher(@RequestBody AmpelRequestDto dto, Authentication authentication) {
-        String sAMAccountName = authentication.getName();
+        String sAMAccountName = userMapper.getUsername(authentication);
 
         Optional<Teacher> teacherOptional = teacherAmpelService.getTeacherBySAMAccountName(sAMAccountName);
 
@@ -105,7 +107,7 @@ public class TeacherAmpelController {
     @Secured(Roles.TEACHER)
     @GetMapping("/kv/getStudents")
     public ResponseEntity<List<TeacherKVAmpelDto>> getKvStudents(Authentication authentication) {
-        String sAMAccountName = authentication.getName();
+        String sAMAccountName = userMapper.getUsername(authentication);
         UserEntry userEntry = userService.findBysAMAccountName(sAMAccountName).orElseThrow();
         
         Teacher teacher = teacherAmpelService.getTeacherByUserEntry(userEntry).orElseThrow(() -> new NoSuchElementException("Lehrer in der Datenbank nicht gefunden."));
