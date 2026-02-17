@@ -47,16 +47,6 @@ public interface AuthenticationApi {
     )
     CsrfToken csrfToken(HttpServletRequest request);*/
     
-    @GetMapping("/logout")
-    @Operation(summary = "Logout the current logged-in user", description = "Does logout the current logged-in user by invalidating the current session.",
-            responses = {
-                    @ApiResponse(responseCode = "200", content = {
-                            @Content(examples = {
-                                    @ExampleObject(name = "Log out successful", value = "User logged out successfully")
-                            }, schema = @Schema(implementation = String.class), mediaType = MediaType.TEXT_PLAIN_VALUE)})
-            })
-    void logout();
-    
     @GetMapping({""})
     @Operation(summary = "Get the current logged-in user",
             description = "Return 200 with the Authentication Object if the user is logged-in, else 204.",

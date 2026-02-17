@@ -114,7 +114,7 @@ public class SecurityConfig {
         http.oauth2Client(Customizer.withDefaults());
         
         http.logout(logout -> {
-            logout.logoutUrl("/logout");
+            logout.logoutUrl("/auth/logout");
             logout.logoutSuccessHandler((request, response, authentication) -> {
                 String referer = request.getHeader("Referer");
                 if (authentication instanceof OAuth2AuthenticationToken) {

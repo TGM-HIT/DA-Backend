@@ -95,13 +95,6 @@ public class AuthenticationController implements AuthenticationApi {
     }*/
     
     @Override
-    public void logout() {
-        // This method is never executed.
-        // Logout is handled by Spring Security filter chain.
-        throw new UnsupportedOperationException("Handled by Spring Security");
-    }
-    
-    @Override
     public ResponseEntity<UserDto> getAuthCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
