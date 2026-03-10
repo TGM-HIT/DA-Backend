@@ -24,6 +24,24 @@ public class AusleiheEntity {
     @ManyToMany
     @JoinTable(name = "ausleihe_lehrer", joinColumns = @JoinColumn(name = "ausleihe_id"), inverseJoinColumns = @JoinColumn(name = "lehrer_id"))
     private Set<LehrerEntity> lehrer = new HashSet<>();
+
+    // Bootsticks
+    @ManyToMany
+    @JoinTable(
+            name = "ausleihe_bootstick",
+            joinColumns = @JoinColumn(name = "ausleihe_id"),
+            inverseJoinColumns = @JoinColumn(name = "bootstick_id")
+    )
+    private Set<BootstickEntity> bootsticks = new HashSet<>();
+
+    // Datensticks
+    @ManyToMany
+    @JoinTable(
+            name = "ausleihe_datenstick",
+            joinColumns = @JoinColumn(name = "ausleihe_id"),
+            inverseJoinColumns = @JoinColumn(name = "datenstick_id")
+    )
+    private Set<DatenstickEntity> datensticks = new HashSet<>();
     //Grund/Nachricht der Ausleihe
     private String nachricht;
     //Klassen, für die die zugehörigen Bootstickboxen ausgeliehen werden (A,B,C,D)
