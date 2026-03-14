@@ -21,7 +21,7 @@ public class MeldeEntity {
 
     // Welcher Bootstick ist defekt
     @ManyToOne
-    @JoinColumn(name = Consts.BSVW_TABLE_PREFIX +"bootstick_id", nullable = false)
+    @JoinColumn(name = "bootstick_id", nullable = false)
     private BootstickEntity bootstick;
 
     // Nachricht

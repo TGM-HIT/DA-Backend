@@ -21,7 +21,7 @@ public class RueckgabeEntity {
 
     // Zugehörige Ausleihe
     @OneToOne
-    @JoinColumn(name = Consts.BSVW_TABLE_PREFIX +"ausleihe_id", nullable = false)
+    @JoinColumn(name = "ausleihe_id", nullable = false)
     private AusleiheEntity ausleihe;
 
     // Nachricht der Rückgabe

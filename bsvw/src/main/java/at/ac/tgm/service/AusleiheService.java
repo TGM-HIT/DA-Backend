@@ -60,6 +60,7 @@ public class AusleiheService {
                 );
             }
             dbStick.setStatus(Status.AUSGEBORGT);
+            bootstickRepository.save(dbStick);
         }
         for (DatenstickEntity stick : ausleihe.getDatensticks()) {
 
@@ -73,6 +74,7 @@ public class AusleiheService {
                 );
             }
             dbStick.setStatus(Status.AUSGEBORGT);
+            datenstickRepository.save(dbStick);
         }
         ausleihe.setAusleihedatum(LocalDateTime.now());
         return repository.save(ausleihe);
@@ -89,6 +91,7 @@ public class AusleiheService {
 
             if (dbStick.getStatus() == Status.AUSGEBORGT) {
                 dbStick.setStatus(Status.VORHANDEN);
+                bootstickRepository.save(dbStick);
             }
 
         }
@@ -99,6 +102,7 @@ public class AusleiheService {
 
             if (dbStick.getStatus() == Status.AUSGEBORGT) {
                 dbStick.setStatus(Status.VORHANDEN);
+                datenstickRepository.save(dbStick);
             }
 
         }
