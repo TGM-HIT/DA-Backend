@@ -10,4 +10,5 @@ dependencies {
     implementation 'org.springframework.security:spring-security-ldap'
     implementation 'org.springframework.boot:spring-boot-starter-data-ldap'
     implementation 'com.unboundid:unboundid-ldapsdk'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
