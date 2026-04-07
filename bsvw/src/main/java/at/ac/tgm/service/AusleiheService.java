@@ -9,10 +9,13 @@ import at.ac.tgm.repository.BootstickRepository;
 import at.ac.tgm.repository.DatenstickRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Slf4j
@@ -31,7 +34,7 @@ public class AusleiheService {
 
     public AusleiheEntity findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ausleihe nicht gefunden"));
+                .orElseThrow(() -> new NoSuchElementException("Ausleihe nicht gefunden"));
     }
 
     public AusleiheEntity save(AusleiheEntity entity) {
@@ -46,17 +49,17 @@ public class AusleiheService {
     public AusleiheEntity beanspruchen(Long id) {
 
         AusleiheEntity ausleihe = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ausleihe nicht gefunden"));
+                .orElseThrow(() -> new NoSuchElementException("Ausleihe nicht gefunden"));
 
         for (BootstickEntity stick : ausleihe.getBootsticks()) {
 
             BootstickEntity dbStick = bootstickRepository.findById(stick.getId())
-                    .orElseThrow(() -> new RuntimeException("Bootstick nicht gefunden"));
+                    .orElseThrow(() -> new NoSuchElementException("Bootstick nicht gefunden"));
 
             if (dbStick.getStatus() != Status.VORHANDEN) {
-                throw new RuntimeException(
-                        "Bootstick bereits vergeben: "
-                                + dbStick.getName() + dbStick.getNummer()
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Bootstick bereits vergeben: " + dbStick.getName() + dbStick.getNummer()
                 );
             }
             dbStick.setStatus(Status.AUSGEBORGT);
@@ -65,12 +68,12 @@ public class AusleiheService {
         for (DatenstickEntity stick : ausleihe.getDatensticks()) {
 
             DatenstickEntity dbStick = datenstickRepository.findById(stick.getId())
-                    .orElseThrow(() -> new RuntimeException("Datenstick nicht gefunden"));
+                    .orElseThrow(() -> new NoSuchElementException("Datenstick nicht gefunden"));
 
             if (dbStick.getStatus() != Status.VORHANDEN) {
-                throw new RuntimeException(
-                        "Datenstick bereits vergeben: "
-                                + dbStick.getName() + dbStick.getNummer()
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Datenstick bereits vergeben: " + dbStick.getName() + dbStick.getNummer()
                 );
             }
             dbStick.setStatus(Status.AUSGEBORGT);
@@ -82,12 +85,12 @@ public class AusleiheService {
     public AusleiheEntity zurueckgeben(Long id) {
 
         AusleiheEntity ausleihe = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ausleihe nicht gefunden"));
+                .orElseThrow(() -> new NoSuchElementException("Ausleihe nicht gefunden"));
 
         for (BootstickEntity stick : ausleihe.getBootsticks()) {
 
             BootstickEntity dbStick = bootstickRepository.findById(stick.getId())
-                    .orElseThrow(() -> new RuntimeException("Bootstick nicht gefunden"));
+                    .orElseThrow(() -> new NoSuchElementException("Bootstick nicht gefunden"));
 
             if (dbStick.getStatus() == Status.AUSGEBORGT) {
                 dbStick.setStatus(Status.VORHANDEN);
@@ -98,7 +101,7 @@ public class AusleiheService {
         for (DatenstickEntity stick : ausleihe.getDatensticks()) {
 
             DatenstickEntity dbStick = datenstickRepository.findById(stick.getId())
-                    .orElseThrow(() -> new RuntimeException("Datenstick nicht gefunden"));
+                    .orElseThrow(() -> new NoSuchElementException("Datenstick nicht gefunden"));
 
             if (dbStick.getStatus() == Status.AUSGEBORGT) {
                 dbStick.setStatus(Status.VORHANDEN);

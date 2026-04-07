@@ -5,6 +5,7 @@ import at.ac.tgm.repository.BootstickRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -13,7 +14,8 @@ import java.util.List;
 @Slf4j
 public class BootstickService {
 
-    private final BootstickRepository repository;
+    @Autowired
+    private BootstickRepository repository;
 
     public List<BootstickEntity> findAll() {
         return repository.findAll();

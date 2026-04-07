@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.Comment;
+
 @Entity
 @Table(name = Consts.BSVW_TABLE_PREFIX + "meldung")
 @Getter
@@ -19,18 +21,18 @@ public class MeldeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Welcher Bootstick ist defekt
+    @Comment("Welcher Bootstick ist defekt")
     @ManyToOne
     @JoinColumn(name = "bootstick_id", nullable = false)
     private BootstickEntity bootstick;
 
-    // Nachricht
+    @Comment("Nachricht")
     private String nachricht;
 
-    // Datum Meldung
+    @Comment("Datum der Meldung")
     private LocalDateTime datum;
 
-    // Wer hat gemeldet
+    @Comment("Wer hat gemeldet")
     @ManyToOne
     @JoinColumn(name = "lehrer_id")
     private LehrerEntity gemeldetVon;

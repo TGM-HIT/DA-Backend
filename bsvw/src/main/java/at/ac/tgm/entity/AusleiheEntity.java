@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.Comment;
+
 @Entity
 @Table(name = Consts.BSVW_TABLE_PREFIX + "ausleihe")
 @Getter
@@ -19,12 +21,12 @@ public class AusleiheEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //Tabellenbeziehung der an der Ausleihe beteiligten Lehrer
+    @Comment("Tabellenbeziehung der an der Ausleihe beteiligten Lehrer")
     @ManyToMany
     @JoinTable(name = Consts.BSVW_TABLE_PREFIX +"ausleihe_lehrer", joinColumns = @JoinColumn(name = "ausleihe_id"), inverseJoinColumns = @JoinColumn(name = "lehrer_id"))
     private Set<LehrerEntity> lehrer = new HashSet<>();
 
-    // Bootsticks
+    @Comment("Bootsticks")
     @ManyToMany
     @JoinTable(
             name = Consts.BSVW_TABLE_PREFIX +"ausleihe_bootstick",
@@ -33,7 +35,7 @@ public class AusleiheEntity {
     )
     private Set<BootstickEntity> bootsticks = new HashSet<>();
 
-    // Datensticks
+    @Comment("Datensticks")
     @ManyToMany
     @JoinTable(
             name = Consts.BSVW_TABLE_PREFIX +"ausleihe_datenstick",
@@ -41,10 +43,10 @@ public class AusleiheEntity {
             inverseJoinColumns = @JoinColumn(name = "datenstick_id")
     )
     private Set<DatenstickEntity> datensticks = new HashSet<>();
-    //Grund/Nachricht der Ausleihe
+    @Comment("Grund/Nachricht der Ausleihe")
     private String nachricht;
-    //Datum der Ausleihe
+    @Comment("Datum der Ausleihe")
     private LocalDateTime ausleihedatum;
-    //Datum der Rückgabe (Wird nach rückgabe Befüllt)
+    @Comment("Datum der Rückgabe (Wird nach rückgabe Befüllt)")
     private LocalDateTime rueckgabedatum;
 }

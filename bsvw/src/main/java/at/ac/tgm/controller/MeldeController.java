@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(Consts.BSVW_PATH_PREFIX + "/melden")
@@ -39,13 +40,13 @@ public class MeldeController {
     @PostMapping("/bootstick/{name}/{nummer}")
     public ResponseEntity<MeldeEntity> melden(@PathVariable Schulklasse name,
                               @PathVariable int nummer,
-                              @RequestParam(defaultValue = "fehlerhaft") String typ,
+                              @RequestParam(defaultValue = "FEHLERHAFT") Status typ,
                               @RequestBody MeldeEntity meldung) {
         BootstickEntity stick = bootstickRepository
                 .findByNameAndNummer(name, nummer)
-                .orElseThrow(() -> new RuntimeException("Bootstick nicht gefunden"));
+                .orElseThrow(() -> new NoSuchElementException("Bootstick nicht gefunden"));
         
-        if ("verloren".equalsIgnoreCase(typ)) {
+        if (typ == Status.VERLOREN) {
             stick.setStatus(Status.VERLOREN);
         } else {
             stick.setZustand(Zustand.FEHLERHAFT);

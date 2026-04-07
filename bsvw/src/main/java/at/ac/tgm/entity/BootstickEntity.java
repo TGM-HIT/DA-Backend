@@ -9,6 +9,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.Comment;
+
 @Entity
 @Table(name = Consts.BSVW_TABLE_PREFIX + "bootstick", uniqueConstraints = @UniqueConstraint(columnNames = {"name","nummer"}))
 @Getter
@@ -19,15 +21,17 @@ public class BootstickEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Comment("Klassenbuchstabe \"A\", \"B\", \"C\", \"D\"")
     @Enumerated(EnumType.STRING)
-    private Schulklasse name; //Klassenbuchstabe "A", "B", "C", "D"
-    private int nummer; //Bootsticknummer z.B. "1" bit "40"
-    //Status des Bootsticks, "VORHANDEN", "AUSGEBORGT, "VERLOREN"
+    private Schulklasse name;
+    @Comment("Bootsticknummer z.B. \"1\" bis \"40\"")
+    private int nummer;
+    @Comment("Status des Bootsticks, \"VORHANDEN\", \"AUSGEBORGT, \"VERLOREN\"")
     @Enumerated(EnumType.STRING)
     private Status status;
-    //Zustand des Bootsticks, "IN_ORDNUNG", "FEHLERHAFT", "DEFEKT"
+    @Comment("Zustand des Bootsticks, \"IN_ORDNUNG\", \"FEHLERHAFT\", \"DEFEKT\"")
     @Enumerated(EnumType.STRING)
     private Zustand zustand;
-    //Datum der letzten Initialisierung/Veränderung des Bootsticks
+    @Comment("Datum der letzten Initialisierung/Veränderung des Bootsticks")
     private LocalDateTime letzte_initialisierung;
 }

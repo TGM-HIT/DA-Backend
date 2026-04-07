@@ -1,5 +1,7 @@
 package at.ac.tgm.entity;
 
+import org.hibernate.annotations.Comment;
+
 import at.ac.tgm.Consts;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,16 +14,16 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class LehrerEntity {
-    //ID für schnellere verarbeitung bei ManyToMany beziehung mit der Ausleihe
+    @Comment("ID für schnellere verarbeitung bei ManyToMany beziehung mit der Ausleihe")
     @Id
     @GeneratedValue
     private Long id;
-    //Der Accountname wie im LDAP
+    @Comment("Der Accountname wie im LDAP")
     @Column(unique = true)
     private String samAccountName;
-    //Displayname vom LDAP
+    @Comment("Displayname vom LDAP")
     private String displayName;
-    //Email vom LDAP
+    @Comment("Email vom LDAP")
     private String email;
 }
 
