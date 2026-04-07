@@ -2,7 +2,6 @@ package at.ac.tgm.service;
 
 import at.ac.tgm.entity.BootstickEntity;
 import at.ac.tgm.repository.BootstickRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class BootstickService {
 

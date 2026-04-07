@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.Comment;
+
 @Entity
 @Table(name = Consts.BSVW_TABLE_PREFIX + "rueckgabe")
 @Getter
@@ -19,14 +21,14 @@ public class RueckgabeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Zugehörige Ausleihe
+    @Comment("Zugehörige Ausleihe")
     @OneToOne
     @JoinColumn(name = "ausleihe_id", nullable = false)
     private AusleiheEntity ausleihe;
 
-    // Nachricht der Rückgabe
+    @Comment("Nachricht der Rückgabe")
     private String nachricht;
 
-    // Datum der Rückgabe
+    @Comment("Datum der Rückgabe")
     private LocalDateTime rueckgabedatum;
 }
